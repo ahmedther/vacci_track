@@ -1,0 +1,15 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+
+# Python
+vacci_track_backed/__pycache__/
+vacci_track_backed/*/__pycache__/
+vacci_track_backed/*/*/__pycache__/
+vacci_track_backed/*/*/*/__pycache__/
+.env/
+.venv/
+venv/

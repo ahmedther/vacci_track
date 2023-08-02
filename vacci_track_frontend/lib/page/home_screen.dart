@@ -1,0 +1,102 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/model/users.dart';
+import 'package:vacci_track_frontend/ui/navigation_side_bar.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/ui/spinner.dart';
+import 'package:vacci_track_frontend/page/add_new_employee.dart';
+import 'package:vacci_track_frontend/page/add_others.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
+  static const String routeName = '/';
+  final String title = "Home";
+  const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final UserData userData;
+  int currentIndex = 0;
+  bool isSpinning = true;
+  List<Widget> pages = [
+    const Text("Home"),
+    const AddNewEmployee(),
+  ];
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      checkAuthRedirect();
+
+      _pageController = PageController(initialPage: currentIndex);
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void checkAuthRedirect() async {
+    userData = await Helpers.checkLogin(ref);
+    if (userData.isLoggedIn! == false) context.go('/login');
+    if (userData.isLoggedIn!) {
+      if (mounted) {
+        setState(() {
+          isSpinning = !userData.isLoggedIn!;
+        });
+      }
+    }
+  }
+
+  void pageChange(int value) {
+    setState(() {
+      currentIndex = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ignore: invalid_use_of_protected_member
+    return Scaffold(
+      body: Center(
+        child: isSpinning
+            ? SpinnerWithOverlay(
+                spinnerColor: Theme.of(context).colorScheme.primaryContainer,
+              )
+            : Stack(
+                children: [
+                  Positioned.fill(
+                    left: 120,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: pages.length,
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      pageSnapping: false,
+                      itemBuilder: (context, index) {
+                        return pages[currentIndex];
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: NavigationSideBar(
+                        userData: userData,
+                        currentIndex: currentIndex,
+                        changePage: pageChange),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+}

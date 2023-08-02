@@ -1,0 +1,702 @@
+import 'dart:js_interop';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/ui/drop_down_field.dart';
+import 'package:vacci_track_frontend/ui/text_input.dart';
+import 'package:vacci_track_frontend/ui/spinner.dart';
+
+class EmployeeAddForm extends StatefulWidget {
+  Function assignAvatar;
+  bool editPage;
+  EmployeeAddForm({
+    super.key,
+    required this.editPage,
+    required this.assignAvatar,
+  });
+
+  @override
+  State<EmployeeAddForm> createState() => _EmployeeAddFormState();
+}
+
+class _EmployeeAddFormState extends State<EmployeeAddForm> {
+  TextEditingController _searchController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  bool isSpinning = true;
+
+  late final List<DropdownMenuItem<String>> prefixlist;
+  late final List<DropdownMenuItem<String>> depatmentlist;
+  late final List<DropdownMenuItem<String>> designationlist;
+  late final List<DropdownMenuItem<String>> facilitylist;
+
+  String? prefix;
+  String? firstName;
+  String? middleName;
+  String? lastName;
+  String? gender;
+  DateTime? joiningDate;
+  String? prNumber;
+  String? phoneNumber;
+  String? emailID;
+  String? department;
+  String? designation;
+  String? facility;
+  String? status;
+  String? eligibility;
+  String? notes;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      allFuture();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future allFuture() async {
+    final API_URL = await Helpers.load_env();
+
+    final List prefixData =
+        await Helpers.makeGetRequest("http://$API_URL/api/get_prefix/");
+    prefixlist = prefixData.map((item) {
+      return DropdownMenuItem<String>(
+        value: item['gender'].toString(),
+        child: Text(item['gender']),
+      );
+    }).toList();
+
+    final List deptData = await Helpers.makeGetRequest(
+        "http://$API_URL/api/get_department_list/");
+    depatmentlist = deptData.map((item) {
+      return DropdownMenuItem<String>(
+        value: item['id'].toString(),
+        child: Text(item['name']),
+      );
+    }).toList();
+
+    final List desigData = await Helpers.makeGetRequest(
+        "http://$API_URL/api/get_designation_list/");
+    designationlist = desigData.map((item) {
+      return DropdownMenuItem<String>(
+        value: item['id'].toString(),
+        child: Text(item['name']),
+      );
+    }).toList();
+
+    final List facilityData =
+        await Helpers.makeGetRequest("http://$API_URL/api/get_facility_list/");
+    facilitylist = facilityData.map((item) {
+      return DropdownMenuItem<String>(
+        value: item['id'].toString(),
+        child: Text(item['name']),
+      );
+    }).toList();
+
+    setState(() {
+      isSpinning = false;
+    });
+  }
+
+  void submitHandler() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      setState(() {
+        isSpinning = true;
+      });
+      final API_URL = await Helpers.load_env();
+      final Map data = await Helpers.makePostRequest(
+          url: "http://$API_URL/api/create_new_employee/",
+          data: {
+            "prefix": prefix,
+            "first_name": firstName,
+            "middle_name": middleName,
+            "last_name": lastName,
+            "gender": gender,
+            "joining_date": joiningDate.toString(),
+            "pr_number": prNumber,
+            "phone_number": phoneNumber,
+            "email_address": emailID,
+            "department": department,
+            "designation": designation,
+            "facility": facility,
+            "status": status,
+            "eligibility": eligibility,
+            "notes_remarks": notes
+          });
+      if (data.containsKey('error')) {
+        setState(() {
+          isSpinning = false;
+        });
+        Helpers.showSnackBar(context, data['error']);
+      } else {
+        prefix = null;
+        firstName = "";
+        middleName = "";
+        lastName = "";
+        gender = null;
+        phoneNumber = "";
+        emailID = "";
+        prNumber = "";
+        joiningDate = null;
+        _searchController.clear();
+        await widget.assignAvatar(
+          newgender: "",
+          newprefix: "",
+          newfirstName: "",
+          newmiddleName: "",
+          newlastName: "",
+        );
+        Helpers.showDialogOnScreen(
+            context: context,
+            btnMessage: 'OK',
+            title: "✔ Successful",
+            message: "User Successfully Added",
+            onPressed: resetBtnHandler);
+        setState(() {
+          isSpinning = false;
+        });
+      }
+    }
+  }
+
+  Future resetBtnHandler() async {
+    _formKey.currentState!.reset();
+    _searchController.clear();
+    prefix = null;
+    firstName = "";
+    middleName = "";
+    lastName = "";
+    gender = null;
+    phoneNumber = "";
+    emailID = "";
+    prNumber = "";
+    joiningDate = null;
+    await widget.assignAvatar(
+      newgender: "",
+      newprefix: "",
+      newfirstName: "",
+      newmiddleName: "",
+      newlastName: "",
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceWidth = MediaQuery.of(context).size.width;
+    return isSpinning
+        ? const SpinnerWithOverlay(
+            spinnerColor: Colors.blue,
+          )
+        : Card(
+            borderOnForeground: true,
+            elevation: 100,
+            margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
+            child: Container(
+              padding: const EdgeInsets.all(30),
+              width: deviceWidth * 0.70,
+              child: Column(
+                children: [
+                  SearchBar(
+                    controller: _searchController,
+                    elevation: const MaterialStatePropertyAll(2),
+                    hintText: widget.editPage
+                        ? "Search PR Number In VacciTrack Database"
+                        : "Search PR Number In EHIS Database",
+                    leading: FaIcon(
+                      FontAwesomeIcons.magnifyingGlass,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    trailing: Iterable.generate(
+                      1,
+                      (index) {
+                        return OutlinedButton(
+                          style: const ButtonStyle(
+                            enableFeedback: true,
+                            animationDuration: Duration(seconds: 2),
+                          ),
+                          child: Text(
+                            widget.editPage
+                                ? "${deviceWidth < 900 ? '🔎' : 'Search'}"
+                                : "${deviceWidth < 900 ? '🔎' : 'Search in EHIS'}",
+                          ),
+                          onPressed: () {
+                            widget.editPage
+                                ? searchDjango(context)
+                                : searchEhisOracle(context);
+                          },
+                        );
+                      },
+                    ),
+                    onChanged: (value) {
+                      _searchController = Helpers.keepOnlyNumbers(
+                          searchController: _searchController, value: value);
+                    },
+                  ),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.end,
+                          spacing: 10,
+                          children: [
+                            CustomDropDownField(
+                              value: prefix,
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              hint: "Prefix",
+                              onSaved: (value) {
+                                prefix = value!;
+                              },
+                              items: prefixlist,
+                              onChanged: (value) async {
+                                await widget.assignAvatar(newprefix: value);
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Prefix Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              initialValue: firstName,
+                              onChanged: (value) {
+                                widget.assignAvatar(newfirstName: value);
+                              },
+                              onSaved: (value) {
+                                if (value == null) return;
+                                firstName = value;
+                              },
+                              label: "First Name",
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.trim().length < 1) {
+                                  return "First Name Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              onChanged: (value) async {
+                                await widget.assignAvatar(newmiddleName: value);
+                              },
+                              initialValue: middleName,
+                              onSaved: (value) {
+                                if (value == null) return;
+                                middleName = value;
+                              },
+                              label: "Middle Name",
+                            ),
+                            CustomInputField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              onChanged: (value) async {
+                                await widget.assignAvatar(newlastName: value);
+                              },
+                              onSaved: (value) {
+                                if (value == null) return;
+                                lastName = value;
+                              },
+                              initialValue: lastName,
+                              label: "Last Name",
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.trim().length < 1) {
+                                  return "Last Name Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomDropDownField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              hint: "Gender",
+                              onSaved: (value) {
+                                gender = value!;
+                              },
+                              value: gender,
+                              items: const [
+                                DropdownMenuItem(
+                                    value: "Male", child: Text("Male")),
+                                DropdownMenuItem(
+                                    value: "Female", child: Text("Female")),
+                              ],
+                              onChanged: (value) async {
+                                if (value == 'Female') {
+                                  await widget.assignAvatar(
+                                      newgender: 'female');
+                                }
+                                if (value == 'Male') {
+                                  await widget.assignAvatar(newgender: 'male');
+                                }
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Gender Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    joiningDate.isDefinedAndNotNull
+                                        ? formater.format(joiningDate!)
+                                        : "Joining Date",
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      joiningDate =
+                                          await Helpers.openDatePicker(context);
+                                      if (joiningDate.isDefinedAndNotNull) {
+                                        setState(() {});
+                                      }
+                                    },
+                                    icon: const FaIcon(
+                                        FontAwesomeIcons.calendarDays),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            CustomInputField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              inputFormatters: [
+                                FilteringTextInputFormatter
+                                    .digitsOnly, // Only allow digits
+                              ],
+                              onSaved: (value) {
+                                if (value == null) return;
+                                prNumber = value;
+                              },
+                              initialValue: _searchController.text,
+                              label: "PR Number",
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.trim().length < 1) {
+                                  return "PR Number  Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              inputFormatters: [
+                                FilteringTextInputFormatter
+                                    .digitsOnly, // Only allow digits
+                              ],
+                              onSaved: (value) {
+                                if (value == null) return;
+                                phoneNumber = value;
+                              },
+                              initialValue: phoneNumber,
+                              label: "Phone Number",
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.trim().length < 1) {
+                                  return "Phone Number  Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              onSaved: (value) {
+                                if (value == null) return;
+                                emailID = value;
+                              },
+                              initialValue: emailID,
+                              label: "Email ID",
+                            ),
+                            CustomDropDownField(
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              hint: "Department",
+                              onChanged: (v) {},
+                              onSaved: (value) {
+                                department = value!;
+                              },
+                              items: depatmentlist,
+                              value: department,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Department Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomDropDownField(
+                              value: designation,
+                              onChanged: (v) {},
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              hint: "Designation",
+                              onSaved: (value) {
+                                designation = value!;
+                              },
+                              items: designationlist,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Designation Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomDropDownField(
+                              value: facility,
+                              onChanged: (v) {},
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              hint: "Facility",
+                              onSaved: (value) {
+                                facility = value!;
+                              },
+                              items: facilitylist,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Facility Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              initialValue: status,
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              onSaved: (value) {
+                                if (value == null) return;
+                                status = value;
+                              },
+                              label: "Status",
+                            ),
+                            CustomDropDownField(
+                              value: eligibility,
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              hint: "Eligibilty",
+                              onSaved: (value) {
+                                eligibility = value!;
+                              },
+                              onChanged: (value) {},
+                              items: const [
+                                DropdownMenuItem(
+                                    value: "Eligible", child: Text("Eligible")),
+                                DropdownMenuItem(
+                                    value: "Non - Eligible",
+                                    child: Text("Non - Eligible")),
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Gender Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              initialValue: notes,
+                              width: deviceWidth,
+                              onSaved: (value) {
+                                if (value == null) return;
+                                notes = value;
+                              },
+                              label: "Notes",
+                              maxLines: 3,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: deviceHeight * 0.02,
+                        ),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 40,
+                          children: [
+                            TextButton(
+                              onPressed: resetBtnHandler,
+                              child: const Text('Reset'),
+                            ),
+                            ElevatedButton(
+                              onPressed: submitHandler,
+                              child: const Text('Submit'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+  }
+
+  Future<void> _dialogBuilder(BuildContext context, List empData) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              'Dependents Found with PR Number ${_searchController.text} '),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * .5,
+            width: MediaQuery.of(context).size.width * .01,
+            child: ListView.builder(
+              itemCount: empData.length,
+              itemBuilder: (context, index) {
+                Map user = empData[index];
+                return Card(
+                  child: ListTile(
+                    hoverColor: Color.fromARGB(31, 0, 0, 0),
+                    onTap: () async {
+                      updateEmpForm(user);
+                      context.pop();
+                    },
+                    leading: CircleAvatar(
+                      backgroundColor: Helpers.getRandomColor(),
+                      child: Text(
+                        user['first_name'][0] ??
+                            FaIcon(FontAwesomeIcons.userAlt),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    title: Text(
+                        '${user['prefix'] ?? ""} ${user['first_name'] ?? ""} ${user['middle_name'] ?? ""}  ${user['last_name'] ?? ""}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Gender: ${user['gender'] ?? ''}'),
+                        Text('Phone Number: ${user['phone_number'] ?? ''}'),
+                        Text('Email ID: ${user['email_id'] ?? ''}'),
+                        Text('Facility: ${user['facility'] ?? ''}'),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void searchEhisOracle(BuildContext context) async {
+    setState(() {
+      isSpinning = true;
+    });
+    final API_URL = await Helpers.load_env();
+    final List empData = await Helpers.makeGetRequest(
+        "http://$API_URL/api/searh_emp_on_oracle_db/",
+        query: "param1=${_searchController.text}");
+    if (empData[0].containsKey("error")) {
+      Helpers.showSnackBar(context, empData[0]['error']);
+      setState(() {
+        isSpinning = false;
+      });
+      return;
+    }
+    if (empData.length > 1) {
+      await _dialogBuilder(context, empData);
+    } else {
+      await _dialogBuilder(context, empData[0]);
+    }
+    setState(() {
+      isSpinning = false;
+    });
+  }
+
+  void searchDjango(BuildContext context) async {
+    setState(() {
+      isSpinning = true;
+    });
+    final API_URL = await Helpers.load_env();
+    final List empData = await Helpers.makeGetRequest(
+        "http://$API_URL/api/search_employee/",
+        query: "param1=${_searchController.text}");
+    if (empData[0].containsKey("error")) {
+      Helpers.showSnackBar(context, empData[0]['error']);
+      setState(() {
+        isSpinning = false;
+      });
+      return;
+    }
+    await updateOtherDeatils(empData[0]);
+    await updateEmpForm(empData[0]);
+    setState(() {
+      isSpinning = false;
+    });
+  }
+
+  Future updateEmpForm(Map empData) async {
+    prefix = empData["prefix"] ?? "Mr.";
+    firstName = empData["first_name"];
+    middleName = empData["middle_name"];
+    lastName = empData["last_name"];
+    gender = empData["gender"];
+    prNumber = _searchController.text;
+    phoneNumber = empData["phone_number"];
+    emailID = empData["email_address"];
+    await widget.assignAvatar(newgender: empData["gender"]);
+  }
+
+  Future updateOtherDeatils(Map empData) async {
+    if (empData["joining_date"] != null) {
+      joiningDate = DateTime.parse(empData["joining_date"]);
+    }
+    prNumber = empData["pr_number"];
+    phoneNumber = empData["phone_number"];
+    department = empData["department"]["id"].isDefinedAndNotNull
+        ? empData["department"]["id"].toString()
+        : null;
+    designation = empData["designation"]["id"].isDefinedAndNotNull
+        ? empData["designation"]["id"]
+        : null;
+    empData["designation"]["id"].toString();
+    facility = empData["facility"]["id"].toString();
+    status = empData["status"];
+    eligibility = empData["eligibility"];
+    notes = empData["notes_remarks"];
+  }
+}

@@ -1,0 +1,8 @@
+djangorestframework
+Django
+cx_oracle
+psycopg2
+django-cors-headers
+djangorestframework-simplejwt
+sqlalchemy
+# uwsgi

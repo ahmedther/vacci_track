@@ -1,0 +1,67 @@
+node_modules
+.parcel-cache
+__pycache__
+postgresql
+/static
+/vacci_track_venv
+
+# Flutter/Dart-specific files and directories
+vacci_track_frontend/android
+vacci_track_frontend/ios
+vacci_track_frontend/linux
+vacci_track_frontend/macos
+vacci_track_frontend/web
+vacci_track_frontend/windows
+
+# IDE-related files (IntelliJ, Android Studio, VS Code, etc.)
+vacci_track_frontend/.idea/
+vacci_track_frontend/*.ipr
+vacci_track_frontend/*.iws
+vacci_track_frontend/*.iml
+vacci_track_frontend/.vscode/
+vacci_track_frontend/.idea/
+
+# macOS-specific files
+vacci_track_frontend/.DS_Store
+
+# Android-specific files
+vacci_track_frontend/android/gradlew
+vacci_track_frontend/android/gradlew.bat
+vacci_track_frontend/android/local.properties
+vacci_track_frontend/android/local.properties~
+vacci_track_frontend/*.apk
+
+# iOS-specific files
+vacci_track_frontend/ios/Pods/
+vacci_track_frontend/ios/Podfile.lock
+vacci_track_frontend/ios/Runner.xcworkspace/
+vacci_track_frontend/ios/.generated/
+vacci_track_frontend/ios/Flutter/App.framework
+vacci_track_frontend/ios/Flutter/Flutter.podspec
+vacci_track_frontend/ios/Flutter/flutter_assets/
+vacci_track_frontend/ios/Flutter/flutter_export_environment.sh
+vacci_track_frontend/ios/Flutter/gen_snapshot
+vacci_track_frontend/ios/Flutter/app.flx
+vacci_track_frontend/ios/Flutter/app.zip
+vacci_track_frontend/ios/Flutter/app.dSYM.zip
+vacci_track_frontend/ios/Flutter/ios-release.cer
+vacci_track_frontend/ios/Flutter/ios-release.p12
+vacci_track_frontend/ios/Flutter/ios-release.provisionprofile
+vacci_track_frontend/ios/Flutter/Generated.xcconfig
+vacci_track_frontend/ios/Flutter/flutter_export_environment_xcconfig
+vacci_track_frontend/ios/Flutter/ephemeral
+vacci_track_frontend/ios/Flutter/app.dSYM
+
+# Test-related files
+vacci_track_frontend/**/test/*.log
+
+# Generated files
+vacci_track_frontend/**/*.g.dart
+vacci_track_frontend/**/*.freezed.dart
+vacci_track_frontend/**/*.gr.dart
+vacci_track_frontend/**/*.pb.dart
+vacci_track_frontend/**/*.pbenum.dart
+vacci_track_frontend/**/*.pbjson.dart
+
+# Keep the pubspec.lock file, as it ensures that your project uses a consistent set of dependencies.
+#!vacci_track_frontend/pubspec.lock

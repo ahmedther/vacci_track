@@ -1,0 +1,47 @@
+version: '3.8'
+
+
+services:
+  app:
+    build: 
+      context: ./vacci_track_backend
+    restart: always
+    image: vacci_track_docker_image
+    container_name: vacci_track_docker_container
+    # command: gunicorn --workers 3 --timeout 86400 --bind 0.0.0.0:8004 vacci_track_Website.wsgi:application
+    volumes:
+      - ./vacci_track_backend:/vacci_track_backend/
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+
+  # nginx:
+  #   build: 
+  #     context: ./nginx
+  #   image: vacci_track_nginx_image
+  #   container_name: vacci_track_nginx_container
+  #   restart: always
+  #   volumes:
+  #     - ./static:/vacci_track_website/static
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8004:8004
+  #   depends_on:
+  #     - postgres
+
+  postgres:
+    build:
+      context: ./postgresql
+    image: vacci_track_postgresql_image
+    container_name: vacci_track_postgresql_container
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+
