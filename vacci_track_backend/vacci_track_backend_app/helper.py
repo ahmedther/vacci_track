@@ -8,7 +8,8 @@ class Helper:
 
     def save_employee(self, request, data: dict):
         validated_join_date = self.get_validated_date(data.get("joining_date"))
-        employee_data = {
+
+        defaults = {
             "prefix": data.get("prefix"),
             "gender": data["gender"],
             "first_name": data["first_name"],
@@ -17,23 +18,32 @@ class Helper:
             "joining_date": validated_join_date,
             "pr_number": data.get("pr_number"),
             "phone_number": data.get("phone_number"),
-            "email_address": data.get("email_address"),
-            "department": Department.objects.get(id=data.get("department"))
-            if data.get("department")
-            else None,
-            "designation": Designation.objects.get(id=data.get("designation"))
-            if data.get("designation")
-            else None,
-            "facility": Facility.objects.get(id=data.get("facility"))
-            if data.get("facility")
-            else None,
+            "email_id": data.get("email_id"),
+            "department_id": data.get("department"),
+            "designation_id": data.get("designation"),
+            "facility_id": data.get("facility"),
             "status": data.get("status"),
             "eligibility": data["eligibility"],
             "added_by": request.user,
             "notes_remarks": data.get("notes_remarks"),
         }
 
-        Employee.objects.create(**employee_data)
+        employee, created = Employee.objects.update_or_create(
+            pr_number=data.get("pr_number"), defaults=defaults
+        )
+
+    def save_designation(self, data: dict):
+        desig_id = data.get("id")
+        data.pop("edit", None)
+        data.pop("id", None)
+        existing_designation = Designation.objects.filter(name=data["name"])
+        if existing_designation:
+            return None, None
+
+        employee, created = Designation.objects.update_or_create(
+            id=desig_id, defaults=data
+        )
+        return employee, created
 
     def get_validated_date(self, date):
         if date is not None:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vacci_track_frontend/ui/employee_add_form.dart';
+import 'package:vacci_track_frontend/forms/employee_add_form.dart';
+import 'package:vacci_track_frontend/components/toggle_button_items.dart';
 
 class AddNewEmployee extends StatefulWidget {
   const AddNewEmployee({super.key});
@@ -99,26 +100,12 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
                   });
                 },
                 children: const [
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text("Add A New"),
-                        SizedBox(width: 10),
-                        FaIcon(FontAwesomeIcons.userPlus)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text("Edit Old"),
-                        SizedBox(width: 10),
-                        FaIcon(FontAwesomeIcons.userEdit)
-                      ],
-                    ),
-                  ),
+                  ToggleButtonItems(
+                      icon: FaIcon(FontAwesomeIcons.userPlus),
+                      text: "Add A New"),
+                  ToggleButtonItems(
+                      icon: FaIcon(FontAwesomeIcons.userEdit),
+                      text: "Edit Old"),
                 ],
               ),
               SizedBox(

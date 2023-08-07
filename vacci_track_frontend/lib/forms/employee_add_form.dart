@@ -125,13 +125,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             "joining_date": joiningDate.toString(),
             "pr_number": prNumber,
             "phone_number": phoneNumber,
-            "email_address": emailID,
+            "email_id": emailID,
             "department": department,
             "designation": designation,
             "facility": facility,
             "status": status,
             "eligibility": eligibility,
-            "notes_remarks": notes
+            "notes_remarks": notes,
+            if (widget.editPage) "edit": widget.editPage,
           });
       if (data.containsKey('error')) {
         setState(() {
@@ -160,7 +161,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             context: context,
             btnMessage: 'OK',
             title: "✔ Successful",
-            message: "User Successfully Added",
+            message: widget.editPage
+                ? "User Successfully Updated"
+                : "User Successfully Added",
             onPressed: resetBtnHandler);
         setState(() {
           isSpinning = false;
@@ -173,6 +176,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     _formKey.currentState!.reset();
     _searchController.clear();
     prefix = null;
+    status = '';
+    notes = '';
     firstName = "";
     middleName = "";
     lastName = "";
@@ -181,6 +186,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     emailID = "";
     prNumber = "";
     joiningDate = null;
+    department = null;
+    designation = null;
+    facility = null;
+    eligibility = null;
+
     await widget.assignAvatar(
       newgender: "",
       newprefix: "",
@@ -662,6 +672,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       });
       return;
     }
+
     await updateOtherDeatils(empData[0]);
     await updateEmpForm(empData[0]);
     setState(() {
@@ -677,8 +688,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     gender = empData["gender"];
     prNumber = _searchController.text;
     phoneNumber = empData["phone_number"];
-    emailID = empData["email_address"];
-    await widget.assignAvatar(newgender: empData["gender"]);
+    emailID = empData["email_id"];
+    await widget.assignAvatar(
+      newgender: gender,
+      newprefix: prefix,
+      newfirstName: firstName,
+      newmiddleName: middleName,
+      newlastName: lastName,
+    );
   }
 
   Future updateOtherDeatils(Map empData) async {
@@ -687,12 +704,15 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     }
     prNumber = empData["pr_number"];
     phoneNumber = empData["phone_number"];
-    department = empData["department"]["id"].isDefinedAndNotNull
-        ? empData["department"]["id"].toString()
-        : null;
-    designation = empData["designation"]["id"].isDefinedAndNotNull
-        ? empData["designation"]["id"]
-        : null;
+    department =
+        empData["department"] != null && empData["department"]["id"] != null
+            ? empData["department"]["id"].toString()
+            : null;
+
+    designation =
+        empData["designation"] != null && empData["designation"]["id"] != null
+            ? empData["designation"]["id"].toString()
+            : null;
     empData["designation"]["id"].toString();
     facility = empData["facility"]["id"].toString();
     status = empData["status"];

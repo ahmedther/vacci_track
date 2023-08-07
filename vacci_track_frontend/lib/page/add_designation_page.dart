@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vacci_track_frontend/ui/designation_add_form.dart';
-import 'package:vacci_track_frontend/data/other_form_data.dart';
+import 'package:vacci_track_frontend/forms/designation_add_form.dart';
+import 'package:vacci_track_frontend/components/toggle_button_items.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
-class AddOtherPage extends StatefulWidget {
-  const AddOtherPage({super.key});
+class AddDesignation extends StatefulWidget {
+  const AddDesignation({super.key});
 
   @override
-  State<AddOtherPage> createState() => _AddOtherPageState();
+  State<AddDesignation> createState() => _AddDesignationState();
 }
 
-class _AddOtherPageState extends State<AddOtherPage> {
-  final List<bool> _selectedToggle = <bool>[true, false, false];
+class _AddDesignationState extends State<AddDesignation> {
+  final List<bool> _selectedToggle = <bool>[true, false];
   String heading = "Create a New Designation";
+
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
@@ -26,7 +28,8 @@ class _AddOtherPageState extends State<AddOtherPage> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.all(deviceHeight * .02),
+                padding: EdgeInsets.only(
+                    top: deviceHeight * .1, bottom: deviceHeight * .04),
                 child: Text(
                   heading,
                   style: TextStyle(
@@ -46,14 +49,21 @@ class _AddOtherPageState extends State<AddOtherPage> {
                     }
                   });
                 },
-                children: toggleButtonItems,
+                children: const [
+                  ToggleButtonItems(
+                      icon: FaIcon(FontAwesomeIcons.userTag),
+                      text: "Add A Designation"),
+                  ToggleButtonItems(
+                      icon: FaIcon(FontAwesomeIcons.userTag),
+                      text: "Edit Old Designation"),
+                ],
               ),
               SizedBox(
                 height: deviceHeight * 0.02,
               ),
               _selectedToggle[0]
-                  ? const DesignationAddForm()
-                  : Text("Secod Display")
+                  ? DesignationAddForm(editPage: false)
+                  : DesignationAddForm(editPage: true)
             ],
           ),
         ),

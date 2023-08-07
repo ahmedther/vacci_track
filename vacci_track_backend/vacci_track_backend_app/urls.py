@@ -20,4 +20,6 @@ urlpatterns = [
     path("get_prefix/", views.get_prefix, name="get_prefix"),
     path("create_new_employee/", views.create_new_employee, name="create_new_employee"),
     path("search_employee/", views.search_employee, name="search_employee"),
+    path("add_designation/", views.add_designation, name="add_designation"),
+    path("search_designation/", views.search_designation, name="search_designation"),
 ]

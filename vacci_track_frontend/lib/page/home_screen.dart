@@ -6,7 +6,7 @@ import 'package:vacci_track_frontend/ui/navigation_side_bar.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/page/add_new_employee.dart';
-import 'package:vacci_track_frontend/page/add_others.dart';
+import 'package:vacci_track_frontend/page/add_designation_page.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const String routeName = '/';
@@ -20,10 +20,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late final UserData userData;
   int currentIndex = 0;
+  int? navCurrentIndex = 0;
   bool isSpinning = true;
   List<Widget> pages = [
     const Text("Home"),
     const AddNewEmployee(),
+    const AddDesignation(),
   ];
   late final PageController _pageController;
 
@@ -61,6 +63,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  void changeNavIndex(value) {
+    navCurrentIndex = value;
+  }
+
   @override
   Widget build(BuildContext context) {
     // ignore: invalid_use_of_protected_member
@@ -91,8 +97,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     bottom: 0,
                     child: NavigationSideBar(
                         userData: userData,
-                        currentIndex: currentIndex,
-                        changePage: pageChange),
+                        currentIndex: navCurrentIndex,
+                        changePage: pageChange,
+                        changeNavIndex: changeNavIndex),
                   ),
                 ],
               ),

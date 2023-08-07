@@ -178,13 +178,47 @@ def search_employee(request):
 @permission_classes([IsAuthenticated])
 def create_new_employee(request):
     try:
-        data = json.loads(request.body)
-        if not Employee.objects.filter(pr_number=data["pr_number"]).exists():
-            Helper().save_employee(request, data)
-            return JsonResponse({"success": True}, status=200)
-        else:
+        data: dict = json.loads(request.body)
+        pr_number_exists = Employee.objects.filter(pr_number=data["pr_number"]).exists()
+
+        if pr_number_exists and not data.get("edit"):
             return JsonResponse(
                 {"error": "User Already Exists. Try Editing this User"}, status=405
             )
+        else:
+            Helper().save_employee(request, data)
+            return JsonResponse({"success": True}, status=200)
+
     except Exception as e:
-        return JsonResponse({"error": f"Error has occourced. Error: {e}"}, status=405)
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_designation(request):
+    try:
+        emp_data = Designation.objects.filter(
+            name__icontains=request.query_params["query"].split("=")[-1]
+        )
+        serializer = DesignationSerializer(emp_data, many=True)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_designation(request):
+    try:
+        data: dict = json.loads(request.body)
+        design, _ = Helper().save_designation(data)
+        if design:
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return JsonResponse(
+                {"error": "Designation Already Exists. Try Editing this Designation"},
+                status=405,
+            )
+
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)

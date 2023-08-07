@@ -79,7 +79,7 @@ class Employee(models.Model):
         ("Eligible", "Eligible"),
         ("Non - Eligible", "Non - Eligible"),
     )
-    prefix = models.CharField(max_length=5, blank=True, null=True, db_index=True)
+    prefix = models.CharField(max_length=10, blank=True, null=True, db_index=True)
     gender = models.CharField(
         max_length=10, choices=GENDER_CHOICES, blank=False, null=False, db_index=True
     )
@@ -91,7 +91,7 @@ class Employee(models.Model):
     joining_date = models.DateField(blank=True, null=True, db_index=True)
     pr_number = models.CharField(max_length=20, blank=True, null=True, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True, db_index=True)
-    email_address = models.EmailField(blank=True, null=True, db_index=True)
+    email_id = models.EmailField(blank=True, null=True, db_index=True)
     department = models.ForeignKey(
         Department,
         on_delete=models.PROTECT,

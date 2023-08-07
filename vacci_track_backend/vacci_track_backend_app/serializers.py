@@ -36,7 +36,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "joining_date",
             "pr_number",
             "phone_number",
-            "email_address",
+            "email_id",
             "department",
             "designation",
             "facility",
