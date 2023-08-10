@@ -71,6 +71,11 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
     }
   }
 
+  Future updateForm(data) async {
+    _nameController.text = data["name"];
+    _id = data["id"];
+  }
+
   void _searchDesignation(BuildContext context) async {
     setState(() {
       _isSpinning = true;
@@ -87,13 +92,13 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       });
       return;
     }
-    setState(() {
-      _isSpinning = false;
-    });
+
     if (_designationData.length > 1)
       await _dialogBuilder(context, _designationData);
-    _nameController.text = _designationData[0]["name"];
-    _id = _designationData[0]["id"];
+    else {
+      await updateForm(_designationData[0]);
+    }
+
     setState(() {
       _isSpinning = false;
     });
@@ -165,33 +170,58 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
   Future<void> _dialogBuilder(
       BuildContext context, List _designationData) async {
     return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-                "Multiple Designations Found with the keyword ${_searchController.text}"),
-            content: UiScaler(
-              alignment: Alignment.center,
-              child: SizedBox(
-                height: 200,
-                width: 200,
-                child: ListView.builder(
-                  itemCount: _designationData.length,
-                  itemBuilder: (context, index) {
-                    Map designation_data = _designationData[index];
-                    return Card(
-                      child: ListTile(
-                        hoverColor: Color.fromARGB(31, 0, 0, 0),
-                        onTap: () async {
-                          context.pop();
-                        },
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              "Multiple Designations Found with the keyword ${_searchController.text}"),
+          content: UiScaler(
+            alignment: Alignment.center,
+            child: SizedBox(
+              height: 200,
+              width: 200,
+              child: ListView.builder(
+                itemCount: _designationData.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> designationData =
+                      _designationData[index];
+                  return Card(
+                    child: ListTile(
+                      hoverColor: Color.fromARGB(31, 0, 0, 0),
+                      onTap: () async {
+                        await updateForm(designationData);
+                        context.pop();
+                      },
+                      leading: CircleAvatar(
+                        backgroundColor: Helpers.getRandomColor(),
+                        child: FaIcon(
+                          FontAwesomeIcons.userTag,
+                          color: Colors.white,
+                        ),
                       ),
-                    );
-                  },
-                ),
+                      title: Text(
+                        designationData["name"],
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-          );
-        });
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

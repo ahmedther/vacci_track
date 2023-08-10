@@ -5,8 +5,9 @@ import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/ui/navigation_side_bar.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
-import 'package:vacci_track_frontend/page/add_new_employee.dart';
+import 'package:vacci_track_frontend/page/add_new_employee_page.dart';
 import 'package:vacci_track_frontend/page/add_designation_page.dart';
+import 'package:vacci_track_frontend/page/add_department_page.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const String routeName = '/';
@@ -26,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const Text("Home"),
     const AddNewEmployee(),
     const AddDesignation(),
+    const AddDepartment(),
   ];
   late final PageController _pageController;
 
