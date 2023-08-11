@@ -14,8 +14,8 @@ class StatefulWrapper extends ConsumerStatefulWidget {
 class _StatefulWrapperState extends ConsumerState<StatefulWrapper> {
   bool? isAuthenticated;
 
-  @override
   Future<void> checkAuth() async {
+    // ignore: invalid_use_of_protected_member
     final userData = ref.watch(userProvider.notifier).state;
     final data = await Helpers.checkLoggedInPost(userData.token);
     print(data);

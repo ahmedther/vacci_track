@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class CustomDropDownField extends StatelessWidget {
   double width;
   String hint;
   String? value;
+  InputDecoration? decoration;
   void Function(String?)? onSaved = (value) {};
   List<DropdownMenuItem<String>>? items;
   void Function(String?)? onChanged = (value) {};
@@ -13,17 +15,19 @@ class CustomDropDownField extends StatelessWidget {
     this.onSaved,
     this.onChanged,
     this.value,
+    this.validator,
+    this.decoration,
     required this.items,
     required this.width,
     required this.hint,
-    required this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: width,
       child: DropdownButtonFormField(
+        decoration: decoration,
         hint: Text(hint),
         isExpanded: true,
         onChanged: onChanged,

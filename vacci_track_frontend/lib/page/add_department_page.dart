@@ -30,7 +30,7 @@ class _AddDepartmentState extends State<AddDepartment> {
       toggelIcon2: const FaIcon(FontAwesomeIcons.buildingUser),
       toggelText1: "Add A Department",
       toggelText2: "Edit A Department",
-      toggelWidget1: DepartmentAddForm(),
+      toggelWidget1: DepartmentAddForm(editPage: false),
       toggelWidget2: Text("Edi A Department"),
     );
   }

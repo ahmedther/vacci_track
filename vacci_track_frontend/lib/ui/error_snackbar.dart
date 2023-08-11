@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+// ignore: must_be_immutable
 class ErrorSnackBar extends StatelessWidget {
   String? errorMessage;
   ErrorSnackBar({super.key, required this.errorMessage});

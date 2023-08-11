@@ -9,6 +9,7 @@ import 'package:vacci_track_frontend/data/navigationrail_data.dart';
 import 'package:vacci_track_frontend/data/other_sub_navigation_rail.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+// ignore: must_be_immutable
 class NavigationSideBar extends ConsumerStatefulWidget {
   final UserData userData;
   int? currentIndex = 2;

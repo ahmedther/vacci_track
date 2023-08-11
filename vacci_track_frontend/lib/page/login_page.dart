@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/ui/input_field.dart';
-import 'package:vacci_track_frontend/ui/error_snackbar.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

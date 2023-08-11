@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// ignore: must_be_immutable
 class CustomInputField extends StatelessWidget {
-  double width;
-  String label;
-  String? initialValue;
-  int? maxLines;
-  List<TextInputFormatter>? inputFormatters;
-  void Function(String)? onChanged = (value) {};
-  void Function(String?)? onSaved = (value) {};
-  String? Function(String?)? validator = (value) {
-    return null;
-  };
-
   CustomInputField({
     super.key,
     this.onChanged,
@@ -20,14 +10,27 @@ class CustomInputField extends StatelessWidget {
     this.initialValue,
     this.inputFormatters,
     this.maxLines,
+    this.border,
     required this.width,
     required this.onSaved,
     required this.label,
   });
 
+  double width;
+  String label;
+  String? initialValue;
+  int? maxLines;
+  InputBorder? border;
+  List<TextInputFormatter>? inputFormatters;
+  void Function(String)? onChanged = (value) {};
+  void Function(String?)? onSaved = (value) {};
+  String? Function(String?)? validator = (value) {
+    return null;
+  };
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: width,
       child: TextFormField(
         inputFormatters: inputFormatters,
@@ -35,9 +38,7 @@ class CustomInputField extends StatelessWidget {
         initialValue: initialValue,
         onSaved: onSaved,
         maxLines: maxLines,
-        decoration: InputDecoration(
-          label: Text(label),
-        ),
+        decoration: InputDecoration(label: Text(label), border: border),
         validator: validator,
       ),
     );

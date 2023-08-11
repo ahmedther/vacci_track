@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/toggle_button_items.dart';
 
+// ignore: must_be_immutable
 class FormUI extends StatelessWidget {
   FormUI(
       {this.widgetsToDisplay,

@@ -5,6 +5,7 @@ import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:vacci_track_frontend/components/ui_scaler.dart";
 
+// ignore: must_be_immutable
 class DesignationAddForm extends StatefulWidget {
   bool editPage;
   DesignationAddForm({required this.editPage, super.key});
@@ -54,6 +55,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       });
       Helpers.showSnackBar(context, data['error']);
     } else {
+      // ignore: use_build_context_synchronously
       Helpers.showDialogOnScreen(
           context: context,
           btnMessage: 'OK',
@@ -85,7 +87,8 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
         "http://$API_URL/api/search_designation/",
         query: "param1=${_searchController.text}");
 
-    if (_designationData[0].containsKey("error")) {
+    if (_designationData.isEmpty || _designationData[0].containsKey("error")) {
+      
       Helpers.showSnackBar(context, _designationData[0]['error']);
       setState(() {
         _isSpinning = false;

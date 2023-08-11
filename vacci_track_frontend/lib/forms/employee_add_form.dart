@@ -8,6 +8,7 @@ import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 
+// ignore: must_be_immutable
 class EmployeeAddForm extends StatefulWidget {
   Function assignAvatar;
   bool editPage;
@@ -666,6 +667,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         "http://$API_URL/api/search_employee/",
         query: "param1=${_searchController.text}");
     if (empData[0].containsKey("error")) {
+      // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, empData[0]['error']);
       setState(() {
         isSpinning = false;

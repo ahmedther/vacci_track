@@ -17,6 +17,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Q
 
 
 @api_view(["POST"])
@@ -174,6 +175,26 @@ def search_employee(request):
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_hod(request):
+    try:
+        query = request.query_params["query"].split("=")[-1]
+        emp_data = Employee.objects.filter(
+            Q(pr_number__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(middle_name__icontains=query)
+            | Q(last_name__icontains=query)
+        )
+        if not emp_data:
+            raise Exception(f"No Employee found with Search Query '{query}'")
+
+        serializer = EmployeeSerializer(emp_data, many=True)
+        return Response([serializer.data], status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_new_employee(request):
@@ -197,9 +218,12 @@ def create_new_employee(request):
 @permission_classes([IsAuthenticated])
 def search_designation(request):
     try:
-        emp_data = Designation.objects.filter(
-            name__icontains=request.query_params["query"].split("=")[-1]
-        )
+        query = request.query_params["query"].split("=")[-1]
+        emp_data = Designation.objects.filter(name__icontains=query)
+
+        if not emp_data:
+            raise Exception(f"No Designation found with Search Query '{query}'")
+
         serializer = DesignationSerializer(emp_data, many=True)
         return Response(serializer.data, status=200)
     except Exception as e:
