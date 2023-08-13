@@ -84,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     left: 120,
                     child: PageView.builder(
                       controller: _pageController,
-                      itemCount: pages.length,
+                      itemCount: 1,
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
                       pageSnapping: false,

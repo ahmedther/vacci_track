@@ -6,6 +6,19 @@ class Helper:
     def __init__(self):
         pass
 
+    def get_validated_date(self, date):
+        if date is not None:
+            try:
+                date_only = date[:10]  # Extract the first 10 characters (YYYY-MM-DD)
+                validated_date = datetime.datetime.strptime(
+                    date_only, "%Y-%m-%d"
+                ).date()
+            except:
+                validated_date = None
+        else:
+            validated_date = None
+        return validated_date
+
     def save_employee(self, request, data: dict):
         validated_join_date = self.get_validated_date(data.get("joining_date"))
 
@@ -40,20 +53,25 @@ class Helper:
         if existing_designation:
             return None, None
 
-        employee, created = Designation.objects.update_or_create(
+        designation, created = Designation.objects.update_or_create(
             id=desig_id, defaults=data
         )
-        return employee, created
+        return designation, created
 
-    def get_validated_date(self, date):
-        if date is not None:
-            try:
-                date_only = date[:10]  # Extract the first 10 characters (YYYY-MM-DD)
-                validated_date = datetime.datetime.strptime(
-                    date_only, "%Y-%m-%d"
-                ).date()
-            except:
-                validated_date = None
-        else:
-            validated_date = None
-        return validated_date
+    def save_department(self, data: dict):
+        desig_id = data.get("id")
+        data.pop("edit", None)
+        data.pop("id", None)
+
+        if not desig_id:
+            existing_department = Department.objects.filter(name=data["name"])
+            if existing_department:
+                return None, None
+
+        data["department_hod"] = Employee.objects.filter(
+            pk=data.get("department_hod")
+        ).first()
+        department, created = Department.objects.update_or_create(
+            id=desig_id, defaults=data
+        )
+        return department, created

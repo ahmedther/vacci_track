@@ -170,6 +170,7 @@ def search_employee(request):
             pr_number=request.query_params["query"].split("=")[-1]
         )
         serializer = EmployeeSerializer(emp_data)
+
         return Response([serializer.data], status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
@@ -190,7 +191,7 @@ def search_hod(request):
             raise Exception(f"No Employee found with Search Query '{query}'")
 
         serializer = EmployeeSerializer(emp_data, many=True)
-        return Response([serializer.data], status=200)
+        return Response(serializer.data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
 
@@ -219,12 +220,12 @@ def create_new_employee(request):
 def search_designation(request):
     try:
         query = request.query_params["query"].split("=")[-1]
-        emp_data = Designation.objects.filter(name__icontains=query)
+        designation = Designation.objects.filter(name__icontains=query)
 
-        if not emp_data:
+        if not designation:
             raise Exception(f"No Designation found with Search Query '{query}'")
 
-        serializer = DesignationSerializer(emp_data, many=True)
+        serializer = DesignationSerializer(designation, many=True)
         return Response(serializer.data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
@@ -241,6 +242,42 @@ def add_designation(request):
         else:
             return JsonResponse(
                 {"error": "Designation Already Exists. Try Editing this Designation"},
+                status=405,
+            )
+
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_department(request):
+    try:
+        query = request.query_params["query"].split("=")[-1]
+        department = Department.objects.filter(name__icontains=query)
+
+        if not department:
+            raise Exception(f"No Department found with Search Query '{query}'")
+
+        serializer = DepartmentSerializer(department, many=True)
+
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_department(request):
+    try:
+        data: dict = json.loads(request.body)
+        print(data)
+        dept, _ = Helper().save_department(data)
+        if dept:
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return JsonResponse(
+                {"error": "Department Already Exists. Try Editing this Department"},
                 status=405,
             )
 

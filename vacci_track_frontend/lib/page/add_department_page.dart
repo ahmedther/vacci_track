@@ -31,7 +31,7 @@ class _AddDepartmentState extends State<AddDepartment> {
       toggelText1: "Add A Department",
       toggelText2: "Edit A Department",
       toggelWidget1: DepartmentAddForm(editPage: false),
-      toggelWidget2: Text("Edi A Department"),
+      toggelWidget2: DepartmentAddForm(editPage: true),
     );
   }
 }

@@ -88,7 +88,6 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
         query: "param1=${_searchController.text}");
 
     if (_designationData.isEmpty || _designationData[0].containsKey("error")) {
-      
       Helpers.showSnackBar(context, _designationData[0]['error']);
       setState(() {
         _isSpinning = false;
@@ -190,21 +189,22 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
                       _designationData[index];
                   return Card(
                     child: ListTile(
-                      hoverColor: Color.fromARGB(31, 0, 0, 0),
+                      hoverColor: const Color.fromARGB(31, 0, 0, 0),
                       onTap: () async {
                         await updateForm(designationData);
+                        // ignore: use_build_context_synchronously
                         context.pop();
                       },
                       leading: CircleAvatar(
                         backgroundColor: Helpers.getRandomColor(),
-                        child: FaIcon(
+                        child: const FaIcon(
                           FontAwesomeIcons.userTag,
                           color: Colors.white,
                         ),
                       ),
                       title: Text(
                         designationData["name"],
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   );

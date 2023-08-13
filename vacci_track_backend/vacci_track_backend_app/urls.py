@@ -23,4 +23,6 @@ urlpatterns = [
     path("search_hod/", views.search_hod, name="search_hod"),
     path("add_designation/", views.add_designation, name="add_designation"),
     path("search_designation/", views.search_designation, name="search_designation"),
+    path("add_department/", views.add_department, name="add_department"),
+    path("search_department/", views.search_department, name="search_department"),
 ]

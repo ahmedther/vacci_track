@@ -3,6 +3,14 @@ from vacci_track_backend_app.models import Department, Designation, Facility, Em
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
+    department_hod = serializers.SerializerMethodField()
+
+    def get_department_hod(self, department):
+        hod_employee = department.department_hod
+        if hod_employee:
+            return EmployeeSerializer(hod_employee).data
+        return None
+
     class Meta:
         model = Department
         fields = ["id", "name", "department_hod"]
@@ -28,6 +36,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = (
+            "id",
             "prefix",
             "gender",
             "first_name",

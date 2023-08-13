@@ -158,6 +158,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
           newmiddleName: "",
           newlastName: "",
         );
+        // ignore: use_build_context_synchronously
         Helpers.showDialogOnScreen(
             context: context,
             btnMessage: 'OK',
@@ -165,8 +166,32 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             message: widget.editPage
                 ? "User Successfully Updated"
                 : "User Successfully Added",
-            onPressed: resetBtnHandler);
+            onPressed: () {});
         setState(() {
+          _searchController.clear();
+          prefix = null;
+          status = '';
+          notes = '';
+          firstName = "";
+          middleName = "";
+          lastName = "";
+          gender = null;
+          phoneNumber = "";
+          emailID = "";
+          prNumber = "";
+          joiningDate = null;
+          department = null;
+          designation = null;
+          facility = null;
+          eligibility = null;
+
+          widget.assignAvatar(
+            newgender: "",
+            newprefix: "",
+            newfirstName: "",
+            newmiddleName: "",
+            newlastName: "",
+          );
           isSpinning = false;
         });
       }
@@ -296,7 +321,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    value.trim().length < 1) {
+                                    value.trim().isEmpty) {
                                   return "First Name Cannot be Empty";
                                 }
                                 return null;
@@ -330,7 +355,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    value.trim().length < 1) {
+                                    value.trim().isEmpty) {
                                   return "Last Name Cannot be Empty";
                                 }
                                 return null;
@@ -411,7 +436,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    value.trim().length < 1) {
+                                    value.trim().isEmpty) {
                                   return "PR Number  Cannot be Empty";
                                 }
                                 return null;
@@ -433,7 +458,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    value.trim().length < 1) {
+                                    value.trim().isEmpty) {
                                   return "Phone Number  Cannot be Empty";
                                 }
                                 return null;
@@ -588,7 +613,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                 Map user = empData[index];
                 return Card(
                   child: ListTile(
-                    hoverColor: Color.fromARGB(31, 0, 0, 0),
+                    hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {
                       updateEmpForm(user);
                       context.pop();
@@ -597,8 +622,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                       backgroundColor: Helpers.getRandomColor(),
                       child: Text(
                         user['first_name'][0] ??
-                            FaIcon(FontAwesomeIcons.userAlt),
-                        style: TextStyle(color: Colors.white),
+                            const FaIcon(FontAwesomeIcons.userAlt),
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                     title: Text(
@@ -642,6 +667,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         "http://$API_URL/api/searh_emp_on_oracle_db/",
         query: "param1=${_searchController.text}");
     if (empData[0].containsKey("error")) {
+      // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, empData[0]['error']);
       setState(() {
         isSpinning = false;
@@ -649,8 +675,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       return;
     }
     if (empData.length > 1) {
+      // ignore: use_build_context_synchronously
       await _dialogBuilder(context, empData);
     } else {
+      // ignore: use_build_context_synchronously
       await _dialogBuilder(context, empData[0]);
     }
     setState(() {

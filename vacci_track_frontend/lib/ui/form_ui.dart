@@ -30,7 +30,6 @@ class FormUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
-    double deviceWidth = MediaQuery.of(context).size.width;
     return ListView(
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
