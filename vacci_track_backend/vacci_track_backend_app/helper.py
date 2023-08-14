@@ -75,3 +75,17 @@ class Helper:
             id=desig_id, defaults=data
         )
         return department, created
+
+    def save_facility(self, data: dict):
+        faci_id = data.get("id")
+        data.pop("edit", None)
+        data.pop("id", None)
+
+        if not faci_id:
+            existing_facility = Facility.objects.filter(name=data["name"])
+
+            if existing_facility:
+                return None, None
+
+        facility, created = Facility.objects.update_or_create(id=faci_id, defaults=data)
+        return facility, created

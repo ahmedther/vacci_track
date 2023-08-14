@@ -8,6 +8,7 @@ import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/page/add_new_employee_page.dart';
 import 'package:vacci_track_frontend/page/add_designation_page.dart';
 import 'package:vacci_track_frontend/page/add_department_page.dart';
+import 'package:vacci_track_frontend/page/add_facility_page.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const String routeName = '/';
@@ -28,6 +29,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const AddNewEmployee(),
     const AddDesignation(),
     const AddDepartment(),
+    const AddFacilityPage(),
   ];
   late final PageController _pageController;
 
@@ -49,6 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void checkAuthRedirect() async {
     userData = await Helpers.checkLogin(ref);
+    // ignore: use_build_context_synchronously
     if (userData.isLoggedIn! == false) context.go('/login');
     if (userData.isLoggedIn!) {
       if (mounted) {

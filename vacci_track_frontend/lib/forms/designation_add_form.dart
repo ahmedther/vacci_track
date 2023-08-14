@@ -88,6 +88,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
         query: "param1=${_searchController.text}");
 
     if (_designationData.isEmpty || _designationData[0].containsKey("error")) {
+      // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, _designationData[0]['error']);
       setState(() {
         _isSpinning = false;

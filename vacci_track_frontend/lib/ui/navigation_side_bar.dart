@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vacci_track_frontend/ui/navigation_hero.dart';
 import 'package:vacci_track_frontend/data/navigationrail_data.dart';
 import 'package:vacci_track_frontend/data/other_sub_navigation_rail.dart';
+import 'package:vacci_track_frontend/data/vaicnation_navigationrail.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:vacci_track_frontend/components/mouse_region_icons.dart';
 
 // ignore: must_be_immutable
 class NavigationSideBar extends ConsumerStatefulWidget {
@@ -28,10 +30,19 @@ class NavigationSideBar extends ConsumerStatefulWidget {
 
 class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
+  bool isVaccineHover = false;
 
   void _toggleExtended(event) {
     setState(() {
       isOtherHover = !isOtherHover;
+      isVaccineHover = false; // Set the other variable to false
+    });
+  }
+
+  void _toggleVacineHover(event) {
+    setState(() {
+      isVaccineHover = !isVaccineHover;
+      isOtherHover = false; // Set the other variable to false
     });
   }
 
@@ -40,6 +51,20 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
     Helpers.clearProviderAndPrefs(ref);
     // ignore: use_build_context_synchronously
     context.go('/login');
+  }
+
+  void onDestinationOthers(value) {
+    widget.changeNavIndex(null);
+    value += nagivationList.length;
+    widget.changePage(value);
+    print(value);
+  }
+
+  void onDestinationVaccine(value) {
+    widget.changeNavIndex(null);
+    value = nagivationList.length + value + otherSubNavigationList.length;
+    widget.changePage(value);
+    print(value);
   }
 
   @override
@@ -53,36 +78,23 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                hitTestBehavior: HitTestBehavior.translucent,
-                onEnter: _toggleExtended,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 33,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          color: isOtherHover
-                              ? const Color.fromARGB(13, 0, 0, 0)
-                              : null,
-                          borderRadius: BorderRadius.circular(20)),
-                      child: const Center(
-                        child: FaIcon(
-                          FontAwesomeIcons.circlePlus,
-                          color: Color(0xFF01579b),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    const Text("Add Others",
-                        maxLines: 3,
-                        style: TextStyle(
-                          fontSize: 12,
-                        )),
-                  ],
-                ),
-              ),
+              CustomMouseRegionOnNavigationRail(
+                  onEnter: _toggleExtended,
+                  isHovered: isOtherHover,
+                  icon: const FaIcon(
+                    FontAwesomeIcons.circlePlus,
+                    color: Color(0xFF01579b),
+                  ),
+                  label: "Add Others"),
+              const SizedBox(height: 10),
+              CustomMouseRegionOnNavigationRail(
+                  onEnter: _toggleVacineHover,
+                  isHovered: isVaccineHover,
+                  icon: const FaIcon(
+                    FontAwesomeIcons.syringe,
+                    color: Color(0xFF01579b),
+                  ),
+                  label: "Add New Vaccine"),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () => logoutHandle(context, ref),
@@ -114,30 +126,29 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
           // minWidth: 10.w,
           destinations: nagivationList,
         ),
-        if (isOtherHover) ...{
+        if (isOtherHover || isVaccineHover) ...{
           Container(
             width: 0.8, // Width of the border
             color: Colors.black, // Color of the border
           ).animate().fadeIn(delay: 300.ms),
           MouseRegion(
-              onExit: _toggleExtended,
-              child: NavigationRail(
-                groupAlignment: 0.0,
-                useIndicator: true,
-                labelType: NavigationRailLabelType.all,
-                elevation: 10,
-                selectedIndex: null,
-                indicatorColor: const Color.fromARGB(141, 255, 255, 255),
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                destinations: otherSubNavigationList,
-                onDestinationSelected: (value) {
-                  widget.changeNavIndex(null);
-                  value += nagivationList.length;
-                  widget.changePage(value);
-                  print(value);
-                },
-              ).animate().slideX().fadeIn().then().shimmer()),
-        }
+            onExit: isOtherHover ? _toggleExtended : _toggleVacineHover,
+            child: NavigationRail(
+              groupAlignment: 0.0,
+              useIndicator: true,
+              labelType: NavigationRailLabelType.all,
+              elevation: 10,
+              selectedIndex: null,
+              indicatorColor: const Color.fromARGB(141, 255, 255, 255),
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              destinations: isOtherHover
+                  ? otherSubNavigationList
+                  : vaccinationNavigationList,
+              onDestinationSelected:
+                  isOtherHover ? onDestinationOthers : onDestinationVaccine,
+            ).animate().slideX().fadeIn().then().shimmer(),
+          ),
+        },
       ],
     );
   }

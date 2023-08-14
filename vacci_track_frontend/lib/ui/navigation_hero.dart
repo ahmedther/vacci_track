@@ -15,7 +15,7 @@ class NavigationHero extends StatelessWidget {
     return Column(
       children: [
         Image(
-          image: AssetImage("assets/img/syringe.png"),
+          image: const AssetImage("assets/img/syringe.png"),
           height: deviceHeight * 0.05,
         ),
         AnimatedTextKit(

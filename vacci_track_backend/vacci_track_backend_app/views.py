@@ -251,6 +251,40 @@ def add_designation(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
+def search_facility(request):
+    try:
+        query = request.query_params["query"].split("=")[-1]
+        facility = Facility.objects.filter(name__icontains=query)
+        if not facility:
+            raise Exception(f"No facility found with Search Query '{query}'")
+
+        serializer = FacilitySerializer(facility, many=True)
+
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_facility(request):
+    try:
+        data: dict = json.loads(request.body)
+        design, _ = Helper().save_facility(data)
+        if design:
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return JsonResponse(
+                {"error": "Designation Already Exists. Try Editing this Designation"},
+                status=405,
+            )
+
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def search_department(request):
     try:
         query = request.query_params["query"].split("=")[-1]

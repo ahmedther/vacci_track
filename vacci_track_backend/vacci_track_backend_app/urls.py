@@ -25,4 +25,6 @@ urlpatterns = [
     path("search_designation/", views.search_designation, name="search_designation"),
     path("add_department/", views.add_department, name="add_department"),
     path("search_department/", views.search_department, name="search_department"),
+    path("add_facility/", views.add_facility, name="add_facility"),
+    path("search_facility/", views.search_facility, name="search_facility"),
 ]
