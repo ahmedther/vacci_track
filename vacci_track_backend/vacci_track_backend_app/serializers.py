@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from vacci_track_backend_app.models import Department, Designation, Facility, Employee
+from vacci_track_backend_app.models import (
+    Department,
+    Designation,
+    Facility,
+    Employee,
+    Vaccination,
+    Dose,
+)
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -55,3 +62,17 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "added_date",
             "notes_remarks",
         )
+
+
+class VaccinationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vaccination
+        fields = "__all__"
+
+
+class DoseSerializer(serializers.ModelSerializer):
+    vaccination = VaccinationSerializer()
+
+    class Meta:
+        model = Dose
+        fields = "__all__"

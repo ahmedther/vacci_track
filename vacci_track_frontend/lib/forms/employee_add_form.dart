@@ -620,11 +620,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     },
                     leading: CircleAvatar(
                       backgroundColor: Helpers.getRandomColor(),
-                      child: Text(
-                        user['first_name'][0] ??
-                            const FaIcon(FontAwesomeIcons.userAlt),
-                        style: const TextStyle(color: Colors.white),
-                      ),
+                      child: user['first_name'][0].isDefinedAndNotNull
+                          ? Text(user['first_name'][0],
+                              style: const TextStyle(color: Colors.white))
+                          : const FaIcon(FontAwesomeIcons.userAlt,
+                              color: Colors.white),
                     ),
                     title: Text(
                         '${user['prefix'] ?? ""} ${user['first_name'] ?? ""} ${user['middle_name'] ?? ""}  ${user['last_name'] ?? ""}'),

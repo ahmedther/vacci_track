@@ -55,7 +55,7 @@ class Dose(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"{self.name} Assigned to {self.vaccination.name}."
 
 
 class Vaccination(models.Model):

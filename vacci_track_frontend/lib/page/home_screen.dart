@@ -9,6 +9,8 @@ import 'package:vacci_track_frontend/page/add_new_employee_page.dart';
 import 'package:vacci_track_frontend/page/add_designation_page.dart';
 import 'package:vacci_track_frontend/page/add_department_page.dart';
 import 'package:vacci_track_frontend/page/add_facility_page.dart';
+import 'package:vacci_track_frontend/page/add_vaccine_page.dart';
+import 'package:vacci_track_frontend/page/add_dose_page.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const String routeName = '/';
@@ -30,6 +32,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const AddDesignation(),
     const AddDepartment(),
     const AddFacilityPage(),
+    const AddVaccinePage(),
+    const AddDosePage(),
   ];
   late final PageController _pageController;
 

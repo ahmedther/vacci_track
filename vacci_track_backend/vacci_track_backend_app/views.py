@@ -1,13 +1,21 @@
 import json
-from vacci_track_backend_app.models import Department, Designation, Facility
+from vacci_track_backend_app.models import (
+    Department,
+    Designation,
+    Facility,
+    Employee,
+    Vaccination,
+    Dose,
+)
 from vacci_track_backend_app.sqlalchemy_con import SqlAlchemyConnection
 from vacci_track_backend_app.serializers import (
     DepartmentSerializer,
     DesignationSerializer,
     FacilitySerializer,
     EmployeeSerializer,
+    VaccinationSerializer,
+    DoseSerializer,
 )
-from vacci_track_backend_app.models import Employee
 from vacci_track_backend_app.helper import Helper
 from django.shortcuts import render
 from django.middleware import csrf
@@ -128,6 +136,14 @@ def get_prefix(request):
     genders = alchemy.get_distict_prefix()
     genders = [{"gender": row[0]} for row in genders if row[0]]
     return Response(genders, status=200)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_vaccination_list(request):
+    vaccine = Vaccination.objects.all()
+    serializer = VaccinationSerializer(vaccine, many=True)
+    return Response(serializer.data, status=200)
 
 
 @api_view(["GET"])
@@ -305,7 +321,6 @@ def search_department(request):
 def add_department(request):
     try:
         data: dict = json.loads(request.body)
-        print(data)
         dept, _ = Helper().save_department(data)
         if dept:
             return JsonResponse({"success": True}, status=200)
@@ -317,3 +332,74 @@ def add_department(request):
 
     except Exception as e:
         return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_vaccine(request):
+    try:
+        query = request.query_params["query"].split("=")[-1]
+        vaccine = Vaccination.objects.filter(name__icontains=query)
+
+        if not vaccine:
+            raise Exception(f"No Vaccination found with Search Query '{query}'")
+
+        serializer = VaccinationSerializer(vaccine, many=True)
+
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_vaccine(request):
+    try:
+        data: dict = json.loads(request.body)
+        dept, _ = Helper().save_vaccine(data)
+        if dept:
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return JsonResponse(
+                {"error": "Vaccine Already Exists. Try Editing this Vaccine"},
+                status=405,
+            )
+
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_dose(request):
+    try:
+        data: dict = json.loads(request.body)
+        dose, existing_dose = Helper().save_dose(data)
+        if dose:
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return JsonResponse(
+                {
+                    "error": f"Dose {existing_dose.name} Already Assigned to {existing_dose.vaccination}"
+                },
+                status=405,
+            )
+
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_dose(request):
+    try:
+        query = request.query_params["query"].split("=")[-1]
+        dose = Dose.objects.filter(name__icontains=query)
+
+        if not dose:
+            raise Exception(f"No Dose found with Search Query '{query}'")
+
+        serializer = DoseSerializer(dose, many=True)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)

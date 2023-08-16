@@ -96,9 +96,10 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       return;
     }
 
-    if (_designationData.length > 1)
+    if (_designationData.length > 1) {
+      // ignore: use_build_context_synchronously
       await _dialogBuilder(context, _designationData);
-    else {
+    } else {
       await updateForm(_designationData[0]);
     }
 

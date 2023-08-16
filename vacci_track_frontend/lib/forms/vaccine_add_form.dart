@@ -1,5 +1,6 @@
-import 'dart:js_interop';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:js_interop';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
@@ -7,21 +8,22 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 
 // ignore: must_be_immutable
-class FacilityAddForm extends StatefulWidget {
-  FacilityAddForm({required this.editPage, super.key});
+class VaccineAddForm extends StatefulWidget {
+  VaccineAddForm({required this.editPage, super.key});
   bool editPage;
 
   @override
-  State<FacilityAddForm> createState() => _FacilityAddFormState();
+  State<VaccineAddForm> createState() => _VaccineAddFormState();
 }
 
-class _FacilityAddFormState extends State<FacilityAddForm> {
+class _VaccineAddFormState extends State<VaccineAddForm> {
   bool _isSpinning = false;
   final TextEditingController _searchController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String? _name;
-  String? _facilityId;
   int? _id = 0;
+  String? _name;
+  String? _totalDose;
+  String? _otherNotes;
 
   @override
   void dispose() {
@@ -32,7 +34,8 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
   Future updateForm(Map data) async {
     _id = data["id"];
     _name = data["name"];
-    _facilityId = data["facility_id"];
+    _totalDose = data["total_number_of_doses"].toString();
+    _otherNotes = data["other_notes"];
   }
 
   void _searchDesignation(BuildContext context) async {
@@ -40,24 +43,24 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
       _isSpinning = true;
     });
     final API_URL = await Helpers.load_env();
-    final List facilityData = await Helpers.makeGetRequest(
-        "http://$API_URL/api/search_facility/",
+    final List vaccinieData = await Helpers.makeGetRequest(
+        "http://$API_URL/api/search_vaccine/",
         query: "param1=${_searchController.text}");
 
-    if (facilityData.isEmpty || facilityData[0].containsKey("error")) {
+    if (vaccinieData.isEmpty || vaccinieData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, facilityData[0]['error']);
+      Helpers.showSnackBar(context, vaccinieData[0]['error']);
       setState(() {
         _isSpinning = false;
       });
       return;
     }
 
-    if (facilityData.length > 1) {
+    if (vaccinieData.length > 1) {
       // ignore: use_build_context_synchronously
-      await _dialogBuilder(context, facilityData);
+      await _dialogBuilder(context, vaccinieData);
     } else {
-      await updateForm(facilityData[0]);
+      await updateForm(vaccinieData[0]);
     }
 
     setState(() {
@@ -73,11 +76,12 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
       });
       final API_URL = await Helpers.load_env();
       final Map data = await Helpers.makePostRequest(
-          url: "http://$API_URL/api/add_facility/",
+          url: "http://$API_URL/api/add_vaccine/",
           data: {
             if (widget.editPage) "id": _id,
             "name": _name,
-            "facility_id": _facilityId,
+            "total_number_of_doses": int.parse(_totalDose!),
+            "other_notes": _otherNotes,
             if (widget.editPage) "edit": widget.editPage,
           });
       if (data.containsKey('error')) {
@@ -94,8 +98,8 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
             btnMessage: 'OK',
             title: "✔ Successful",
             message: widget.editPage
-                ? "Facility Successfully Updated"
-                : "Facility Successfully Added",
+                ? "Vaccine Successfully Updated"
+                : "Vaccine Successfully Added",
             onPressed: () {});
         await resetBtnHandler();
       }
@@ -107,9 +111,10 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
       if (_formKey.currentState.isDefinedAndNotNull) {
         _formKey.currentState!.reset();
       }
-      _name = null;
-      _facilityId = null;
       _id = null;
+      _name = null;
+      _totalDose = null;
+      _otherNotes = null;
       _searchController.clear();
       _isSpinning = false;
     });
@@ -139,7 +144,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                       SearchBar(
                         controller: _searchController,
                         elevation: const MaterialStatePropertyAll(2),
-                        hintText: "Search For A Facility ",
+                        hintText: "Search For A Vaccine ",
                         leading: FaIcon(
                           FontAwesomeIcons.magnifyingGlass,
                           color: Theme.of(context).colorScheme.primary,
@@ -165,42 +170,63 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                       ),
                       const SizedBox(height: 32)
                     },
-                    CustomInputField(
-                      label: "Name",
-                      initialValue: _name,
-                      border: const OutlineInputBorder(),
-                      width: inputWidth,
-                      onSaved: (value) {
-                        if (value == null) return;
-                        _name = value;
-                      },
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.trim().length < 3) {
-                          return "Facility name can not be empty or less then 3 characters!";
-                        }
-                        return null;
-                      },
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.end,
+                      spacing: 10,
+                      children: [
+                        CustomInputField(
+                          label: "Name",
+                          initialValue: _name,
+                          border: const OutlineInputBorder(),
+                          width: Helpers.min_max(deviceWidth, .10, 350, 400),
+                          onSaved: (value) {
+                            if (value == null) return;
+                            _name = value;
+                          },
+                          validator: (value) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                value.trim().length < 3) {
+                              return "Vaccine name can not be empty or less then 3 characters!";
+                            }
+                            return null;
+                          },
+                        ),
+                        CustomInputField(
+                          label: "Doses",
+                          initialValue: _totalDose,
+                          inputFormatters: [
+                            FilteringTextInputFormatter
+                                .digitsOnly, // Only allow digits
+                          ],
+                          border: const OutlineInputBorder(),
+                          width: Helpers.min_max(deviceWidth, .10, 70, 70),
+                          onSaved: (value) {
+                            if (value == null) return;
+                            _totalDose = value;
+                          },
+                          validator: (value) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                value.trim().isEmpty) {
+                              return "Total Number of Doese Cannot be Empty";
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     CustomInputField(
-                      label: "Facility Code",
-                      initialValue: _facilityId,
+                      label: "Other Notes",
+                      initialValue: _otherNotes,
                       border: const OutlineInputBorder(),
-                      width: inputWidth,
+                      width: inputWidth - 70,
                       onSaved: (value) {
                         if (value == null) return;
-                        _facilityId = value;
+                        _otherNotes = value;
                       },
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.trim().length < 2) {
-                          return "Facility Code can not be empty or less then 2 characters!";
-                        }
-                        return null;
-                      },
+                      maxLines: 5,
                     ),
                     SizedBox(
                       height: deviceHeight * 0.02,
@@ -227,45 +253,47 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
           );
   }
 
-  Future<void> _dialogBuilder(BuildContext context, List facilityData) async {
+  Future<void> _dialogBuilder(BuildContext context, List vaccineData) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-              "Multiple Facility Found with the keyword ${_searchController.text}"),
+              "Multiple Vaccine Found with the keyword ${_searchController.text}"),
           content: SizedBox(
             height: 200,
             width: 200,
             child: ListView.builder(
-              itemCount: facilityData.length,
+              itemCount: vaccineData.length,
               itemBuilder: (context, index) {
-                Map<String, dynamic> facility = facilityData[index];
+                Map<String, dynamic> vaccine = vaccineData[index];
                 return Card(
                   child: ListTile(
                     hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {
-                      await updateForm(facility);
+                      await updateForm(vaccine);
                       // ignore: use_build_context_synchronously
                       context.pop();
                     },
                     leading: CircleAvatar(
                       backgroundColor: Helpers.getRandomColor(),
                       child: const FaIcon(
-                        FontAwesomeIcons.buildingUser,
+                        FontAwesomeIcons.vialCircleCheck,
                         color: Colors.white,
                       ),
                     ),
                     title: Text(
-                      facility["name"],
+                      vaccine["name"],
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Facility Code : ${facility["facility_id"] ?? ''}"),
-                        ]),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            "Total Number of Doses : ${vaccine['total_number_of_doses']}"),
+                        Text("Other Notes : ${vaccine['other_notes'] ?? ""}"),
+                      ],
+                    ),
                   ),
                 );
               },

@@ -8,12 +8,14 @@ class ErrorSnackBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double deviceHeight = MediaQuery.of(context).size.height;
+    double autoHeight = deviceHeight * .2;
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          height: 90,
+          height: autoHeight,
           decoration: const BoxDecoration(
             color: Color(0xFFC72C41),
             borderRadius: BorderRadius.all(
@@ -37,9 +39,9 @@ class ErrorSnackBar extends StatelessWidget {
                       errorMessage!,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 20,
                       ),
-                      maxLines: 2,
+                      maxLines: 5,
                       overflow: TextOverflow.ellipsis,
                     )
                   ],

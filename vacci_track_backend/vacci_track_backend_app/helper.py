@@ -89,3 +89,38 @@ class Helper:
 
         facility, created = Facility.objects.update_or_create(id=faci_id, defaults=data)
         return facility, created
+
+    def save_vaccine(self, data: dict):
+        faci_id = data.get("id")
+        data.pop("edit", None)
+        data.pop("id", None)
+
+        if not faci_id:
+            existing_vaccine = Vaccination.objects.filter(name=data["name"])
+
+            if existing_vaccine:
+                return None, None
+
+        vaccine, created = Vaccination.objects.update_or_create(
+            id=faci_id, defaults=data
+        )
+        return vaccine, created
+
+    def save_dose(self, data: dict):
+        dose_id = data.get("id")
+        data.pop("edit", None)
+        data.pop("id", None)
+
+        if not dose_id:
+            existing_dose = Dose.objects.filter(
+                name=data["name"], vaccination_id=data["vaccination"]
+            ).first()
+            if existing_dose:
+                # The existing_dose is associated with the specified vaccination
+                return None, existing_dose
+
+        data["vaccination"] = Vaccination.objects.filter(
+            pk=data.get("vaccination")
+        ).first()
+        dose, created = Dose.objects.update_or_create(id=dose_id, defaults=data)
+        return dose, created

@@ -329,6 +329,7 @@ class Helpers {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          scrollable: true,
           title: Text(title),
           content: Text(message),
           actions: <Widget>[

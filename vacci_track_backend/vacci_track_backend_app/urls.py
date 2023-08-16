@@ -13,6 +13,9 @@ urlpatterns = [
     ),
     path("get_facility_list/", views.get_facility_list, name="get_facility_list"),
     path(
+        "get_vaccination_list/", views.get_vaccination_list, name="get_vaccination_list"
+    ),
+    path(
         "searh_emp_on_oracle_db/",
         views.searh_emp_on_oracle_db,
         name="searh_emp_on_oracle_db",
@@ -27,4 +30,8 @@ urlpatterns = [
     path("search_department/", views.search_department, name="search_department"),
     path("add_facility/", views.add_facility, name="add_facility"),
     path("search_facility/", views.search_facility, name="search_facility"),
+    path("add_vaccine/", views.add_vaccine, name="add_vaccine"),
+    path("search_vaccine/", views.search_vaccine, name="search_vaccine"),
+    path("add_dose/", views.add_dose, name="add_dose"),
+    path("search_dose/", views.search_dose, name="search_dose"),
 ]
