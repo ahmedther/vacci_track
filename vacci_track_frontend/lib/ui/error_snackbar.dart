@@ -9,7 +9,7 @@ class ErrorSnackBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
-    double autoHeight = deviceHeight * .2;
+    double autoHeight = deviceHeight * .25;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -31,17 +31,18 @@ class ErrorSnackBar extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Oh snap!",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(
+                          fontSize: autoHeight * .15, color: Colors.white),
                     ),
                     Text(
                       errorMessage!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: autoHeight * .12,
                       ),
-                      maxLines: 5,
+                      maxLines: 6,
                       overflow: TextOverflow.ellipsis,
                     )
                   ],

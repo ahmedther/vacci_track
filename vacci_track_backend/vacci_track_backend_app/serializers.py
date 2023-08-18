@@ -35,10 +35,25 @@ class FacilitySerializer(serializers.ModelSerializer):
         fields = ["id", "name", "facility_id"]
 
 
+class VaccinationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vaccination
+        fields = "__all__"
+
+
+class DoseSerializer(serializers.ModelSerializer):
+    vaccination = VaccinationSerializer()
+
+    class Meta:
+        model = Dose
+        fields = "__all__"
+
+
 class EmployeeSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer()
     designation = DesignationSerializer()
     facility = FacilitySerializer()
+    vaccination = VaccinationSerializer()
 
     class Meta:
         model = Employee
@@ -61,18 +76,5 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "added_by",
             "added_date",
             "notes_remarks",
+            "vaccination",
         )
-
-
-class VaccinationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Vaccination
-        fields = "__all__"
-
-
-class DoseSerializer(serializers.ModelSerializer):
-    vaccination = VaccinationSerializer()
-
-    class Meta:
-        model = Dose
-        fields = "__all__"

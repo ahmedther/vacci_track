@@ -44,6 +44,7 @@ class Helper:
         employee, created = Employee.objects.update_or_create(
             pr_number=data.get("pr_number"), defaults=defaults
         )
+        employee.vaccinations.set(data.get("vaccinations"))
 
     def save_designation(self, data: dict):
         desig_id = data.get("id")

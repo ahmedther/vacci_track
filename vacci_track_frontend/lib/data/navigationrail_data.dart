@@ -11,10 +11,18 @@ const List<NavigationRailDestination> nagivationList = [
   ),
   NavigationRailDestination(
     icon: FaIcon(
+      FontAwesomeIcons.bookMedical,
+      color: Color(0xFF01579b),
+    ),
+    label:
+        Text("Record \nVaccine Dose", maxLines: 3, textAlign: TextAlign.center),
+  ),
+  NavigationRailDestination(
+    icon: FaIcon(
       FontAwesomeIcons.userGear,
       color: Color(0xFF01579b),
     ),
-    label: Text("Add/Edit\nEmployee", maxLines: 3),
+    label: Text("Add/Edit\nEmployee", maxLines: 3, textAlign: TextAlign.center),
   ),
   // NavigationRailDestination(
   //   icon: FaIcon(

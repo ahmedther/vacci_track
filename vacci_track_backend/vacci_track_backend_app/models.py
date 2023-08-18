@@ -139,9 +139,7 @@ class Employee(models.Model):
         null=False,
     )
     notes_remarks = models.TextField(blank=True, null=True, db_index=True)
-    vaccinations = models.ManyToManyField(
-        Vaccination, through="EmployeeVaccination", db_index=True, blank=True
-    )
+    vaccinations = models.ManyToManyField(Vaccination, db_index=True, blank=True)
 
     def __str__(self):
         return (

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
@@ -33,6 +34,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   late final List<DropdownMenuItem<String>> depatmentlist;
   late final List<DropdownMenuItem<String>> designationlist;
   late final List<DropdownMenuItem<String>> facilitylist;
+  late final List<MultiSelectItem<dynamic>> vaccineList;
 
   String? prefix;
   String? firstName;
@@ -49,6 +51,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   String? status;
   String? eligibility;
   String? notes;
+
+  List initialValueVaccine = [];
+
+  late final Color chipColor = Theme.of(context).colorScheme.primary;
 
   @override
   void initState() {
@@ -103,6 +109,12 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       );
     }).toList();
 
+    final List vaccineData = await Helpers.makeGetRequest(
+        "http://$API_URL/api/get_vaccination_list/");
+    vaccineList = vaccineData.map((item) {
+      return MultiSelectItem(item['id'], item['name']);
+    }).toList();
+
     setState(() {
       isSpinning = false;
     });
@@ -133,12 +145,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             "status": status,
             "eligibility": eligibility,
             "notes_remarks": notes,
+            "vaccinations": initialValueVaccine,
             if (widget.editPage) "edit": widget.editPage,
           });
       if (data.containsKey('error')) {
         setState(() {
           isSpinning = false;
         });
+        // ignore: use_build_context_synchronously
         Helpers.showSnackBar(context, data['error']);
       } else {
         prefix = null;
@@ -160,62 +174,43 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         );
         // ignore: use_build_context_synchronously
         Helpers.showDialogOnScreen(
-            context: context,
-            btnMessage: 'OK',
-            title: "✔ Successful",
-            message: widget.editPage
-                ? "User Successfully Updated"
-                : "User Successfully Added",
-            onPressed: () {});
-        setState(() {
-          _searchController.clear();
-          prefix = null;
-          status = '';
-          notes = '';
-          firstName = "";
-          middleName = "";
-          lastName = "";
-          gender = null;
-          phoneNumber = "";
-          emailID = "";
-          prNumber = "";
-          joiningDate = null;
-          department = null;
-          designation = null;
-          facility = null;
-          eligibility = null;
-
-          widget.assignAvatar(
-            newgender: "",
-            newprefix: "",
-            newfirstName: "",
-            newmiddleName: "",
-            newlastName: "",
-          );
-          isSpinning = false;
-        });
+          context: context,
+          btnMessage: 'OK',
+          title: "✔ Successful",
+          message: widget.editPage
+              ? "User Successfully Updated"
+              : "User Successfully Added",
+          onPressed: () {},
+        );
+        await resetBtnHandler();
       }
     }
   }
 
   Future resetBtnHandler() async {
-    _formKey.currentState!.reset();
-    _searchController.clear();
-    prefix = null;
-    status = '';
-    notes = '';
-    firstName = "";
-    middleName = "";
-    lastName = "";
-    gender = null;
-    phoneNumber = "";
-    emailID = "";
-    prNumber = "";
-    joiningDate = null;
-    department = null;
-    designation = null;
-    facility = null;
-    eligibility = null;
+    setState(() {
+      if (_formKey.currentState != null) {
+        _formKey.currentState!.reset();
+      }
+      _searchController.clear();
+      prefix = null;
+      status = '';
+      notes = '';
+      firstName = "";
+      middleName = "";
+      lastName = "";
+      gender = null;
+      phoneNumber = "";
+      emailID = "";
+      prNumber = "";
+      joiningDate = null;
+      department = null;
+      designation = null;
+      facility = null;
+      eligibility = null;
+      initialValueVaccine = [];
+      isSpinning = false;
+    });
 
     await widget.assignAvatar(
       newgender: "",
@@ -251,7 +246,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                         : "Search PR Number In EHIS Database",
                     leading: FaIcon(
                       FontAwesomeIcons.magnifyingGlass,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: chipColor,
                     ),
                     trailing: Iterable.generate(
                       1,
@@ -558,6 +553,45 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                 return null;
                               },
                             ),
+                            MultiSelectDialogField(
+                                items: vaccineList,
+                                checkColor: Colors.white,
+                                unselectedColor: Colors.white,
+                                dialogWidth: deviceWidth * .3,
+                                buttonIcon:
+                                    const Icon(FontAwesomeIcons.syringe),
+                                buttonText: const Text("Assign Vaccines",
+                                    style: TextStyle(fontSize: 16)),
+                                initialValue: initialValueVaccine,
+                                listType: MultiSelectListType.CHIP,
+                                selectedColor: chipColor,
+                                selectedItemsTextStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                searchHint: 'Search Vaccine',
+                                chipDisplay: MultiSelectChipDisplay(
+                                    chipColor: chipColor,
+                                    scroll: true,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                    onTap: (chip) {
+                                      setState(() {
+                                        if (initialValueVaccine.length > 1) {
+                                          initialValueVaccine.remove(chip);
+                                        } else {
+                                          initialValueVaccine = [];
+                                        }
+                                      });
+                                    }),
+                                title: const Text(
+                                    "Multi-Select Vaccine to Assign"),
+                                searchable: true,
+                                separateSelectedItems: true,
+                                onConfirm: (value) {
+                                  initialValueVaccine = value;
+                                }),
                             CustomInputField(
                               initialValue: notes,
                               width: deviceWidth,
@@ -620,7 +654,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     },
                     leading: CircleAvatar(
                       backgroundColor: Helpers.getRandomColor(),
-                      child: user['first_name'][0].isDefinedAndNotNull
+                      child: user['first_name'] != null
                           ? Text(user['first_name'][0],
                               style: const TextStyle(color: Colors.white))
                           : const FaIcon(FontAwesomeIcons.userAlt,
