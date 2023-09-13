@@ -28,7 +28,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
 
   final _formKey = GlobalKey<FormState>();
 
-  bool isSpinning = true;
+  bool _isSpinning = true;
 
   late final List<DropdownMenuItem<String>> prefixlist;
   late final List<DropdownMenuItem<String>> depatmentlist;
@@ -116,7 +116,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     }).toList();
 
     setState(() {
-      isSpinning = false;
+      _isSpinning = false;
     });
   }
 
@@ -124,7 +124,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
-        isSpinning = true;
+        _isSpinning = true;
       });
       final API_URL = await Helpers.load_env();
       final Map data = await Helpers.makePostRequest(
@@ -150,7 +150,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
           });
       if (data.containsKey('error')) {
         setState(() {
-          isSpinning = false;
+          _isSpinning = false;
         });
         // ignore: use_build_context_synchronously
         Helpers.showSnackBar(context, data['error']);
@@ -209,7 +209,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       facility = null;
       eligibility = null;
       initialValueVaccine = [];
-      isSpinning = false;
+      _isSpinning = false;
     });
 
     await widget.assignAvatar(
@@ -225,7 +225,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    return isSpinning
+    return _isSpinning
         ? const SpinnerWithOverlay(
             spinnerColor: Colors.blue,
           )
@@ -694,7 +694,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
 
   void searchEhisOracle(BuildContext context) async {
     setState(() {
-      isSpinning = true;
+      _isSpinning = true;
     });
     final API_URL = await Helpers.load_env();
     final List empData = await Helpers.makeGetRequest(
@@ -704,7 +704,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, empData[0]['error']);
       setState(() {
-        isSpinning = false;
+        _isSpinning = false;
       });
       return;
     }
@@ -716,13 +716,13 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       await _dialogBuilder(context, empData[0]);
     }
     setState(() {
-      isSpinning = false;
+      _isSpinning = false;
     });
   }
 
   void searchDjango(BuildContext context) async {
     setState(() {
-      isSpinning = true;
+      _isSpinning = true;
     });
     final API_URL = await Helpers.load_env();
     final List empData = await Helpers.makeGetRequest(
@@ -732,15 +732,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, empData[0]['error']);
       setState(() {
-        isSpinning = false;
+        _isSpinning = false;
       });
       return;
     }
-
     await updateOtherDeatils(empData[0]);
     await updateEmpForm(empData[0]);
     setState(() {
-      isSpinning = false;
+      _isSpinning = false;
     });
   }
 
@@ -782,5 +781,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     status = empData["status"];
     eligibility = empData["eligibility"];
     notes = empData["notes_remarks"];
+
+    initialValueVaccine.addAll(
+      (empData["vaccinations"] as List?)
+              ?.map<int?>((value) => value?['id'])
+              .where((id) => id != null)
+              .cast<int>() // Cast the filtered values to int
+              .toList() ??
+          [],
+    );
   }
 }

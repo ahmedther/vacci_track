@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/employee_add_form.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
+import 'package:vacci_track_frontend/forms/record_vaccine_page.dart';
 
 class AddNewEmployee extends StatefulWidget {
-  const AddNewEmployee({super.key});
+  const AddNewEmployee(
+      {required this.heading,
+      required this.toggleIcon1,
+      required this.toggleIcon2,
+      required this.toggelText1,
+      required this.toggelText2,
+      required this.employeeAddFrom,
+      super.key});
+
+  final String heading;
+  final Widget toggleIcon1;
+  final Widget toggleIcon2;
+  final String toggelText1;
+  final String toggelText2;
+  final bool employeeAddFrom;
 
   @override
   State<AddNewEmployee> createState() => _AddNewEmployeeState();
@@ -18,6 +32,8 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   String lastName = "";
 
   final List<bool> _selectedToggle = <bool>[true, false];
+
+  int buildcounter = 0;
 
   Future assignAvatar({
     String? newgender,
@@ -41,6 +57,16 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
     });
   }
 
+  void resetAvatar() {
+    setState(() {
+      gender = "";
+      prefix = "";
+      firstName = "";
+      middleName = "";
+      lastName = "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
@@ -54,19 +80,31 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
           }
         });
       },
-      heading: "Add/Edit Employee",
-      toggelIcon1: const FaIcon(FontAwesomeIcons.userPlus),
-      toggelIcon2: const FaIcon(FontAwesomeIcons.userEdit),
-      toggelText1: "Add A New",
-      toggelText2: "Edit Old",
-      toggelWidget1: EmployeeAddForm(
-        assignAvatar: assignAvatar,
-        editPage: false,
-      ),
-      toggelWidget2: EmployeeAddForm(
-        assignAvatar: assignAvatar,
-        editPage: true,
-      ),
+      heading: widget.heading,
+      toggelIcon1: widget.toggleIcon1,
+      toggelIcon2: widget.toggleIcon2,
+      toggelText1: widget.toggelText1,
+      toggelText2: widget.toggelText2,
+      toggelWidget1: widget.employeeAddFrom
+          ? EmployeeAddForm(
+              assignAvatar: assignAvatar,
+              editPage: false,
+            )
+          : RecordVaccineForm(
+              assignAvatar: assignAvatar,
+              editPage: false,
+              resetAvatar: resetAvatar,
+            ),
+      toggelWidget2: widget.employeeAddFrom
+          ? EmployeeAddForm(
+              assignAvatar: assignAvatar,
+              editPage: true,
+            )
+          : RecordVaccineForm(
+              assignAvatar: assignAvatar,
+              editPage: true,
+              resetAvatar: resetAvatar,
+            ),
       widgetsToDisplay: [
         CircleAvatar(
           backgroundColor: Colors.blue,

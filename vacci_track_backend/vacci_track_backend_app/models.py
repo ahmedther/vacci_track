@@ -184,6 +184,9 @@ class EmployeeVaccination(models.Model):
         max_length=20, blank=True, null=True, db_index=True
     )
     next_dose_due_date = models.DateField(blank=True, null=True, db_index=True)
+    is_dose_due = models.BooleanField(
+        default=False, db_index=True, verbose_name="Is This Dose Due?"  
+    )
     notes_remarks = models.TextField(blank=True, null=True, db_index=True)
 
     def save(self, *args, **kwargs):

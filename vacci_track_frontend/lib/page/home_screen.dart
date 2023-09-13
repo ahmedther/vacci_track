@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/model/users.dart';
-import 'package:vacci_track_frontend/page/record_vaccine_page.dart';
 import 'package:vacci_track_frontend/ui/navigation_side_bar.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
@@ -12,6 +11,7 @@ import 'package:vacci_track_frontend/page/add_department_page.dart';
 import 'package:vacci_track_frontend/page/add_facility_page.dart';
 import 'package:vacci_track_frontend/page/add_vaccine_page.dart';
 import 'package:vacci_track_frontend/page/add_dose_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const String routeName = '/';
@@ -24,13 +24,27 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late final UserData userData;
-  int currentIndex = 2;
-  int? navCurrentIndex = 2;
+  int currentIndex = 1;
+  int? navCurrentIndex = 1;
   bool isSpinning = true;
   List<Widget> pages = [
     const Text("Home"),
-    const RecordVaccinePage(),
-    const AddNewEmployee(),
+    const AddNewEmployee(
+      heading: "Record a Vaccine Dose",
+      employeeAddFrom: false,
+      toggleIcon1: FaIcon(FontAwesomeIcons.bookMedical),
+      toggleIcon2: FaIcon(FontAwesomeIcons.bookMedical),
+      toggelText1: "Record a Dose",
+      toggelText2: "Edit A Dose",
+    ),
+    const AddNewEmployee(
+      heading: "Add/Edit Employee",
+      toggleIcon1: FaIcon(FontAwesomeIcons.userPlus),
+      toggleIcon2: FaIcon(FontAwesomeIcons.userEdit),
+      toggelText1: "Add A New",
+      toggelText2: "Edit Old",
+      employeeAddFrom: true,
+    ),
     const AddDesignation(),
     const AddDepartment(),
     const AddFacilityPage(),

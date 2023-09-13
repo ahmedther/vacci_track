@@ -53,7 +53,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer()
     designation = DesignationSerializer()
     facility = FacilitySerializer()
-    vaccination = VaccinationSerializer()
+    vaccinations = VaccinationSerializer(many=True)
 
     class Meta:
         model = Employee
@@ -76,5 +76,5 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "added_by",
             "added_date",
             "notes_remarks",
-            "vaccination",
+            "vaccinations",
         )
