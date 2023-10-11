@@ -6,7 +6,6 @@ import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
-import 'dart:js_interop';
 
 // ignore: must_be_immutable
 class DoseAddForm extends StatefulWidget {
@@ -141,7 +140,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
 
   Future resetBtnHandler() async {
     setState(() {
-      if (_formKey.currentState.isDefinedAndNotNull) {
+      if (_formKey.currentState != null) {
         _formKey.currentState!.reset();
       }
       _searchController.clear();

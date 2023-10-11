@@ -1,4 +1,3 @@
-import 'dart:js_interop';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
@@ -106,7 +105,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
           data: {
             if (widget.editPage) "id": _id,
             "name": departmentName,
-            if (hod.isDefinedAndNotNull) "department_hod": hod,
+            if (hod != null) "department_hod": hod,
             if (widget.editPage) "edit": widget.editPage,
           });
       if (data.containsKey('error')) {

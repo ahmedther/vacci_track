@@ -1,4 +1,3 @@
-import 'dart:js_interop';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -188,7 +187,7 @@ class Helpers {
       lastDate: DateTime.now(),
       helpText: "Select Joining Date",
     );
-    if (selectedDate.isDefinedAndNotNull) return selectedDate;
+    if (selectedDate != null) return selectedDate;
     return null;
   }
 
@@ -305,7 +304,7 @@ class Helpers {
         int.parse(randomColorCode.substring(1, 7), radix: 16) + 0xFF000000);
   }
 
-  static void showSnackBar(BuildContext context, errorMessage) {
+  static void showSnackBar(BuildContext context, String? errorMessage) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: ErrorSnackBar(

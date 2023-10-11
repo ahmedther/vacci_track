@@ -65,6 +65,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "middle_name",
             "last_name",
             "joining_date",
+            "uhid",
             "pr_number",
             "phone_number",
             "email_id",

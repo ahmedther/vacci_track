@@ -149,30 +149,38 @@ def get_vaccination_list(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def searh_emp_on_oracle_db(request):
-    pr_num = request.query_params["query"].split("=")[-1]
+    query = request.query_params["query"].split("=")[-1]
     try:
         alchemy = SqlAlchemyConnection()
-        emp_data = alchemy.get_employees_details_with_pr_num(pr_num)
+        emp_data = alchemy.get_employees_details(query)
         if not emp_data:
             return Response(
-                [{"error": f"No Records found for the User with PR Number {pr_num}"}],
+                [{"error": f"No Records found for the User with PR Number {query}"}],
                 status=405,
             )
+
         converted_data = [
             {
                 "prefix": tup[0],
                 "first_name": tup[1],
                 "middle_name": tup[2],
                 "last_name": tup[3],
-                "gender": "Male" if tup[4] == "M" else "Female",
-                "phone_number": tup[6]
-                if tup[5] == "" or tup[5] == None or len(tup[5]) < 2
-                else tup[5],
-                "email_id": tup[7],
-                "facility": tup[8],
+                "uhid": tup[4],
+                "pr_number": tup[5],
+                "gender": "Male" if tup[6] == "M" else "Female",
+                "phone_number": tup[7]
+                if tup[8] == "" or tup[8] == None or len(tup[8]) < 2
+                else tup[8],
+                "email_id": tup[9],
+                "facility": FacilitySerializer(
+                    Facility.objects.filter(facility_id=tup[10]).first()
+                ).data
+                if Facility.objects.filter(facility_id=tup[10]).exists()
+                else {"name": tup[10], "id": None},
             }
             for tup in emp_data
         ]
+
         return Response(converted_data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
@@ -182,12 +190,29 @@ def searh_emp_on_oracle_db(request):
 @permission_classes([IsAuthenticated])
 def search_employee(request):
     try:
-        emp_data = Employee.objects.get(
-            pr_number=request.query_params["query"].split("=")[-1]
-        )
-        serializer = EmployeeSerializer(emp_data)
+        query = request.query_params["query"].split("=")[-1]
+        emp_data = Employee.objects.filter(Q(pr_number=query) | Q(uhid__contains=query))
+        serializer = EmployeeSerializer(emp_data, many=True)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
 
-        return Response([serializer.data], status=200)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def search_employee_by_name(request):
+    try:
+        query = request.query_params["query"].split("=")[-1]
+        emp_data = Employee.objects.filter(
+            Q(pr_number__contains=query)
+            | Q(uhid__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(middle_name__icontains=query)
+            | Q(last_name__icontains=query)
+        )[:15]
+
+        serializer = EmployeeSerializer(emp_data, many=True)
+        return Response(serializer.data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
 
@@ -217,7 +242,9 @@ def search_hod(request):
 def create_new_employee(request):
     try:
         data: dict = json.loads(request.body)
-        pr_number_exists = Employee.objects.filter(pr_number=data["pr_number"]).exists()
+        pr_number_exists = Employee.objects.filter(
+            Q(uhid=data.get("uhid")) | Q(pr_number=data.get("pr_number"))
+        ).exists()
 
         if pr_number_exists and not data.get("edit"):
             return JsonResponse(

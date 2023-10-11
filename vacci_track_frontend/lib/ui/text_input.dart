@@ -11,6 +11,7 @@ class CustomInputField extends StatelessWidget {
     this.inputFormatters,
     this.maxLines,
     this.border,
+    this.enabled,
     required this.width,
     required this.onSaved,
     required this.label,
@@ -21,6 +22,7 @@ class CustomInputField extends StatelessWidget {
   String? initialValue;
   int? maxLines;
   InputBorder? border;
+  bool? enabled;
   List<TextInputFormatter>? inputFormatters;
   void Function(String)? onChanged = (value) {};
   void Function(String?)? onSaved = (value) {};
@@ -33,6 +35,7 @@ class CustomInputField extends StatelessWidget {
     return SizedBox(
       width: width,
       child: TextFormField(
+        enabled: enabled,
         inputFormatters: inputFormatters,
         onChanged: onChanged,
         initialValue: initialValue,

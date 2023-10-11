@@ -1,4 +1,3 @@
-import 'dart:js_interop';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -30,6 +29,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
 
   bool _isSpinning = true;
 
+  bool _searchError = false;
+
+  bool _useUpdateOthers = false;
+
   late final List<DropdownMenuItem<String>> prefixlist;
   late final List<DropdownMenuItem<String>> depatmentlist;
   late final List<DropdownMenuItem<String>> designationlist;
@@ -43,6 +46,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   String? gender;
   DateTime? joiningDate;
   String? prNumber;
+  String? uhid;
   String? phoneNumber;
   String? emailID;
   String? department;
@@ -137,6 +141,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             "gender": gender,
             "joining_date": joiningDate.toString(),
             "pr_number": prNumber,
+            "uhid": uhid,
             "phone_number": phoneNumber,
             "email_id": emailID,
             "department": department,
@@ -162,7 +167,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         gender = null;
         phoneNumber = "";
         emailID = "";
-        prNumber = "";
+        prNumber = null;
+        uhid = null;
         joiningDate = null;
         _searchController.clear();
         await widget.assignAvatar(
@@ -202,13 +208,15 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       gender = null;
       phoneNumber = "";
       emailID = "";
-      prNumber = "";
+      prNumber = null;
+      uhid = null;
       joiningDate = null;
       department = null;
       designation = null;
       facility = null;
       eligibility = null;
       initialValueVaccine = [];
+      _searchError = false;
       _isSpinning = false;
     });
 
@@ -242,8 +250,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     controller: _searchController,
                     elevation: const MaterialStatePropertyAll(2),
                     hintText: widget.editPage
-                        ? "Search PR Number In VacciTrack Database"
-                        : "Search PR Number In EHIS Database",
+                        ? "Search PR or UHID In VacciTrack Database"
+                        : "Search PR or UHID EHIS Database",
                     leading: FaIcon(
                       FontAwesomeIcons.magnifyingGlass,
                       color: chipColor,
@@ -258,22 +266,50 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           ),
                           child: Text(
                             widget.editPage
-                                ? "${deviceWidth < 900 ? '🔎' : 'Search'}"
-                                : "${deviceWidth < 900 ? '🔎' : 'Search in EHIS'}",
+                                ? deviceWidth < 900
+                                    ? '🔎'
+                                    : 'Search'
+                                : deviceWidth < 900
+                                    ? '🔎'
+                                    : 'Search in EHIS',
                           ),
                           onPressed: () {
-                            widget.editPage
-                                ? searchDjango(context)
-                                : searchEhisOracle(context);
+                            if (_searchController.text.trim().length > 3) {
+                              widget.editPage
+                                  ? searchDjango(context)
+                                  : searchEhisOracle(context);
+                            } else {
+                              setState(() {
+                                _searchError = true;
+                              });
+                            }
                           },
                         );
                       },
                     ),
                     onChanged: (value) {
-                      _searchController = Helpers.keepOnlyNumbers(
-                          searchController: _searchController, value: value);
+                      setState(() {
+                        _searchError = false;
+                      });
+                      _searchController.value = TextEditingValue(
+                        text: value.toUpperCase(),
+                        selection: _searchController.selection,
+                      );
                     },
                   ),
+                  _searchError
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 40),
+                            child: Text(
+                              "Enter a Valid UHID / PR Number",
+                              style: TextStyle(
+                                  color: Colors.red.shade800, fontSize: 12),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(width: 0, height: 17),
                   Form(
                     key: _formKey,
                     child: Column(
@@ -396,7 +432,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    joiningDate.isDefinedAndNotNull
+                                    joiningDate != null
                                         ? formater.format(joiningDate!)
                                         : "Joining Date",
                                     style: const TextStyle(fontSize: 16),
@@ -405,7 +441,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                     onPressed: () async {
                                       joiningDate =
                                           await Helpers.openDatePicker(context);
-                                      if (joiningDate.isDefinedAndNotNull) {
+                                      if (joiningDate != null) {
                                         setState(() {});
                                       }
                                     },
@@ -416,6 +452,26 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               ),
                             ),
                             CustomInputField(
+                              enabled: uhid != null ? false : true,
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              onSaved: (value) {
+                                if (value == null) return;
+                                uhid = value;
+                              },
+                              initialValue: uhid,
+                              label: "UHID",
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.trim().isEmpty) {
+                                  return "UHID Number  Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            CustomInputField(
+                              enabled: prNumber != null ? false : true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               inputFormatters: [
@@ -426,7 +482,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                 if (value == null) return;
                                 prNumber = value;
                               },
-                              initialValue: _searchController.text,
+                              initialValue: prNumber,
                               label: "PR Number",
                               validator: (value) {
                                 if (value == null ||
@@ -636,11 +692,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              'Dependents Found with PR Number ${_searchController.text} '),
+          title: Text('Results Found With ${_searchController.text} '),
           content: SizedBox(
             height: MediaQuery.of(context).size.height * .5,
-            width: MediaQuery.of(context).size.width * .01,
+            width: MediaQuery.of(context).size.width * .3,
             child: ListView.builder(
               itemCount: empData.length,
               itemBuilder: (context, index) {
@@ -649,7 +704,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                   child: ListTile(
                     hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {
-                      updateEmpForm(user);
+                      _useUpdateOthers ? await updateOtherDeatils(user) : null;
+                      await updateEmpForm(user);
+                      // ignore: use_build_context_synchronously
                       context.pop();
                     },
                     leading: CircleAvatar(
@@ -665,10 +722,12 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text('UHID: ${user['uhid'] ?? ''}'),
+                        Text('PR Number: ${user['pr_number'] ?? ''}'),
                         Text('Gender: ${user['gender'] ?? ''}'),
                         Text('Phone Number: ${user['phone_number'] ?? ''}'),
                         Text('Email ID: ${user['email_id'] ?? ''}'),
-                        Text('Facility: ${user['facility'] ?? ''}'),
+                        Text('Facility: ${user['facility']['name'] ?? ''}'),
                       ],
                     ),
                   ),
@@ -700,7 +759,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/searh_emp_on_oracle_db/",
         query: "param1=${_searchController.text}");
-    if (empData[0].containsKey("error")) {
+    if ((empData[0] as Map).containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, empData[0]['error']);
       setState(() {
@@ -713,7 +772,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       await _dialogBuilder(context, empData);
     } else {
       // ignore: use_build_context_synchronously
-      await _dialogBuilder(context, empData[0]);
+      await updateEmpForm(empData[0]);
     }
     setState(() {
       _isSpinning = false;
@@ -728,16 +787,31 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_employee/",
         query: "param1=${_searchController.text}");
-    if (empData[0].containsKey("error")) {
+    if (empData.isEmpty || (empData[0] as Map).containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, empData[0]['error']);
+      Helpers.showSnackBar(
+          context,
+          empData.isEmpty
+              ? "No Results Found with UHID/PR Number ${_searchController.text}"
+              : (empData[0] as Map).containsKey("error")
+                  ? empData[0]["error"]
+                  : "No Results Found with UHID/PR Number ${_searchController.text}");
       setState(() {
         _isSpinning = false;
       });
       return;
     }
-    await updateOtherDeatils(empData[0]);
-    await updateEmpForm(empData[0]);
+    if (empData.length > 1) {
+      // ignore: use_build_context_synchronously
+      _useUpdateOthers = true;
+      await _dialogBuilder(context, empData);
+      _useUpdateOthers = false;
+    } else {
+      // ignore: use_build_context_synchronously
+      await updateOtherDeatils(empData[0]);
+      await updateEmpForm(empData[0]);
+    }
+
     setState(() {
       _isSpinning = false;
     });
@@ -749,9 +823,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     middleName = empData["middle_name"];
     lastName = empData["last_name"];
     gender = empData["gender"];
-    prNumber = _searchController.text;
+    prNumber = empData["pr_number"];
+    uhid = empData["uhid"];
     phoneNumber = empData["phone_number"];
     emailID = empData["email_id"];
+    facility = empData["facility"]["id"]?.toString();
     await widget.assignAvatar(
       newgender: gender,
       newprefix: prefix,
@@ -766,6 +842,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       joiningDate = DateTime.parse(empData["joining_date"]);
     }
     prNumber = empData["pr_number"];
+    uhid = empData["uhid"];
     phoneNumber = empData["phone_number"];
     department =
         empData["department"] != null && empData["department"]["id"] != null
@@ -777,7 +854,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             ? empData["designation"]["id"].toString()
             : null;
     empData["designation"]["id"].toString();
-    facility = empData["facility"]["id"].toString();
+
     status = empData["status"];
     eligibility = empData["eligibility"];
     notes = empData["notes_remarks"];

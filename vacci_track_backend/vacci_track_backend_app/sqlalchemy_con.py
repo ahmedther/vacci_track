@@ -1,4 +1,4 @@
-from sqlalchemy import Table, MetaData, create_engine, inspect
+from sqlalchemy import Table, MetaData, create_engine, inspect, or_
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 
@@ -29,21 +29,24 @@ class SqlAlchemyConnection:
         # create a session to interact with the database
         self.session = self.Session()
 
-    def get_employees_details_with_pr_num(self, pr_number):
+    def get_employees_details(self, query):
         self.make_connection()
-        # retrieve a patient by pr_number
+        # retrieve a patient by query
         employee_data = (
             self.session.query(self.mp_patient)
             .filter(
-                self.mp_patient.columns.alt_id2_no == pr_number,
-                self.mp_patient.columns.alt_id2_type == "EML",
-                self.mp_patient.columns.alt_id2_no.isnot(None),
+                or_(
+                    self.mp_patient.columns.alt_id2_no == query,
+                    self.mp_patient.columns.patient_id.like(f"%{query}%"),
+                )
             )
             .with_entities(
                 self.mp_patient.columns.name_prefix,
                 self.mp_patient.columns.first_name,
                 self.mp_patient.columns.second_name,
                 self.mp_patient.columns.family_name,
+                self.mp_patient.columns.patient_id,
+                self.mp_patient.columns.alt_id2_no,
                 self.mp_patient.columns.sex,
                 self.mp_patient.columns.contact1_no,
                 self.mp_patient.columns.contact2_no,

@@ -1,4 +1,3 @@
-import 'dart:js_interop';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
@@ -104,7 +103,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
 
   Future resetBtnHandler() async {
     setState(() {
-      if (_formKey.currentState.isDefinedAndNotNull) {
+      if (_formKey.currentState != null) {
         _formKey.currentState!.reset();
       }
       _name = null;

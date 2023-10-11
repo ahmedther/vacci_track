@@ -29,6 +29,7 @@ class Helper:
             "middle_name": data.get("middle_name"),
             "last_name": data.get("last_name"),
             "joining_date": validated_join_date,
+            "uhid": data.get("uhid"),
             "pr_number": data.get("pr_number"),
             "phone_number": data.get("phone_number"),
             "email_id": data.get("email_id"),

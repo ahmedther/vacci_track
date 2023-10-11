@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:js_interop';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
@@ -108,7 +107,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
 
   Future resetBtnHandler() async {
     setState(() {
-      if (_formKey.currentState.isDefinedAndNotNull) {
+      if (_formKey.currentState != null) {
         _formKey.currentState!.reset();
       }
       _id = null;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/forms/employee_add_form.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
-import 'package:vacci_track_frontend/forms/record_vaccine_page.dart';
+import 'package:vacci_track_frontend/forms/record_vaccine_form.dart';
 
 class AddNewEmployee extends StatefulWidget {
   const AddNewEmployee(

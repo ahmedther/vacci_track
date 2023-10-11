@@ -90,6 +90,7 @@ class Employee(models.Model):
     last_name = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     joining_date = models.DateField(blank=True, null=True, db_index=True)
     pr_number = models.CharField(max_length=20, blank=True, null=True, db_index=True)
+    uhid = models.CharField(max_length=20, blank=True, null=True, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True, db_index=True)
     email_id = models.EmailField(blank=True, null=True, db_index=True)
     department = models.ForeignKey(
