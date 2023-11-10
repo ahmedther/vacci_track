@@ -109,7 +109,8 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
             ),
       widgetsToDisplay: [
         CircleAvatar(
-          backgroundColor: Colors.blue,
+          backgroundColor:
+              gender.toLowerCase() == 'female' ? Colors.pink : Colors.blue,
           maxRadius: deviceHeight * 0.09,
           child: CircleAvatar(
             backgroundColor: Colors.blue[100],

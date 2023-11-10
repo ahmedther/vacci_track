@@ -189,7 +189,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                       children: [
                         FaIcon(FontAwesomeIcons.mars, color: profileColor),
                         const SizedBox(height: 20),
-                        FaIcon(FontAwesomeIcons.idCardClip,
+                        FaIcon(FontAwesomeIcons.buildingUser,
                             color: profileColor),
                       ],
                     ),
@@ -199,7 +199,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                       children: [
                         Text("Gender"),
                         SizedBox(height: 20),
-                        Text("PR Number"),
+                        Text("Desgination"),
                       ],
                     ),
                     const SizedBox(
@@ -226,19 +226,21 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                       ],
                     ),
                     const SizedBox(width: 60),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        FaIcon(FontAwesomeIcons.buildingUser),
-                        SizedBox(height: 20),
-                        FaIcon(FontAwesomeIcons.solidIdBadge),
+                        FaIcon(FontAwesomeIcons.idCardClip,
+                            color: profileColor),
+                        const SizedBox(height: 20),
+                        FaIcon(FontAwesomeIcons.solidIdBadge,
+                            color: profileColor),
                       ],
                     ),
                     const SizedBox(width: 20),
                     const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Desgination"),
+                        Text("PR Number"),
                         SizedBox(height: 20),
                         Text("UHID"),
                       ],
