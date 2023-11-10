@@ -46,8 +46,10 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
       if (newgender != null) gender = newgender;
       if (newprefix != null) {
         prefix = newprefix;
-        if (prefix == "Mrs." || prefix == "Ms" || prefix == "Ms.")
+        if (prefix == "Mrs." || prefix == "Ms" || prefix == "Ms.") {
           gender = "female";
+        }
+
         if (prefix == "Mr." || prefix == "Mr") gender = "male";
       }
       ;

@@ -203,13 +203,16 @@ def search_employee(request):
 def search_employee_by_name(request):
     try:
         query = request.query_params["query"].split("=")[-1]
-        emp_data = Employee.objects.filter(
-            Q(pr_number__contains=query)
-            | Q(uhid__icontains=query)
-            | Q(first_name__icontains=query)
-            | Q(middle_name__icontains=query)
-            | Q(last_name__icontains=query)
-        )[:15]
+        if query == "":
+            emp_data = Employee.objects.all().order_by("-id")[:15]
+        else:
+            emp_data = Employee.objects.filter(
+                Q(pr_number__contains=query)
+                | Q(uhid__icontains=query)
+                | Q(first_name__icontains=query)
+                | Q(middle_name__icontains=query)
+                | Q(last_name__icontains=query)
+            )[:15]
 
         serializer = EmployeeSerializer(emp_data, many=True)
         return Response(serializer.data, status=200)

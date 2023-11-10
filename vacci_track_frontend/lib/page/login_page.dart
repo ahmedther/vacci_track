@@ -156,6 +156,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   color: Colors.white,
                                 ),
                                 "Password",
+                                obscureText: true,
                                 dataCallback: passwordCallback),
                           ),
                           Container(

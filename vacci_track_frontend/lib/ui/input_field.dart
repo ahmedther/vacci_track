@@ -5,8 +5,9 @@ class InputField extends StatefulWidget {
   Icon fieldIcon;
   String hintText;
   Function dataCallback;
+  bool obscureText = false;
   InputField(this.fieldIcon, this.hintText,
-      {required this.dataCallback, Key? key})
+      {this.obscureText = false, required this.dataCallback, Key? key})
       : super(key: key);
 
   void sendDataToParent(text) {
@@ -49,6 +50,7 @@ class _InputFieldState extends State<InputField> {
                 padding: const EdgeInsets.all(8.0),
                 child: Form(
                   child: TextField(
+                    obscureText: widget.obscureText,
                     //TestField
                     controller: _text,
                     onChanged: (text) => {widget.sendDataToParent(text)},

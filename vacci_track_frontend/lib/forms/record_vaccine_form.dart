@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
-
+import 'package:vacci_track_frontend/ui/badge.dart';
 import '../ui/spinner.dart';
 
 // ignore: must_be_immutable
@@ -32,8 +32,8 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   String? middleName;
   String? lastName;
   String? gender;
-
   List? empData1;
+  bool textSelectionCount = false;
 
   @override
   void initState() {
@@ -41,6 +41,26 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     Future.delayed(Duration.zero, () {
       widget.resetAvatar();
     });
+  }
+
+  Future updateEmpForm(Map empData) async {
+    prefix = empData["prefix"] ?? "Mr.";
+    firstName = empData["first_name"];
+    middleName = empData["middle_name"];
+    lastName = empData["last_name"];
+    gender = empData["gender"];
+    // prNumber = empData["pr_number"];
+    // uhid = empData["uhid"];
+    // phoneNumber = empData["phone_number"];
+    // emailID = empData["email_id"];
+    // facility = empData["facility"]["id"]?.toString();
+    await widget.assignAvatar(
+      newgender: gender,
+      newprefix: prefix,
+      newfirstName: firstName,
+      newmiddleName: middleName,
+      newlastName: lastName,
+    );
   }
 
   Future searchEmployee(BuildContext context, String query,
@@ -55,7 +75,6 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_employee_by_name/",
         query: "param1=$query");
-
     if (spinning &&
         (empData.isEmpty || (empData[0] as Map).containsKey("error"))) {
       // ignore: use_build_context_synchronously
@@ -79,7 +98,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     if (spinning) {
       _isForm = true;
       // await updateOtherDeatils(empData[0]);
-      // await updateEmpForm(empData[0]);
+      await updateEmpForm(empData[0]);
       setState(() {
         _isSpinning = false;
       });
@@ -151,15 +170,99 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    Color? profileColor =
+        gender?.toLowerCase() == "male" ? Colors.blue : Colors.pink;
     ColorScheme themeColor = Theme.of(context).colorScheme;
+
     return _isSpinning
         ? const SpinnerWithOverlay(
             spinnerColor: Colors.blue,
           )
         : Column(
             children: [
-              if (_isForm) ...{Text(empData1.toString())},
+              if (_isForm) ...<Widget>{
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        FaIcon(FontAwesomeIcons.mars, color: profileColor),
+                        const SizedBox(height: 20),
+                        FaIcon(FontAwesomeIcons.idCardClip,
+                            color: profileColor),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Gender"),
+                        SizedBox(height: 20),
+                        Text("PR Number"),
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const Column(
+                      children: [
+                        Text(":"),
+                        SizedBox(height: 20),
+                        Text(":"),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomBadge(
+                          text: "Male",
+                        ),
+                        const SizedBox(height: 20),
+                        CustomBadge(
+                          text: "222222222",
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 60),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FaIcon(FontAwesomeIcons.buildingUser),
+                        SizedBox(height: 20),
+                        FaIcon(FontAwesomeIcons.solidIdBadge),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Desgination"),
+                        SizedBox(height: 20),
+                        Text("UHID"),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    const Column(
+                      children: [
+                        Text(":"),
+                        SizedBox(height: 20),
+                        Text(":"),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomBadge(text: "Nurse in I.T"),
+                        const SizedBox(height: 20),
+                        CustomBadge(text: "222222222"),
+                      ],
+                    ),
+                  ],
+                )
+              },
               Card(
                 borderOnForeground: true,
                 elevation: 100,
@@ -196,57 +299,66 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                 );
                               },
                             ),
-                            onChanged: (_) async {
-                              if (controller.text.length <= 3) return;
-                              await searchEmployee(context, controller.text);
-                              if (empData1 == null || empData1!.isEmpty) return;
-
+                            // onChanged: (_) async {
+                            //   if (controller.text.length <= 3) return;
+                            //   await searchEmployee(context, controller.text);
+                            //   if (empData1 == null || empData1!.isEmpty) return;
+                            //   controller.openView();
+                            // },
+                            onTap: () async {
+                              final query = controller.text.length > 3
+                                  ? controller.text
+                                  : "";
+                              await searchEmployee(context, query);
                               controller.openView();
                             },
                           );
                         },
+                        viewElevation: 100,
                         suggestionsBuilder: (BuildContext context,
-                            SearchController controller) {
-                          bool textSelectionExecuted = false;
+                            SearchController controller) async {
+                          Future.delayed(Duration.zero, () {
+                            controller.selection = TextSelection.collapsed(
+                                offset: controller.text.length);
+                          });
+                          await searchEmployee(context, controller.text);
+                          if (empData1 == null || empData1!.isEmpty) return [];
                           return empData1!.map(
-                            (e) {
-                              if (!textSelectionExecuted) {
-                                controller.selection = TextSelection.collapsed(
-                                    offset: controller.text.length);
-                                textSelectionExecuted = true;
-                              }
+                            (item) {
                               return Card(
                                 child: ListTile(
                                   hoverColor: const Color.fromARGB(31, 0, 0, 0),
                                   onTap: () async {
+                                    await updateEmpForm(item);
+                                    setState(() {
+                                      _isForm = true;
+                                    });
+                                    controller.closeView(controller.text);
                                     // _useUpdateOthers
                                     //     ? await updateOtherDeatils(user)
                                     //     : null;
-                                    // await updateEmpForm(user);
-                                    // // ignore: use_build_context_synchronously
-                                    // context.pop();
                                   },
                                   leading: CircleAvatar(
                                     backgroundColor: Helpers.getRandomColor(),
-                                    child: e['first_name'] != null
-                                        ? Text(e['first_name'][0],
+                                    child: item['first_name'] != null
+                                        ? Text(item['first_name'][0],
                                             style: const TextStyle(
                                                 color: Colors.white))
                                         : const FaIcon(FontAwesomeIcons.userAlt,
                                             color: Colors.white),
                                   ),
                                   title: Text(
-                                      '${e['prefix'] ?? ""} ${e['first_name'] ?? ""} ${e['middle_name'] ?? ""}  ${e['last_name'] ?? ""}'),
+                                      '${item['prefix'] ?? ""} ${item['first_name'] ?? ""} ${item['middle_name'] ?? ""}  ${item['last_name'] ?? ""}'),
                                   subtitle: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'UHID: ${e['uhid'] ?? ''}',
+                                        'UHID: ${item['uhid'] ?? ''}',
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                       Text(
-                                        'PR Number: ${e['pr_number'] ?? ''}',
+                                        'PR Number: ${item['pr_number'] ?? ''}',
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                     ],
@@ -255,6 +367,13 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                               );
                             },
                           );
+                        },
+                        viewBuilder: (Iterable<Widget> suggestions) {
+                          return ListView.builder(
+                              itemCount: suggestions.length,
+                              itemBuilder: ((context, index) {
+                                return suggestions.elementAt(index);
+                              }));
                         },
                       ),
                       if (!_isForm) ...{
