@@ -5,6 +5,8 @@ import 'package:vacci_track_frontend/page/login_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+//colors #01579b #e91e63 #76997d
+
 class Home extends StatelessWidget {
   static const String title = 'Vacci Track';
   const Home({super.key});
