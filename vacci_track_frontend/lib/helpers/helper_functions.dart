@@ -25,6 +25,8 @@ class Helpers {
     prefs.setInt("user_id", int.parse(data['user_id']));
     prefs.setString("fullName", data['user_fullname']);
     prefs.setString("username", data['username']);
+    prefs.setString("gender", data['gender']);
+    prefs.setString("prNumber", data['pr_number']);
     prefs.setString("token", data['token']);
     prefs.setBool("isLoggedIn", true);
   }
@@ -35,10 +37,10 @@ class Helpers {
       id: prefs.getInt("user_id"),
       fullName: prefs.getString('fullName'),
       username: prefs.getString('username'),
+      gender: prefs.getString('gender'),
+      prNumber: prefs.getString('prNumber'),
       token: prefs.getString('token'),
-      isLoggedIn: prefs.getBool("isLoggedIn") != null
-          ? prefs.getBool("isLoggedIn")
-          : false,
+      isLoggedIn: prefs.getBool("isLoggedIn") ?? false,
     );
 
     return userData;
@@ -49,8 +51,6 @@ class Helpers {
     String? API_URL = dotenv.env['API_URL'];
     return API_URL;
   }
-
-  
 
   static Future get_csrfToken() async {
     // Create an HttpClient instance
@@ -348,5 +348,12 @@ class Helpers {
         );
       },
     );
+  }
+
+  static Color getThemeColor(String gender) {
+    Color themeColor =
+        gender.toLowerCase() == 'male' ? const Color(0xFF01579b) : Colors.pink;
+
+    return themeColor;
   }
 }

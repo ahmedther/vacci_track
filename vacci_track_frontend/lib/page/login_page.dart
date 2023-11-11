@@ -77,19 +77,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (data.containsKey("error")) {
         error = true;
         errorMessage = data['error']!;
+        // ignore: use_build_context_synchronously
         Helpers.showSnackBar(context, errorMessage);
         return;
       }
-      ;
       UserData userData = UserData(
         id: int.parse(data['user_id']),
         fullName: data['user_fullname'],
         username: data['username'],
+        gender: data['gender'],
+        prNumber: data['pr_number'],
         token: data['token'],
         isLoggedIn: true,
       );
-
       ref.watch(userProvider.notifier).setUserData(userData);
+      // ignore: use_build_context_synchronously
       context.go('/');
     }
   }
@@ -105,22 +107,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               color: Colors.lightBlueAccent,
               child: Stack(
                 children: <Widget>[
-                  Align(
+                  const Align(
                     alignment: Alignment.bottomRight,
                     heightFactor: 0.5,
                     widthFactor: 0.5,
                     child: Material(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(200.0)),
-                      color: const Color.fromRGBO(255, 255, 255, 0.4),
-                      child: Container(
+                      borderRadius: BorderRadius.all(Radius.circular(200.0)),
+                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                      child: SizedBox(
                         width: 400,
                         height: 400,
                       ),
                     ),
                   ),
                   Center(
-                    child: Container(
+                    child: SizedBox(
                       width: 400,
                       height: 400,
                       child: Column(
@@ -159,7 +160,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 obscureText: true,
                                 dataCallback: passwordCallback),
                           ),
-                          Container(
+                          SizedBox(
                             width: 150,
                             child: ElevatedButton(
                               onPressed: () => sendLoginRequest(context),

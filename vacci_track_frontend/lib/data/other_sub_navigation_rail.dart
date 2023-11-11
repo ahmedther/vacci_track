@@ -1,29 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
-const List<NavigationRailDestination> otherSubNavigationList = [
-  NavigationRailDestination(
-    icon: FaIcon(
-      FontAwesomeIcons.userTag,
-      color: Color(0xFF01579b),
+List<NavigationRailDestination> getotherSubNavigationList(String gender) {
+  final Color iconColor = Helpers.getThemeColor(gender);
+
+  final List<NavigationRailDestination> otherSubNavigationList = [
+    NavigationRailDestination(
+      icon: FaIcon(
+        FontAwesomeIcons.userTag,
+        color: iconColor,
+      ),
+      label: const Text("Designation"),
+      padding: const EdgeInsets.symmetric(vertical: 10),
     ),
-    label: Text("Designation"),
-    padding: EdgeInsets.symmetric(vertical: 10),
-  ),
-  NavigationRailDestination(
-    icon: FaIcon(
-      FontAwesomeIcons.buildingUser,
-      color: Color(0xFF01579b),
+    NavigationRailDestination(
+      icon: FaIcon(
+        FontAwesomeIcons.buildingUser,
+        color: iconColor,
+      ),
+      label: const Text("Department", maxLines: 3),
+      padding: const EdgeInsets.symmetric(vertical: 10),
     ),
-    label: Text("Department", maxLines: 3),
-    padding: EdgeInsets.symmetric(vertical: 10),
-  ),
-  NavigationRailDestination(
-    icon: FaIcon(
-      FontAwesomeIcons.buildingCircleArrowRight,
-      color: Color(0xFF01579b),
+    NavigationRailDestination(
+      icon: FaIcon(
+        FontAwesomeIcons.buildingCircleArrowRight,
+        color: iconColor,
+      ),
+      label: const Text("Facility", maxLines: 3),
+      padding: const EdgeInsets.symmetric(vertical: 10),
     ),
-    label: Text("Facility", maxLines: 3),
-    padding: EdgeInsets.symmetric(vertical: 10),
-  ),
-];
+  ];
+
+  return otherSubNavigationList;
+}

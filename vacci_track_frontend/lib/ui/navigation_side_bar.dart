@@ -31,6 +31,14 @@ class NavigationSideBar extends ConsumerStatefulWidget {
 class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
   bool isVaccineHover = false;
+  late List<NavigationRailDestination> nagivationList =
+      getNavigationRailDestinations(widget.userData.gender!);
+
+  late List<NavigationRailDestination> otherSubNavigationList =
+      getotherSubNavigationList(widget.userData.gender!);
+
+  late List<NavigationRailDestination> vaccinationNavigationList =
+      getvaccinationNavigationList(widget.userData.gender!);
 
   void _toggleExtended(event) {
     setState(() {

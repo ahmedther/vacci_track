@@ -55,6 +55,8 @@ def login_user(request):
                 "user_fullname": f"{request.user.get_full_name().title()}",
                 "username": f"{user.get_username()}",
                 "user_id": f"{user.id}",
+                "gender": f"{user.appuser.gender}",
+                "pr_number": f"{user.appuser.pr_number}",
                 "token": token.key,
             },
             status=200,

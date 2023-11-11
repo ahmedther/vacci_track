@@ -61,6 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       _pageController = PageController(initialPage: currentIndex);
     });
+
   }
 
   @override
