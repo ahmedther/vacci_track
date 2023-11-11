@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomBadge extends StatelessWidget {
-  String text;
+  String? text;
   TextStyle? style;
   List<Color> gradientColors;
   CustomBadge(
-      {required this.text,
+      {this.text = "Not Defined",
       this.gradientColors = const [
         Color.fromARGB(255, 57, 57, 57),
         Color.fromARGB(255, 0, 0, 0),
@@ -16,7 +16,7 @@ class CustomBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25),
         gradient: LinearGradient(
@@ -27,7 +27,7 @@ class CustomBadge extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        text,
+        text!,
         style: style,
       ),
     );

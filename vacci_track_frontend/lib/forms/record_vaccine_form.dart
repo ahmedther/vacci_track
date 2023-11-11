@@ -32,6 +32,10 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   String? middleName;
   String? lastName;
   String? gender;
+  String? prNumber;
+  String? uhid;
+  String? department;
+  String? designation;
   List? empData1;
   bool textSelectionCount = false;
 
@@ -49,17 +53,26 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     middleName = empData["middle_name"];
     lastName = empData["last_name"];
     gender = empData["gender"];
-    // prNumber = empData["pr_number"];
-    // uhid = empData["uhid"];
+    prNumber = empData["pr_number"] ?? "NO PR Number Entered";
+    uhid = empData["uhid"] ?? "NO UHID Entered";
+    department =
+        empData["department"] != null && empData["department"]["id"] != null
+            ? empData["department"]["name"].toString()
+            : null;
+
+    designation =
+        empData["designation"] != null && empData["designation"]["id"] != null
+            ? empData["designation"]["name"].toString()
+            : null;
     // phoneNumber = empData["phone_number"];
     // emailID = empData["email_id"];
     // facility = empData["facility"]["id"]?.toString();
     await widget.assignAvatar(
-      newgender: gender,
-      newprefix: prefix,
-      newfirstName: firstName,
-      newmiddleName: middleName,
-      newlastName: lastName,
+      newgender: gender ?? "",
+      newprefix: prefix ?? "",
+      newfirstName: firstName ?? "",
+      newmiddleName: middleName ?? "",
+      newlastName: lastName ?? "",
     );
   }
 
@@ -170,8 +183,17 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    Color? profileColor =
-        gender?.toLowerCase() == "male" ? Colors.blue : Colors.pink;
+    List<Color> profileColor = gender?.toLowerCase() == "female"
+        ? [
+            Colors.pink,
+            const Color.fromARGB(255, 244, 57, 119),
+            const Color.fromARGB(255, 255, 0, 85)
+          ]
+        : [
+            const Color(0xff01579b),
+            Color.fromARGB(255, 76, 124, 160),
+            const Color(0xff01579b),
+          ];
     ColorScheme themeColor = Theme.of(context).colorScheme;
 
     return _isSpinning
@@ -180,36 +202,51 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
           )
         : Column(
             children: [
-              if (_isForm) ...<Widget>{
+              if (_isForm && deviceWidth > 900) ...<Widget>{
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        FaIcon(FontAwesomeIcons.mars, color: profileColor),
+                        FaIcon(FontAwesomeIcons.mars, color: profileColor[0]),
                         const SizedBox(height: 20),
                         FaIcon(FontAwesomeIcons.buildingUser,
-                            color: profileColor),
+                            color: profileColor[0]),
                       ],
                     ),
                     const SizedBox(width: 20),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Gender"),
-                        SizedBox(height: 20),
-                        Text("Desgination"),
+                        Text("Gender",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 20),
+                        Text(
+                          "Desgination",
+                          style: TextStyle(
+                              color: profileColor[0],
+                              fontWeight: FontWeight.bold),
+                        ),
                       ],
                     ),
                     const SizedBox(
                       width: 20,
                     ),
-                    const Column(
+                    Column(
                       children: [
-                        Text(":"),
-                        SizedBox(height: 20),
-                        Text(":"),
+                        Text(":",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 20),
+                        Text(":",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(width: 20),
@@ -217,49 +254,67 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomBadge(
-                          text: "Male",
-                        ),
+                            text: gender, // gender
+                            gradientColors: [profileColor[1], profileColor[2]]),
                         const SizedBox(height: 20),
                         CustomBadge(
-                          text: "222222222",
-                        ),
+                            text: designation != null && department != null
+                                ? "$designation in $department"
+                                : "Not Available", // Designation in Department
+                            gradientColors: [profileColor[1], profileColor[2]]),
                       ],
                     ),
-                    const SizedBox(width: 60),
+                    const SizedBox(width: 100),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         FaIcon(FontAwesomeIcons.idCardClip,
-                            color: profileColor),
+                            color: profileColor[0]),
                         const SizedBox(height: 20),
                         FaIcon(FontAwesomeIcons.solidIdBadge,
-                            color: profileColor),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("PR Number"),
-                        SizedBox(height: 20),
-                        Text("UHID"),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    const Column(
-                      children: [
-                        Text(":"),
-                        SizedBox(height: 20),
-                        Text(":"),
+                            color: profileColor[0]),
                       ],
                     ),
                     const SizedBox(width: 20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CustomBadge(text: "Nurse in I.T"),
+                        Text("PR Number",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
                         const SizedBox(height: 20),
-                        CustomBadge(text: "222222222"),
+                        Text("UHID",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      children: [
+                        Text(":",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 20),
+                        Text(":",
+                            style: TextStyle(
+                                color: profileColor[0],
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomBadge(
+                            text: prNumber, // PR Number
+                            gradientColors: [profileColor[1], profileColor[2]]),
+                        const SizedBox(height: 20),
+                        CustomBadge(
+                            text: uhid,
+                            gradientColors: [profileColor[1], profileColor[2]]),
                       ],
                     ),
                   ],

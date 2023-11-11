@@ -829,11 +829,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     emailID = empData["email_id"];
     facility = empData["facility"]["id"]?.toString();
     await widget.assignAvatar(
-      newgender: gender,
-      newprefix: prefix,
-      newfirstName: firstName,
-      newmiddleName: middleName,
-      newlastName: lastName,
+      newgender: gender ?? "",
+      newprefix: prefix ?? "",
+      newfirstName: firstName ?? "",
+      newmiddleName: middleName ?? "",
+      newlastName: lastName ?? "",
     );
   }
 

@@ -109,8 +109,9 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
             ),
       widgetsToDisplay: [
         CircleAvatar(
-          backgroundColor:
-              gender.toLowerCase() == 'female' ? Colors.pink : Colors.blue,
+          backgroundColor: gender.toLowerCase() == 'female'
+              ? Colors.pink
+              : const Color(0xff01579b),
           maxRadius: deviceHeight * 0.09,
           child: CircleAvatar(
             backgroundColor: Colors.blue[100],
@@ -129,6 +130,9 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
             fontSize: deviceHeight * 0.02,
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
+            color: gender.toLowerCase() == 'female'
+                ? Colors.pink
+                : const Color(0xff01579b),
           ),
         ),
         SizedBox(

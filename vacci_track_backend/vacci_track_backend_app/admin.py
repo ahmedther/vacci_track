@@ -1,4 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from vacci_track_backend_app.forms import NewUserCreationForm
+
 from .models import (
     Department,
     Designation,
@@ -7,7 +11,34 @@ from .models import (
     Vaccination,
     Employee,
     EmployeeVaccination,
+    AppUser,
 )
+
+
+class AppUserInline(admin.StackedInline):
+    model = AppUser
+    can_delete = False
+    verbose_name_plural = "App Users"
+
+
+class AppUserAdmin(BaseUserAdmin):
+    add_form = NewUserCreationForm
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "password1",
+                    "password2",
+                    "first_name",
+                    "last_name",
+                ),
+            },
+        ),
+    )
+    inlines = (AppUserInline,)
 
 
 class DepartmentAdmin(admin.ModelAdmin):
@@ -56,7 +87,10 @@ class EmployeeVaccinationAdmin(admin.ModelAdmin):
     ]
 
 
+admin.site.unregister(User)
+
 models_and_admins = [
+    (User, AppUserAdmin),
     (Department, DepartmentAdmin),
     (Designation, DesignationAdmin),
     (Facility, FacilityAdmin),
@@ -72,6 +106,7 @@ for model, admin_class in models_and_admins:
 
 
 # CHnage admin Panel
+
 admin.site.site_header = "Vacci Track Admin Panel"
 admin.site.site_title = "Vacci Track Admin Panel"
 admin.site.index_title = "Vacci Track Administration"

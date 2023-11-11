@@ -1,5 +1,18 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+
+
+class AppUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    GENDER_CHOICES = (
+        ("Male", "Male"),
+        ("Female", "Female"),
+    )
+    pr_number = models.CharField(max_length=16, blank=False, null=False, db_index=True)
+    gender = models.CharField(
+        max_length=10, choices=GENDER_CHOICES, blank=False, null=False, db_index=True
+    )
 
 
 class Department(models.Model):
@@ -186,7 +199,7 @@ class EmployeeVaccination(models.Model):
     )
     next_dose_due_date = models.DateField(blank=True, null=True, db_index=True)
     is_dose_due = models.BooleanField(
-        default=False, db_index=True, verbose_name="Is This Dose Due?"  
+        default=False, db_index=True, verbose_name="Is This Dose Due?"
     )
     notes_remarks = models.TextField(blank=True, null=True, db_index=True)
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/toggle_button_items.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
 // ignore: must_be_immutable
 class FormUI extends StatelessWidget {
@@ -34,35 +35,38 @@ class FormUI extends StatelessWidget {
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
       children: [
-        Container(
-          color: Theme.of(context).colorScheme.background,
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(deviceHeight * .02),
-                child: Text(
-                  heading,
-                  style: TextStyle(
-                    fontSize: deviceHeight * .03,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.bold,
+        ConstrainedBox(
+          constraints: BoxConstraints(minHeight: deviceHeight),
+          child: Container(
+            color: Color.fromARGB(9, 1, 88, 155),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(deviceHeight * .02),
+                  child: Text(
+                    heading,
+                    style: TextStyle(
+                      fontSize: deviceHeight * .03,
+                      letterSpacing: 1,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              ...?widgetsToDisplay,
-              ToggleButtons(
-                isSelected: selectedToggle,
-                onPressed: toggleFunction,
-                children: [
-                  ToggleButtonItems(icon: toggelIcon1, text: toggelText1),
-                  ToggleButtonItems(icon: toggelIcon2, text: toggelText2),
-                ],
-              ),
-              SizedBox(
-                height: deviceHeight * 0.02,
-              ),
-              selectedToggle[0] ? toggelWidget1 : toggelWidget2
-            ],
+                ...?widgetsToDisplay,
+                ToggleButtons(
+                  isSelected: selectedToggle,
+                  onPressed: toggleFunction,
+                  children: [
+                    ToggleButtonItems(icon: toggelIcon1, text: toggelText1),
+                    ToggleButtonItems(icon: toggelIcon2, text: toggelText2),
+                  ],
+                ),
+                SizedBox(
+                  height: deviceHeight * 0.02,
+                ),
+                selectedToggle[0] ? toggelWidget1 : toggelWidget2
+              ],
+            ),
           ),
         ),
       ],

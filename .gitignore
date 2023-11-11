@@ -56,7 +56,7 @@ vacci_track_frontend/ios/Flutter/app.dSYM
 vacci_track_frontend/**/test/*.log
 
 # Generated files
-vacci_track_frontend/**/*.g.dart
+# vacci_track_frontend/**/*.g.dart
 vacci_track_frontend/**/*.freezed.dart
 vacci_track_frontend/**/*.gr.dart
 vacci_track_frontend/**/*.pb.dart
