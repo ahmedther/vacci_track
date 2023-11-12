@@ -1,5 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vacci_track_frontend/model/users.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 UserData defaultUserData = UserData(isLoggedIn: false);
 

@@ -31,14 +31,16 @@ class NavigationSideBar extends ConsumerStatefulWidget {
 class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
   bool isVaccineHover = false;
-  late List<NavigationRailDestination> nagivationList =
+  late final List<NavigationRailDestination> nagivationList =
       getNavigationRailDestinations(widget.userData.gender!);
 
-  late List<NavigationRailDestination> otherSubNavigationList =
+  late final List<NavigationRailDestination> otherSubNavigationList =
       getotherSubNavigationList(widget.userData.gender!);
 
-  late List<NavigationRailDestination> vaccinationNavigationList =
+  late final List<NavigationRailDestination> vaccinationNavigationList =
       getvaccinationNavigationList(widget.userData.gender!);
+
+  late final Color uiColor = Helpers.getThemeColor(widget.userData.gender!);
 
   void _toggleExtended(event) {
     setState(() {
@@ -77,7 +79,9 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: invalid_use_of_protected_member
+    final Color themeColor = widget.userData.gender!.toLowerCase() == 'male'
+        ? Theme.of(context).colorScheme.primaryContainer
+        : Theme.of(context).colorScheme.secondaryContainer;
     return Row(
       children: [
         NavigationRail(
@@ -89,32 +93,35 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
               CustomMouseRegionOnNavigationRail(
                   onEnter: _toggleExtended,
                   isHovered: isOtherHover,
-                  icon: const FaIcon(
+                  icon: FaIcon(
                     FontAwesomeIcons.circlePlus,
-                    color: Color(0xFF01579b),
+                    color: uiColor,
                   ),
                   label: "Add Others"),
               const SizedBox(height: 10),
               CustomMouseRegionOnNavigationRail(
                   onEnter: _toggleVacineHover,
                   isHovered: isVaccineHover,
-                  icon: const FaIcon(
+                  icon: FaIcon(
                     FontAwesomeIcons.syringe,
-                    color: Color(0xFF01579b),
+                    color: uiColor,
                   ),
                   label: "Add New Vaccine"),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () => logoutHandle(context, ref),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     FaIcon(
                       FontAwesomeIcons.rightFromBracket,
-                      color: Color(0xFF01579b),
+                      color: uiColor,
                     ),
-                    Text('Logout')
+                    Text(
+                      'Logout',
+                      style: TextStyle(color: uiColor),
+                    )
                   ],
                 ),
               ),
@@ -126,8 +133,8 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
             widget.changePage(value);
             print(value);
           },
-          indicatorColor: const Color.fromARGB(141, 255, 255, 255),
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          indicatorColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: themeColor,
           elevation: 10,
           labelType: NavigationRailLabelType.all,
           useIndicator: true,
@@ -148,7 +155,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
               elevation: 10,
               selectedIndex: null,
               indicatorColor: const Color.fromARGB(141, 255, 255, 255),
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: themeColor,
               destinations: isOtherHover
                   ? otherSubNavigationList
                   : vaccinationNavigationList,

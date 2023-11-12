@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vacci_track_frontend/components/toggle_button_items.dart';
+import 'package:vacci_track_frontend/model/users.dart';
+import 'package:vacci_track_frontend/provider/user_provider.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
 // ignore: must_be_immutable
-class FormUI extends StatelessWidget {
+
+class FormUI extends ConsumerWidget {
   FormUI(
       {this.widgetsToDisplay,
       required this.selectedToggle,
@@ -29,7 +33,12 @@ class FormUI extends StatelessWidget {
   final Widget toggelWidget2;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    Color backgroundColor =
+        ref.watch(userProvider).gender?.toLowerCase() == 'male'
+            ? const Color.fromARGB(10, 1, 88, 155)
+            : const Color.fromARGB(10, 233, 30, 98);
+
     double deviceHeight = MediaQuery.of(context).size.height;
     return ListView(
       shrinkWrap: true,
@@ -38,7 +47,8 @@ class FormUI extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints(minHeight: deviceHeight),
           child: Container(
-            color: Color.fromARGB(9, 1, 88, 155),
+            color: backgroundColor,
+            // color: const Color.fromARGB(9, 1, 88, 155),
             child: Column(
               children: [
                 Padding(

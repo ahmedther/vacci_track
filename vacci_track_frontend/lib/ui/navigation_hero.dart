@@ -5,8 +5,9 @@ import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/model/users.dart';
 
 class NavigationHero extends StatelessWidget {
-  const NavigationHero(this.userData, {super.key});
+  NavigationHero(this.userData, {super.key});
   final UserData userData;
+  late final Color uiColor = Helpers.getThemeColor(userData.gender!);
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +25,8 @@ class NavigationHero extends StatelessWidget {
           animatedTexts: [
             TypewriterAnimatedText(
               'Vacci Track',
-              textStyle: const TextStyle(
-                color: Colors.blue,
+              textStyle: TextStyle(
+                color: uiColor,
                 letterSpacing: 2,
                 fontWeight: FontWeight.bold,
               ),
@@ -38,15 +39,25 @@ class NavigationHero extends StatelessWidget {
           height: Helpers.min_max(deviceWidth, 0.12, 106, 120),
           child: Column(
             children: [
-              CircleAvatar(
-                backgroundColor: const Color(0xFF01579b),
-                radius: 20,
+              InkWell(
+                highlightColor: uiColor,
+                splashColor: uiColor,
+                hoverColor: Colors.white,
                 child: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Helpers.getRandomColor(),
-                  radius: 18,
-                  child: const FaIcon(FontAwesomeIcons.userTie),
+                  backgroundColor: uiColor,
+                  radius: 20,
+                  child: CircleAvatar(
+                    backgroundColor: userData.gender!.toLowerCase() == 'male'
+                        ? Theme.of(context).colorScheme.primaryContainer
+                        : Theme.of(context).colorScheme.secondaryContainer,
+                    foregroundColor: uiColor,
+                    radius: 18,
+                    child: const FaIcon(FontAwesomeIcons.userTie),
+                  ),
                 ),
+                onTap: () {
+                  print("THis was CLicked");
+                },
               ),
               AnimatedTextKit(
                 isRepeatingAnimation: true,
@@ -55,25 +66,33 @@ class NavigationHero extends StatelessWidget {
                   RotateAnimatedText(
                     userData.fullName!.split(" ").first,
                     textAlign: TextAlign.center,
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF01579b),
+                      color: uiColor,
                     ),
                   ),
                   RotateAnimatedText(
                     userData.fullName!.split(" ").last,
                     textAlign: TextAlign.center,
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF01579b),
+                      color: uiColor,
                     ),
                   ),
                   RotateAnimatedText(
                     "username: ${userData.username}",
                     textAlign: TextAlign.center,
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF01579b),
+                      color: uiColor,
+                    ),
+                  ),
+                  RotateAnimatedText(
+                    "PR : ${userData.prNumber}",
+                    textAlign: TextAlign.center,
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: uiColor,
                     ),
                   ),
                 ],

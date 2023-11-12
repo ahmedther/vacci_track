@@ -175,7 +175,7 @@ class Helpers {
     return userData;
   }
 
-  static void clearProviderAndPrefs(ref) async {
+  static void clearProviderAndPrefs(WidgetRef ref) async {
     ref.watch(userProvider.notifier).setUserData(UserData(isLoggedIn: false));
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -355,5 +355,11 @@ class Helpers {
         gender.toLowerCase() == 'male' ? const Color(0xFF01579b) : Colors.pink;
 
     return themeColor;
+  }
+
+  static Future<String> getAppUserGender() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String genderString = prefs.getString('gender') ?? 'male';
+    return genderString;
   }
 }
