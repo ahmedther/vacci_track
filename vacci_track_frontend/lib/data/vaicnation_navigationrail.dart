@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
-List<NavigationRailDestination> getvaccinationNavigationList(String gender) {
-  final Color iconColor = Helpers.getThemeColor(gender);
-
+List<NavigationRailDestination> getvaccinationNavigationList(Color iconColor) {
   final List<NavigationRailDestination> vaccinationNavigationList = [
     NavigationRailDestination(
       icon: FaIcon(

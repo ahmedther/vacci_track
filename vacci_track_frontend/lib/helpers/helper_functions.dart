@@ -1,13 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacci_track_frontend/model/users.dart';
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:vacci_track_frontend/provider/user_provider.dart';
-import 'package:intl/intl.dart';
 import 'package:vacci_track_frontend/ui/error_snackbar.dart';
 
 final formater = DateFormat('dd-MMM-yyyy');
@@ -352,14 +352,23 @@ class Helpers {
 
   static Color getThemeColor(String gender) {
     Color themeColor =
-        gender.toLowerCase() == 'male' ? const Color(0xFF01579b) : Colors.pink;
+        gender.toLowerCase() == "male" ? const Color(0xFF01579b) : Colors.pink;
 
     return themeColor;
   }
 
   static Future<String> getAppUserGender() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String genderString = prefs.getString('gender') ?? 'male';
+    String genderString = prefs.getString("gender") ?? "male";
     return genderString;
+  }
+
+  static Future genderChange(WidgetRef? ref) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    UserData userData = ref!.watch(userProvider);
+    userData.gender =
+        userData.gender?.toLowerCase() == "male" ? "female" : "male";
+    ref.watch(userProvider.notifier).setUserData(userData);
+    prefs.setString("gender", userData.gender!);
   }
 }

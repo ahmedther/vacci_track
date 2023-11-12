@@ -5,10 +5,9 @@ import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:vacci_track_frontend/components/ui_scaler.dart";
 
-// ignore: must_be_immutable
 class DesignationAddForm extends StatefulWidget {
-  bool editPage;
-  DesignationAddForm({required this.editPage, super.key});
+  final bool editPage;
+  const DesignationAddForm({required this.editPage, super.key});
 
   @override
   State<DesignationAddForm> createState() => _DesignationAddFormState();

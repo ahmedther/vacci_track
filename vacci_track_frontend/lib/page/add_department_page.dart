@@ -4,7 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/department_add_form.dart';
 
 class AddDepartment extends StatefulWidget {
-  const AddDepartment({super.key});
+  final Color backgroundColor;
+  const AddDepartment({required this.backgroundColor, super.key});
 
   @override
   State<AddDepartment> createState() => _AddDepartmentState();
@@ -16,6 +17,7 @@ class _AddDepartmentState extends State<AddDepartment> {
   @override
   Widget build(BuildContext context) {
     return FormUI(
+      backgroundColor: widget.backgroundColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {
         setState(() {

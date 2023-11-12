@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
-List<NavigationRailDestination> getotherSubNavigationList(String gender) {
-  final Color iconColor = Helpers.getThemeColor(gender);
-
+List<NavigationRailDestination> getotherSubNavigationList(Color iconColor) {
   final List<NavigationRailDestination> otherSubNavigationList = [
     NavigationRailDestination(
       icon: FaIcon(

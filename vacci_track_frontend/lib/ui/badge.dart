@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CustomBadge extends StatelessWidget {
-  String? text;
-  TextStyle? style;
-  List<Color> gradientColors;
-  CustomBadge(
+  final String? text;
+  final TextStyle? style;
+  final List<Color> gradientColors;
+  const CustomBadge(
       {this.text = "Not Defined",
       this.gradientColors = const [
         Color.fromARGB(255, 57, 57, 57),

@@ -1,19 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class CustomMouseRegionOnNavigationRail extends StatelessWidget {
-  CustomMouseRegionOnNavigationRail(
+  const CustomMouseRegionOnNavigationRail(
       {required this.isHovered,
       required this.icon,
       required this.label,
       this.onEnter,
       super.key});
 
-  void Function(PointerEnterEvent)? onEnter;
-  bool isHovered;
-  Widget icon;
-  String label;
+  final void Function(PointerEnterEvent)? onEnter;
+  final bool isHovered;
+  final Widget icon;
+  final String label;
 
   @override
   Widget build(BuildContext context) {

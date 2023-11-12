@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vacci_track_frontend/components/toggle_button_items.dart';
-import 'package:vacci_track_frontend/model/users.dart';
-import 'package:vacci_track_frontend/provider/user_provider.dart';
-import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
 // ignore: must_be_immutable
 
-class FormUI extends ConsumerWidget {
-  FormUI(
+class FormUI extends StatelessWidget {
+  const FormUI(
       {this.widgetsToDisplay,
       required this.selectedToggle,
       required this.toggleFunction,
@@ -19,9 +15,10 @@ class FormUI extends ConsumerWidget {
       required this.toggelText2,
       required this.toggelWidget1,
       required this.toggelWidget2,
+      required this.backgroundColor,
       super.key});
 
-  List<Widget>? widgetsToDisplay;
+  final List<Widget>? widgetsToDisplay;
   final List<bool> selectedToggle;
   final Function(int) toggleFunction;
   final String heading;
@@ -31,14 +28,10 @@ class FormUI extends ConsumerWidget {
   final String toggelText2;
   final Widget toggelWidget1;
   final Widget toggelWidget2;
+  final Color backgroundColor;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    Color backgroundColor =
-        ref.watch(userProvider).gender?.toLowerCase() == 'male'
-            ? const Color.fromARGB(10, 1, 88, 155)
-            : const Color.fromARGB(10, 233, 30, 98);
-
+  Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     return ListView(
       shrinkWrap: true,

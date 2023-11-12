@@ -4,7 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/vaccine_add_form.dart';
 
 class AddVaccinePage extends StatefulWidget {
-  const AddVaccinePage({super.key});
+  final Color backgroundColor;
+  const AddVaccinePage({required this.backgroundColor, super.key});
 
   @override
   State<AddVaccinePage> createState() => _AddVaccinePageState();
@@ -16,6 +17,7 @@ class _AddVaccinePageState extends State<AddVaccinePage> {
   @override
   Widget build(BuildContext context) {
     return FormUI(
+      backgroundColor: widget.backgroundColor,
       heading: "Add A New Vaccine",
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {

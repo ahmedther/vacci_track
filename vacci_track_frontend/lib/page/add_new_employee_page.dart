@@ -11,6 +11,7 @@ class AddNewEmployee extends StatefulWidget {
       required this.toggelText1,
       required this.toggelText2,
       required this.employeeAddFrom,
+      required this.backgroundColor,
       super.key});
 
   final String heading;
@@ -19,6 +20,7 @@ class AddNewEmployee extends StatefulWidget {
   final String toggelText1;
   final String toggelText2;
   final bool employeeAddFrom;
+  final Color backgroundColor;
 
   @override
   State<AddNewEmployee> createState() => _AddNewEmployeeState();
@@ -73,6 +75,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     return FormUI(
+      backgroundColor: widget.backgroundColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {
         setState(() {

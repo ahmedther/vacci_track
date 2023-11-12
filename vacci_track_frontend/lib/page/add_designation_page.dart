@@ -4,7 +4,8 @@ import 'package:vacci_track_frontend/forms/designation_add_form.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
 
 class AddDesignation extends StatefulWidget {
-  const AddDesignation({super.key});
+  final Color backgroundColor;
+  const AddDesignation({required this.backgroundColor, super.key});
 
   @override
   State<AddDesignation> createState() => _AddDesignationState();
@@ -20,6 +21,7 @@ class _AddDesignationState extends State<AddDesignation> {
       physics: const BouncingScrollPhysics(),
       children: [
         FormUI(
+          backgroundColor: widget.backgroundColor,
           selectedToggle: _selectedToggle,
           toggleFunction: (int index) {
             setState(() {

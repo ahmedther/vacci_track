@@ -11,18 +11,25 @@ import 'package:vacci_track_frontend/data/vaicnation_navigationrail.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:vacci_track_frontend/components/mouse_region_icons.dart';
 
-// ignore: must_be_immutable
 class NavigationSideBar extends ConsumerStatefulWidget {
   final UserData userData;
-  int? currentIndex = 2;
-  Function(int) changePage;
-  void Function(dynamic) changeNavIndex;
-  NavigationSideBar(
-      {super.key,
-      required this.userData,
-      required this.currentIndex,
-      required this.changePage,
-      required this.changeNavIndex});
+  final Color uiColor;
+  final Color backgroundColor;
+
+  final int? currentIndex;
+  final Function(int) changePage;
+  final void Function(dynamic) changeNavIndex;
+  final void Function() changeUiColor;
+  const NavigationSideBar({
+    super.key,
+    required this.userData,
+    required this.uiColor,
+    required this.backgroundColor,
+    required this.changePage,
+    required this.changeNavIndex,
+    required this.changeUiColor,
+    this.currentIndex = 2,
+  });
 
   @override
   ConsumerState<NavigationSideBar> createState() => _NavigationSideBarState();
@@ -31,16 +38,14 @@ class NavigationSideBar extends ConsumerStatefulWidget {
 class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
   bool isVaccineHover = false;
-  late final List<NavigationRailDestination> nagivationList =
-      getNavigationRailDestinations(widget.userData.gender!);
+  late List<NavigationRailDestination> nagivationList =
+      getNavigationRailDestinations(widget.uiColor);
 
-  late final List<NavigationRailDestination> otherSubNavigationList =
-      getotherSubNavigationList(widget.userData.gender!);
+  late List<NavigationRailDestination> otherSubNavigationList =
+      getotherSubNavigationList(widget.uiColor);
 
-  late final List<NavigationRailDestination> vaccinationNavigationList =
-      getvaccinationNavigationList(widget.userData.gender!);
-
-  late final Color uiColor = Helpers.getThemeColor(widget.userData.gender!);
+  late List<NavigationRailDestination> vaccinationNavigationList =
+      getvaccinationNavigationList(widget.uiColor);
 
   void _toggleExtended(event) {
     setState(() {
@@ -79,13 +84,18 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
 
   @override
   Widget build(BuildContext context) {
-    final Color themeColor = widget.userData.gender!.toLowerCase() == 'male'
-        ? Theme.of(context).colorScheme.primaryContainer
-        : Theme.of(context).colorScheme.secondaryContainer;
+    nagivationList = getNavigationRailDestinations(widget.uiColor);
+    otherSubNavigationList = getotherSubNavigationList(widget.uiColor);
+    vaccinationNavigationList = getvaccinationNavigationList(widget.uiColor);
     return Row(
       children: [
         NavigationRail(
-          leading: NavigationHero(widget.userData),
+          leading: NavigationHero(
+            backgroundColor: widget.backgroundColor,
+            uiColor: widget.uiColor,
+            userData: widget.userData,
+            changeUiColor: widget.changeUiColor,
+          ),
           trailing: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -95,7 +105,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
                   isHovered: isOtherHover,
                   icon: FaIcon(
                     FontAwesomeIcons.circlePlus,
-                    color: uiColor,
+                    color: widget.uiColor,
                   ),
                   label: "Add Others"),
               const SizedBox(height: 10),
@@ -104,7 +114,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
                   isHovered: isVaccineHover,
                   icon: FaIcon(
                     FontAwesomeIcons.syringe,
-                    color: uiColor,
+                    color: widget.uiColor,
                   ),
                   label: "Add New Vaccine"),
               const SizedBox(height: 10),
@@ -116,11 +126,11 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
                   children: [
                     FaIcon(
                       FontAwesomeIcons.rightFromBracket,
-                      color: uiColor,
+                      color: widget.uiColor,
                     ),
                     Text(
                       'Logout',
-                      style: TextStyle(color: uiColor),
+                      style: TextStyle(color: widget.uiColor),
                     )
                   ],
                 ),
@@ -134,7 +144,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
             print(value);
           },
           indicatorColor: const Color.fromARGB(255, 255, 255, 255),
-          backgroundColor: themeColor,
+          backgroundColor: widget.backgroundColor,
           elevation: 10,
           labelType: NavigationRailLabelType.all,
           useIndicator: true,
@@ -155,7 +165,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
               elevation: 10,
               selectedIndex: null,
               indicatorColor: const Color.fromARGB(141, 255, 255, 255),
-              backgroundColor: themeColor,
+              backgroundColor: widget.backgroundColor,
               destinations: isOtherHover
                   ? otherSubNavigationList
                   : vaccinationNavigationList,

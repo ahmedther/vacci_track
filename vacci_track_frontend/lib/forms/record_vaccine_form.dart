@@ -5,9 +5,8 @@ import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/badge.dart';
 import '../ui/spinner.dart';
 
-// ignore: must_be_immutable
 class RecordVaccineForm extends StatefulWidget {
-  RecordVaccineForm(
+  const RecordVaccineForm(
       {required this.editPage,
       required this.assignAvatar,
       required this.resetAvatar,
@@ -15,7 +14,7 @@ class RecordVaccineForm extends StatefulWidget {
 
   final Function assignAvatar;
   final Function resetAvatar;
-  bool editPage;
+  final bool editPage;
 
   @override
   State<RecordVaccineForm> createState() => _RecordVaccineFormState();

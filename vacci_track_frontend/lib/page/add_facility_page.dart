@@ -4,7 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/facility_add_form.dart';
 
 class AddFacilityPage extends StatefulWidget {
-  const AddFacilityPage({super.key});
+  final Color backgroundColor;
+  const AddFacilityPage({required this.backgroundColor, super.key});
 
   @override
   State<AddFacilityPage> createState() => _AddFacilityPageState();
@@ -16,6 +17,7 @@ class _AddFacilityPageState extends State<AddFacilityPage> {
   @override
   Widget build(BuildContext context) {
     return FormUI(
+      backgroundColor: widget.backgroundColor,
       heading: "Add Facility",
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {

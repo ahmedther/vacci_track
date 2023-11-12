@@ -6,10 +6,9 @@ import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 
-// ignore: must_be_immutable
 class VaccineAddForm extends StatefulWidget {
-  VaccineAddForm({required this.editPage, super.key});
-  bool editPage;
+  const VaccineAddForm({required this.editPage, super.key});
+  final bool editPage;
 
   @override
   State<VaccineAddForm> createState() => _VaccineAddFormState();

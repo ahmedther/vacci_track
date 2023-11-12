@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/model/users.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
 class NavigationHero extends StatelessWidget {
-  NavigationHero(this.userData, {super.key});
   final UserData userData;
-  late final Color uiColor = Helpers.getThemeColor(userData.gender!);
+  final Color uiColor;
+  final Color backgroundColor;
+  final void Function() changeUiColor;
+  const NavigationHero(
+      {required this.userData,
+      required this.backgroundColor,
+      required this.uiColor,
+      required this.changeUiColor,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +54,15 @@ class NavigationHero extends StatelessWidget {
                   backgroundColor: uiColor,
                   radius: 20,
                   child: CircleAvatar(
-                    backgroundColor: userData.gender!.toLowerCase() == 'male'
-                        ? Theme.of(context).colorScheme.primaryContainer
-                        : Theme.of(context).colorScheme.secondaryContainer,
+                    backgroundColor: backgroundColor,
                     foregroundColor: uiColor,
                     radius: 18,
                     child: const FaIcon(FontAwesomeIcons.userTie),
                   ),
                 ),
                 onTap: () {
-                  print("THis was CLicked");
+                  changeUiColor();
+                  // context.go("/login");
                 },
               ),
               AnimatedTextKit(

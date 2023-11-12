@@ -6,10 +6,11 @@ import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// ignore: must_be_immutable
 class DepartmentAddForm extends StatefulWidget {
-  DepartmentAddForm({required this.editPage, super.key});
-  bool editPage;
+  const DepartmentAddForm(
+      {required this.editPage, this.uiColor = Colors.blue, super.key});
+  final bool editPage;
+  final Color uiColor;
 
   @override
   State<DepartmentAddForm> createState() => _DepartmentAddFormState();

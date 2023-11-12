@@ -8,11 +8,11 @@ import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 
-// ignore: must_be_immutable
 class EmployeeAddForm extends StatefulWidget {
-  Function assignAvatar;
-  bool editPage;
-  EmployeeAddForm({
+  final Function assignAvatar;
+  final bool editPage;
+
+  const EmployeeAddForm({
     super.key,
     required this.editPage,
     required this.assignAvatar,

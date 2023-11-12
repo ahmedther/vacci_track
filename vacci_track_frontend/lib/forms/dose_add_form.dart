@@ -7,10 +7,9 @@ import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 
-// ignore: must_be_immutable
 class DoseAddForm extends StatefulWidget {
-  DoseAddForm({required this.editPage, super.key});
-  bool editPage;
+  const DoseAddForm({required this.editPage, super.key});
+  final bool editPage;
 
   @override
   State<DoseAddForm> createState() => _DoseAddFormState();
