@@ -11,11 +11,13 @@ import 'package:vacci_track_frontend/ui/spinner.dart';
 class EmployeeAddForm extends StatefulWidget {
   final Function assignAvatar;
   final bool editPage;
+  final Color uiColor;
 
   const EmployeeAddForm({
     super.key,
-    required this.editPage,
     required this.assignAvatar,
+    required this.editPage,
+    required this.uiColor,
   });
 
   @override
@@ -23,7 +25,7 @@ class EmployeeAddForm extends StatefulWidget {
 }
 
 class _EmployeeAddFormState extends State<EmployeeAddForm> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -234,8 +236,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     return _isSpinning
-        ? const SpinnerWithOverlay(
-            spinnerColor: Colors.blue,
+        ? SpinnerWithOverlay(
+            spinnerColor: widget.uiColor,
           )
         : Card(
             borderOnForeground: true,

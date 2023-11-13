@@ -22,11 +22,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int? navCurrentIndex = 1;
   bool isSpinning = true;
 
-// late Color uiColor = Helpers.getThemeColor(userData.gender ?? "");
-  Color uiColor = Helpers.getRandomColor();
-
+  late Color uiColor =
+      Helpers.getUIandBackgroundColor(userData.gender ?? "female")[0];
+  // Color uiColor = Helpers.getRandomColor();
   late Color backgroundColor;
-
   late List<Widget> pages;
 
   late final PageController _pageController;
@@ -72,12 +71,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void changeTheUI() {
-    uiColor = Helpers.getThemeColor(userData.gender!);
-    backgroundColor = userData.gender!.toLowerCase() == 'male'
-        ? const Color.fromARGB(10, 1, 88, 155)
-        : const Color.fromARGB(10, 233, 30, 98);
-    uiColor = Helpers.getThemeColor(userData.gender!);
-    pages = getNaviPages(backgroundColor);
+    uiColor = Helpers.getUIandBackgroundColor(userData.gender!)[0];
+    backgroundColor = Helpers.getUIandBackgroundColor(userData.gender!)[1];
+    pages = getNaviPages(backgroundColor, uiColor);
   }
 
   void changeUiColor() async {
@@ -89,9 +85,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    late final Color themeColor = userData.gender?.toLowerCase() == 'male'
-        ? Theme.of(context).colorScheme.primaryContainer
-        : Theme.of(context).colorScheme.secondaryContainer;
+    final themeColor = Helpers.getThemeColor(
+        context: context, gender: userData.gender ?? "female");
 
     return Scaffold(
       body: Center(

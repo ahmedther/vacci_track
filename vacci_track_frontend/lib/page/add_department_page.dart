@@ -5,7 +5,10 @@ import 'package:vacci_track_frontend/forms/department_add_form.dart';
 
 class AddDepartment extends StatefulWidget {
   final Color backgroundColor;
-  const AddDepartment({required this.backgroundColor, super.key});
+  final Color uiColor;
+
+  const AddDepartment(
+      {required this.backgroundColor, required this.uiColor, super.key});
 
   @override
   State<AddDepartment> createState() => _AddDepartmentState();
@@ -18,6 +21,7 @@ class _AddDepartmentState extends State<AddDepartment> {
   Widget build(BuildContext context) {
     return FormUI(
       backgroundColor: widget.backgroundColor,
+      uiColor: widget.uiColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {
         setState(() {

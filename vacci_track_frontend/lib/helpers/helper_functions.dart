@@ -350,13 +350,6 @@ class Helpers {
     );
   }
 
-  static Color getThemeColor(String gender) {
-    Color themeColor =
-        gender.toLowerCase() == "male" ? const Color(0xFF01579b) : Colors.pink;
-
-    return themeColor;
-  }
-
   static Future<String> getAppUserGender() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String genderString = prefs.getString("gender") ?? "male";
@@ -370,5 +363,43 @@ class Helpers {
         userData.gender?.toLowerCase() == "male" ? "female" : "male";
     ref.watch(userProvider.notifier).setUserData(userData);
     prefs.setString("gender", userData.gender!);
+  }
+
+  static List<Color> getUIandBackgroundColor(String gender) {
+    final Color uiColor;
+    final Color backgroundColor;
+
+    if (gender.toLowerCase() == "male") {
+      uiColor = const Color(0xFF01579b);
+      backgroundColor = const Color.fromARGB(15, 1, 88, 155);
+      return [uiColor, backgroundColor];
+    } else {
+      uiColor = Colors.pink;
+      backgroundColor = const Color.fromARGB(15, 233, 30, 98);
+      return [uiColor, backgroundColor];
+    }
+  }
+
+  static Color getThemeColor(
+      {required BuildContext context, required String gender}) {
+    late final Color themeColor = gender.toLowerCase() == 'male'
+        ? Theme.of(context).colorScheme.primaryContainer
+        : Theme.of(context).colorScheme.secondaryContainer;
+    return themeColor;
+  }
+
+  static Color getThemeColorWithUIColor(
+      {required BuildContext context, required Color uiColor}) {
+    late final Color themeColor = uiColor == const Color(0xFF01579b)
+        ? Theme.of(context).colorScheme.primaryContainer
+        : Theme.of(context).colorScheme.secondaryContainer;
+    return themeColor;
+  }
+
+  static Color getGraditentWithGender(String gender) {
+    late final Color gradientColor = gender.toLowerCase() == "male"
+        ? const Color.fromARGB(255, 47, 114, 165)
+        : const Color.fromARGB(255, 237, 68, 124);
+    return gradientColor;
   }
 }

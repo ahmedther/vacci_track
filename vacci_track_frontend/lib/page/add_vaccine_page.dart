@@ -5,7 +5,9 @@ import 'package:vacci_track_frontend/forms/vaccine_add_form.dart';
 
 class AddVaccinePage extends StatefulWidget {
   final Color backgroundColor;
-  const AddVaccinePage({required this.backgroundColor, super.key});
+  final Color uiColor;
+  const AddVaccinePage(
+      {required this.uiColor, required this.backgroundColor, super.key});
 
   @override
   State<AddVaccinePage> createState() => _AddVaccinePageState();
@@ -17,6 +19,7 @@ class _AddVaccinePageState extends State<AddVaccinePage> {
   @override
   Widget build(BuildContext context) {
     return FormUI(
+      uiColor: widget.uiColor,
       backgroundColor: widget.backgroundColor,
       heading: "Add A New Vaccine",
       selectedToggle: _selectedToggle,

@@ -5,7 +5,10 @@ import 'package:vacci_track_frontend/forms/facility_add_form.dart';
 
 class AddFacilityPage extends StatefulWidget {
   final Color backgroundColor;
-  const AddFacilityPage({required this.backgroundColor, super.key});
+  final Color uiColor;
+
+  const AddFacilityPage(
+      {required this.uiColor, required this.backgroundColor, super.key});
 
   @override
   State<AddFacilityPage> createState() => _AddFacilityPageState();
@@ -17,6 +20,7 @@ class _AddFacilityPageState extends State<AddFacilityPage> {
   @override
   Widget build(BuildContext context) {
     return FormUI(
+      uiColor: widget.uiColor,
       backgroundColor: widget.backgroundColor,
       heading: "Add Facility",
       selectedToggle: _selectedToggle,

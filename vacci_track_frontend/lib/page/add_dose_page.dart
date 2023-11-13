@@ -5,8 +5,10 @@ import 'package:vacci_track_frontend/forms/dose_add_form.dart';
 
 class AddDosePage extends StatefulWidget {
   final Color backgroundColor;
+  final Color uiColor;
 
-  const AddDosePage({required this.backgroundColor, super.key});
+  const AddDosePage(
+      {required this.uiColor, required this.backgroundColor, super.key});
 
   @override
   State<AddDosePage> createState() => _AddDosePageState();
@@ -18,6 +20,7 @@ class _AddDosePageState extends State<AddDosePage> {
   @override
   Widget build(BuildContext context) {
     return FormUI(
+      uiColor: widget.uiColor,
       backgroundColor: widget.backgroundColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {

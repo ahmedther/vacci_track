@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/forms/employee_add_form.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
 import 'package:vacci_track_frontend/forms/record_vaccine_form.dart';
 
@@ -12,6 +13,7 @@ class AddNewEmployee extends StatefulWidget {
       required this.toggelText2,
       required this.employeeAddFrom,
       required this.backgroundColor,
+      required this.uiColor,
       super.key});
 
   final String heading;
@@ -21,6 +23,7 @@ class AddNewEmployee extends StatefulWidget {
   final String toggelText2;
   final bool employeeAddFrom;
   final Color backgroundColor;
+  final Color uiColor;
 
   @override
   State<AddNewEmployee> createState() => _AddNewEmployeeState();
@@ -74,7 +77,12 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
+    final themeColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
+    final genderWiseColor = Helpers.getUIandBackgroundColor(gender)[0];
+
     return FormUI(
+      uiColor: widget.uiColor,
       backgroundColor: widget.backgroundColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {
@@ -94,30 +102,32 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
           ? EmployeeAddForm(
               assignAvatar: assignAvatar,
               editPage: false,
+              uiColor: widget.uiColor,
             )
           : RecordVaccineForm(
               assignAvatar: assignAvatar,
               editPage: false,
               resetAvatar: resetAvatar,
+              uiColor: widget.uiColor,
             ),
       toggelWidget2: widget.employeeAddFrom
           ? EmployeeAddForm(
               assignAvatar: assignAvatar,
               editPage: true,
+              uiColor: widget.uiColor,
             )
           : RecordVaccineForm(
               assignAvatar: assignAvatar,
               editPage: true,
               resetAvatar: resetAvatar,
+              uiColor: widget.uiColor,
             ),
       widgetsToDisplay: [
         CircleAvatar(
-          backgroundColor: gender.toLowerCase() == 'female'
-              ? Colors.pink
-              : const Color(0xff01579b),
+          backgroundColor: gender == "" ? widget.uiColor : genderWiseColor,
           maxRadius: deviceHeight * 0.09,
           child: CircleAvatar(
-            backgroundColor: Colors.blue[100],
+            backgroundColor: themeColor,
             maxRadius: deviceHeight * 0.08,
             child: Image.asset(
               'assets/img/${gender.isNotEmpty ? gender : "both"}.png',
@@ -133,9 +143,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
             fontSize: deviceHeight * 0.02,
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
-            color: gender.toLowerCase() == 'female'
-                ? Colors.pink
-                : const Color(0xff01579b),
+            color: genderWiseColor,
           ),
         ),
         SizedBox(

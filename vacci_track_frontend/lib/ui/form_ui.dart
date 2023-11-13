@@ -16,6 +16,7 @@ class FormUI extends StatelessWidget {
       required this.toggelWidget1,
       required this.toggelWidget2,
       required this.backgroundColor,
+      required this.uiColor,
       super.key});
 
   final List<Widget>? widgetsToDisplay;
@@ -29,6 +30,7 @@ class FormUI extends StatelessWidget {
   final Widget toggelWidget1;
   final Widget toggelWidget2;
   final Color backgroundColor;
+  final Color uiColor;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,6 @@ class FormUI extends StatelessWidget {
           constraints: BoxConstraints(minHeight: deviceHeight),
           child: Container(
             color: backgroundColor,
-            // color: const Color.fromARGB(9, 1, 88, 155),
             child: Column(
               children: [
                 Padding(
@@ -57,6 +58,9 @@ class FormUI extends StatelessWidget {
                 ),
                 ...?widgetsToDisplay,
                 ToggleButtons(
+                  borderRadius: BorderRadius.circular(20),
+                  borderWidth: 2,
+                  fillColor: backgroundColor,
                   isSelected: selectedToggle,
                   onPressed: toggleFunction,
                   children: [
