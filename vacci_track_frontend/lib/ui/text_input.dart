@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 // ignore: must_be_immutable
 class CustomInputField extends StatelessWidget {
-  CustomInputField({
+  const CustomInputField({
     super.key,
     this.onChanged,
     this.validator,
@@ -12,37 +12,52 @@ class CustomInputField extends StatelessWidget {
     this.maxLines,
     this.border,
     this.enabled,
+    this.uiColor,
     required this.width,
     required this.onSaved,
     required this.label,
   });
 
-  double width;
-  String label;
-  String? initialValue;
-  int? maxLines;
-  InputBorder? border;
-  bool? enabled;
-  List<TextInputFormatter>? inputFormatters;
-  void Function(String)? onChanged = (value) {};
-  void Function(String?)? onSaved = (value) {};
-  String? Function(String?)? validator = (value) {
-    return null;
-  };
+  final double width;
+  final String label;
+  final String? initialValue;
+  final int? maxLines;
+  final InputBorder? border;
+  final bool? enabled;
+  final Color? uiColor;
+  final List<TextInputFormatter>? inputFormatters;
+  final void Function(String)? onChanged;
+  final void Function(String?)? onSaved;
+  final String? Function(String?)? validator;
 
+  void returnNull(String? value) {}
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
       child: TextFormField(
+        style: const TextStyle(fontWeight: FontWeight.bold),
+        cursorColor: uiColor,
         enabled: enabled,
         inputFormatters: inputFormatters,
-        onChanged: onChanged,
+        onChanged: onChanged ?? returnNull,
         initialValue: initialValue,
-        onSaved: onSaved,
+        onSaved: onSaved ?? returnNull,
         maxLines: maxLines,
-        decoration: InputDecoration(label: Text(label), border: border),
-        validator: validator,
+        decoration: InputDecoration(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: uiColor ?? Colors.amber, width: 2.0),
+          ),
+          // enabledBorder: const OutlineInputBorder(
+          //   borderSide: BorderSide(color: Colors.red, width: 2.0),
+          // ),
+          label: Text(label, style: TextStyle(color: uiColor)),
+          border: border,
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black, width: 2.0),
+          ),
+        ),
+        validator: validator ?? (String? value) => null,
       ),
     );
   }

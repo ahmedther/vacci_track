@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/toggle_button_items.dart';
+import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 
 // ignore: must_be_immutable
 
@@ -35,6 +36,8 @@ class FormUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
+    late final themeColor =
+        Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
     return ListView(
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
@@ -58,9 +61,12 @@ class FormUI extends StatelessWidget {
                 ),
                 ...?widgetsToDisplay,
                 ToggleButtons(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(5),
                   borderWidth: 2,
-                  fillColor: backgroundColor,
+                  borderColor: const Color.fromARGB(24, 0, 0, 0),
+                  selectedBorderColor: uiColor,
+                  selectedColor: uiColor,
+                  fillColor: themeColor,
                   isSelected: selectedToggle,
                   onPressed: toggleFunction,
                   children: [

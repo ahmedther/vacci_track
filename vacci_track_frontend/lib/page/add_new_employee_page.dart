@@ -82,7 +82,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
     final genderWiseColor = Helpers.getUIandBackgroundColor(gender)[0];
 
     return FormUI(
-      uiColor: widget.uiColor,
+      uiColor: gender == "" ? widget.uiColor : genderWiseColor,
       backgroundColor: widget.backgroundColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {

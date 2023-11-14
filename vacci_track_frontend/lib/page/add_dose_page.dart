@@ -36,8 +36,8 @@ class _AddDosePageState extends State<AddDosePage> {
       toggelIcon2: const FaIcon(FontAwesomeIcons.syringe),
       toggelText1: "Add New Dose",
       toggelText2: "Edit Dose",
-      toggelWidget1: DoseAddForm(editPage: false),
-      toggelWidget2: DoseAddForm(editPage: true),
+      toggelWidget1: DoseAddForm(editPage: false, uiColor: widget.uiColor),
+      toggelWidget2: DoseAddForm(editPage: true, uiColor: widget.uiColor),
     );
   }
 }

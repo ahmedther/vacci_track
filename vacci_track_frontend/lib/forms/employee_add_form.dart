@@ -291,7 +291,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        _searchError = false;
+                        _searchError = false;   
                       });
                       _searchController.value = TextEditingValue(
                         text: value.toUpperCase(),

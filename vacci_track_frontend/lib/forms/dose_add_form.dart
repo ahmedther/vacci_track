@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 
 class DoseAddForm extends StatefulWidget {
-  const DoseAddForm({required this.editPage, super.key});
+  const DoseAddForm({required this.uiColor, required this.editPage, super.key});
   final bool editPage;
+
+  final Color uiColor;
 
   @override
   State<DoseAddForm> createState() => _DoseAddFormState();
@@ -27,7 +31,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
   String? _detail;
   String? _vaccination;
 
-  late List<DropdownMenuItem<String>>? vaccinationList = null;
+  late List<DropdownMenuItem<String>>? vaccinationList;
 
   @override
   void initState() {
@@ -67,7 +71,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
     final List doseList = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_dose/",
         query: "param1=${_searchController.text}");
-    print(doseList);
 
     if (doseList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
@@ -157,9 +160,12 @@ class _DoseAddFormState extends State<DoseAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+
+    late final Color themeContainerColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
     return _isSpinning
-        ? const SpinnerWithOverlay(
-            spinnerColor: Colors.blue,
+        ? SpinnerWithOverlay(
+            spinnerColor: widget.uiColor,
           )
         : Column(
             children: [
@@ -169,32 +175,14 @@ class _DoseAddFormState extends State<DoseAddForm> {
                 ),
                 SizedBox(
                   width: inputWidth + 20,
-                  child: SearchBar(
+                  child: CustomSearchBar(
+                    deviceWidth: deviceWidth,
+                    onPressed: () {
+                      _searchDose(context);
+                    },
                     controller: _searchController,
-                    elevation: const MaterialStatePropertyAll(2),
-                    hintText: "Search For A Dose ",
-                    leading: FaIcon(
-                      FontAwesomeIcons.magnifyingGlass,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    trailing: Iterable.generate(
-                      1,
-                      (index) {
-                        return OutlinedButton(
-                          style: const ButtonStyle(
-                            enableFeedback: true,
-                            animationDuration: Duration(seconds: 2),
-                          ),
-                          onPressed: () {
-                            _searchDose(context);
-                          },
-                          child: Text(
-                            deviceWidth < 900 ? '🔎' : 'Search',
-                          ),
-                        );
-                      },
-                    ),
-                    onChanged: (value) {},
+                    uiColor: widget.uiColor,
+                    backgroundColor: themeContainerColor,
                   ),
                 ),
                 SizedBox(
@@ -206,6 +194,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                 elevation: 100,
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
+                  color: themeContainerColor,
                   padding: const EdgeInsets.all(30),
                   width: inputWidth + 20,
                   child: Form(
@@ -237,10 +226,14 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 }
                                 return null;
                               },
+                              uiColor: widget.uiColor,
                             ),
                             SizedBox(
                                 width: inputWidth * .4,
-                                child: const Text("Dose Number")),
+                                child: const Text(
+                                  "Dose Number",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                )),
                             CustomInputField(
                               label: "",
                               initialValue: _doseNumber,
@@ -265,12 +258,15 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 }
                                 return null;
                               },
+                              uiColor: widget.uiColor,
                             ),
                             SizedBox(width: inputWidth * .23),
                             SizedBox(
                                 width: inputWidth * .4,
                                 child: const Text(
-                                    "Gap Before Next Dose is Due. In Months")),
+                                  "Gap Before Next Dose is Due. In Months",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                )),
                             CustomInputField(
                               label: "",
                               initialValue: _gapBeforNextDose,
@@ -295,16 +291,15 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 }
                                 return null;
                               },
+                              uiColor: widget.uiColor,
                             ),
                             CustomDropDownField(
-                              decoration: const InputDecoration(
-                                labelText: 'Vaccination',
-                                border: OutlineInputBorder(),
-                              ),
+                              decoration: dropdownDecoration(
+                                  label: "Vaccination", color: widget.uiColor),
                               width: inputWidth,
                               value: _vaccination,
                               items: vaccinationList ?? [],
-                              hint: "Vaccination",
+                              hint: "Select a Vaccination",
                               onChanged: (value) {
                                 _vaccination = value;
                               },
@@ -314,6 +309,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 }
                                 return null;
                               },
+                              uiColor: widget.uiColor,
                             ),
                             CustomInputField(
                               label: "Details",
@@ -325,6 +321,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 _detail = value;
                               },
                               maxLines: 5,
+                              uiColor: widget.uiColor,
                             ),
                           ],
                         ),
@@ -338,11 +335,17 @@ class _DoseAddFormState extends State<DoseAddForm> {
                           children: [
                             TextButton(
                               onPressed: resetBtnHandler,
-                              child: const Text('Reset'),
+                              child: Text('Reset',
+                                  style: TextStyle(
+                                      color: widget.uiColor,
+                                      fontWeight: FontWeight.bold)),
                             ),
                             ElevatedButton(
                               onPressed: submitHandler,
-                              child: const Text('Submit'),
+                              child: Text('Submit',
+                                  style: TextStyle(
+                                      color: widget.uiColor,
+                                      fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -360,8 +363,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              'Multiple Dose Found with PR Number ${_searchController.text} '),
+          title: Text('Multiple Dose Found with  ${_searchController.text} '),
           content: SizedBox(
             height: MediaQuery.of(context).size.height * .5,
             width: MediaQuery.of(context).size.width * .01,

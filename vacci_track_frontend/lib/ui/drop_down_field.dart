@@ -9,6 +9,7 @@ class CustomDropDownField extends StatelessWidget {
   final List<DropdownMenuItem<String>>? items;
   final void Function(String?)? onChanged;
   final String? Function(String?)? validator;
+  final Color? uiColor;
 
   const CustomDropDownField({
     super.key,
@@ -17,6 +18,7 @@ class CustomDropDownField extends StatelessWidget {
     this.value,
     this.validator,
     this.decoration,
+    this.uiColor,
     required this.items,
     required this.width,
     required this.hint,
@@ -27,8 +29,12 @@ class CustomDropDownField extends StatelessWidget {
     return SizedBox(
       width: width,
       child: DropdownButtonFormField(
+        style:
+            const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         decoration: decoration,
-        hint: Text(hint),
+        hint: Text(hint,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold)),
         isExpanded: true,
         onChanged: onChanged ?? (String? value) {},
         onSaved: onSaved ?? (String? value) {},
