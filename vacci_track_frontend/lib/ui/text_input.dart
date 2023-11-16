@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
+import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 
 // ignore: must_be_immutable
 class CustomInputField extends StatelessWidget {
@@ -10,9 +12,12 @@ class CustomInputField extends StatelessWidget {
     this.initialValue,
     this.inputFormatters,
     this.maxLines,
-    this.border,
     this.enabled,
+    this.underlineBorder = false,
     this.uiColor,
+    this.controller,
+    this.labelFontSize,
+    this.lableIsBold = true,
     required this.width,
     required this.onSaved,
     required this.label,
@@ -22,13 +27,16 @@ class CustomInputField extends StatelessWidget {
   final String label;
   final String? initialValue;
   final int? maxLines;
-  final InputBorder? border;
   final bool? enabled;
+  final bool? underlineBorder;
   final Color? uiColor;
+  final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final void Function(String)? onChanged;
   final void Function(String?)? onSaved;
   final String? Function(String?)? validator;
+  final double? labelFontSize;
+  final bool lableIsBold;
 
   void returnNull(String? value) {}
   @override
@@ -36,6 +44,7 @@ class CustomInputField extends StatelessWidget {
     return SizedBox(
       width: width,
       child: TextFormField(
+        controller: controller,
         style: const TextStyle(fontWeight: FontWeight.bold),
         cursorColor: uiColor,
         enabled: enabled,
@@ -44,19 +53,30 @@ class CustomInputField extends StatelessWidget {
         initialValue: initialValue,
         onSaved: onSaved ?? returnNull,
         maxLines: maxLines,
-        decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: uiColor ?? Colors.amber, width: 2.0),
-          ),
-          // enabledBorder: const OutlineInputBorder(
-          //   borderSide: BorderSide(color: Colors.red, width: 2.0),
-          // ),
-          label: Text(label, style: TextStyle(color: uiColor)),
-          border: border,
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black, width: 2.0),
-          ),
-        ),
+        decoration: underlineBorder!
+            ? dropdownDecorationAddEmployee(
+                color: uiColor,
+                label: label,
+                fontSize: labelFontSize,
+                isBold: lableIsBold,
+              )
+            : InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: uiColor ?? Colors.amber, width: 2.0),
+                ),
+                // enabledBorder: const OutlineInputBorder(
+                //   borderSide: BorderSide(color: Colors.red, width: 2.0),
+                // ),Text(label, style: TextStyle(color: uiColor))
+                label: CustomTextStyle(
+                    text: label,
+                    color: uiColor,
+                    fontSize: labelFontSize,
+                    isBold: lableIsBold),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 2.0),
+                ),
+              ),
         validator: validator ?? (String? value) => null,
       ),
     );

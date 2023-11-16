@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
+import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 
@@ -60,7 +63,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
 
   List initialValueVaccine = [];
 
-  late final Color chipColor = Theme.of(context).colorScheme.primary;
+  late Color themeContainerColor;
 
   @override
   void initState() {
@@ -235,6 +238,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
     return _isSpinning
         ? SpinnerWithOverlay(
             spinnerColor: widget.uiColor,
@@ -244,54 +249,34 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
+              color: themeContainerColor,
               padding: const EdgeInsets.all(30),
               width: deviceWidth * 0.70,
               child: Column(
                 children: [
-                  SearchBar(
+                  CustomSearchBar(
+                    deviceWidth: deviceWidth,
+                    onPressed: () {
+                      if (_searchController.text.trim().length > 3) {
+                        widget.editPage
+                            ? searchDjango(context)
+                            : searchEhisOracle(context);
+                      } else {
+                        setState(() {
+                          _searchError = true;
+                        });
+                      }
+                    },
                     controller: _searchController,
-                    elevation: const MaterialStatePropertyAll(2),
+                    uiColor: widget.uiColor,
+                    backgroundColor: themeContainerColor,
                     hintText: widget.editPage
                         ? "Search PR or UHID In VacciTrack Database"
                         : "Search PR or UHID EHIS Database",
-                    leading: FaIcon(
-                      FontAwesomeIcons.magnifyingGlass,
-                      color: chipColor,
-                    ),
-                    trailing: Iterable.generate(
-                      1,
-                      (index) {
-                        return OutlinedButton(
-                          style: const ButtonStyle(
-                            enableFeedback: true,
-                            animationDuration: Duration(seconds: 2),
-                          ),
-                          child: Text(
-                            widget.editPage
-                                ? deviceWidth < 900
-                                    ? '🔎'
-                                    : 'Search'
-                                : deviceWidth < 900
-                                    ? '🔎'
-                                    : 'Search in EHIS',
-                          ),
-                          onPressed: () {
-                            if (_searchController.text.trim().length > 3) {
-                              widget.editPage
-                                  ? searchDjango(context)
-                                  : searchEhisOracle(context);
-                            } else {
-                              setState(() {
-                                _searchError = true;
-                              });
-                            }
-                          },
-                        );
-                      },
-                    ),
+                    buttonText: widget.editPage ? 'Search' : 'Search in EHIS',
                     onChanged: (value) {
                       setState(() {
-                        _searchError = false;   
+                        _searchError = false;
                       });
                       _searchController.value = TextEditingValue(
                         text: value.toUpperCase(),
@@ -303,7 +288,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                       ? Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
-                            padding: EdgeInsets.only(left: 40),
+                            padding: const EdgeInsets.only(left: 40),
                             child: Text(
                               "Enter a Valid UHID / PR Number",
                               style: TextStyle(
@@ -321,14 +306,17 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           spacing: 10,
                           children: [
                             CustomDropDownField(
+                              uiColor: widget.uiColor,
                               value: prefix,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               hint: "Prefix",
+                              items: prefixlist,
+                              decoration: dropdownDecorationAddEmployee(
+                                  color: widget.uiColor),
                               onSaved: (value) {
                                 prefix = value!;
                               },
-                              items: prefixlist,
                               onChanged: (value) async {
                                 await widget.assignAvatar(newprefix: value);
                               },
@@ -340,6 +328,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               initialValue: firstName,
@@ -361,6 +353,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               onChanged: (value) async {
@@ -374,6 +370,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               label: "Middle Name",
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               onChanged: (value) async {
@@ -395,6 +395,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDropDownField(
+                              uiColor: widget.uiColor,
+                              decoration: dropdownDecorationAddEmployee(
+                                  color: widget.uiColor),
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               hint: "Gender",
@@ -425,6 +428,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             Container(
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.black,
+                                    width: 2.0,
+                                  ),
+                                ),
+                              ),
                               alignment: Alignment.center,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
@@ -433,11 +444,13 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    joiningDate != null
+                                  CustomTextStyle(
+                                    text: joiningDate != null
                                         ? formater.format(joiningDate!)
                                         : "Joining Date",
-                                    style: const TextStyle(fontSize: 16),
+                                    color: Colors.black,
+                                    isBold: true,
+                                    fontSize: 14,
                                   ),
                                   IconButton(
                                     onPressed: () async {
@@ -454,6 +467,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               ),
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               enabled: uhid != null ? false : true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
@@ -473,6 +490,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               enabled: prNumber != null ? false : true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
@@ -496,6 +517,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               inputFormatters: [
@@ -518,6 +543,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               onSaved: (value) {
@@ -528,6 +557,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               label: "Email ID",
                             ),
                             CustomDropDownField(
+                              uiColor: widget.uiColor,
+                              decoration: dropdownDecorationAddEmployee(
+                                  color: widget.uiColor),
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
                               hint: "Department",
@@ -545,6 +577,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDropDownField(
+                              uiColor: widget.uiColor,
+                              decoration: dropdownDecorationAddEmployee(
+                                  color: widget.uiColor),
                               value: designation,
                               onChanged: (v) {},
                               width:
@@ -562,6 +597,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDropDownField(
+                              uiColor: widget.uiColor,
+                              decoration: dropdownDecorationAddEmployee(
+                                  color: widget.uiColor),
                               value: facility,
                               onChanged: (v) {},
                               width:
@@ -579,6 +617,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               initialValue: status,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
@@ -589,6 +631,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               label: "Status",
                             ),
                             CustomDropDownField(
+                              uiColor: widget.uiColor,
+                              decoration: dropdownDecorationAddEmployee(
+                                  color: widget.uiColor),
                               value: eligibility,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
@@ -612,24 +657,61 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             MultiSelectDialogField(
+                                backgroundColor: themeContainerColor,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: initialValueVaccine == []
+                                            ? Colors.black
+                                            : widget.uiColor,
+                                        width: 2),
+                                  ),
+                                ),
+                                cancelText: getCustomTextStyle(
+                                    text: "Cancel",
+                                    color: widget.uiColor,
+                                    isBold: true,
+                                    fontSize: 16),
+                                confirmText: getCustomTextStyle(
+                                    text: "OK",
+                                    color: widget.uiColor,
+                                    isBold: true,
+                                    fontSize: 16),
+                                searchTextStyle: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                                itemsTextStyle: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                                searchIcon: Icon(Icons.search,
+                                    color: widget.uiColor, size: 43),
+                                closeSearchIcon: Icon(Icons.close,
+                                    color: widget.uiColor, size: 43),
                                 items: vaccineList,
-                                checkColor: Colors.white,
+                                checkColor: widget.uiColor,
                                 unselectedColor: Colors.white,
                                 dialogWidth: deviceWidth * .3,
                                 buttonIcon:
                                     const Icon(FontAwesomeIcons.syringe),
-                                buttonText: const Text("Assign Vaccines",
-                                    style: TextStyle(fontSize: 16)),
+                                buttonText: getCustomTextStyle(
+                                    text: "Assign Vaccines",
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    isBold: true),
                                 initialValue: initialValueVaccine,
                                 listType: MultiSelectListType.CHIP,
-                                selectedColor: chipColor,
+                                selectedColor: widget.uiColor,
                                 selectedItemsTextStyle: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 searchHint: 'Search Vaccine',
+                                searchHintStyle: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
                                 chipDisplay: MultiSelectChipDisplay(
-                                    chipColor: chipColor,
+                                    chipColor: widget.uiColor,
                                     scroll: true,
                                     textStyle: const TextStyle(
                                         color: Colors.white,
@@ -643,14 +725,20 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                         }
                                       });
                                     }),
-                                title: const Text(
-                                    "Multi-Select Vaccine to Assign"),
+                                title: CustomTextStyle(
+                                    text: "Multi-Select Vaccines to Assign",
+                                    color: widget.uiColor,
+                                    isBold: true),
                                 searchable: true,
                                 separateSelectedItems: true,
                                 onConfirm: (value) {
                                   initialValueVaccine = value;
                                 }),
                             CustomInputField(
+                              lableIsBold: true,
+                              labelFontSize: 14,
+                              uiColor: widget.uiColor,
+                              underlineBorder: true,
                               initialValue: notes,
                               width: deviceWidth,
                               onSaved: (value) {

@@ -38,8 +38,6 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
 
   final List<bool> _selectedToggle = <bool>[true, false];
 
-  int buildcounter = 0;
-
   Future assignAvatar({
     String? newgender,
     String? newprefix,
@@ -57,7 +55,6 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
 
         if (prefix == "Mr." || prefix == "Mr") gender = "male";
       }
-      ;
       if (newfirstName != null) firstName = newfirstName;
       if (newmiddleName != null) middleName = newmiddleName;
       if (newlastName != null) lastName = newlastName;
@@ -82,7 +79,9 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
     final genderWiseColor = Helpers.getUIandBackgroundColor(gender)[0];
 
     return FormUI(
-      uiColor: gender == "" ? widget.uiColor : genderWiseColor,
+      uiColor: gender == "" && widget.employeeAddFrom == false
+          ? widget.uiColor
+          : genderWiseColor,
       backgroundColor: widget.backgroundColor,
       selectedToggle: _selectedToggle,
       toggleFunction: (int index) {

@@ -40,8 +40,10 @@ class _AddDesignationState extends State<AddDesignation> {
           toggelIcon2: const FaIcon(FontAwesomeIcons.userTag),
           toggelText1: "Add A Designation",
           toggelText2: "Edit Old Designation",
-          toggelWidget1: DesignationAddForm(editPage: false),
-          toggelWidget2: DesignationAddForm(editPage: true),
+          toggelWidget1:
+              DesignationAddForm(editPage: false, uiColor: widget.uiColor),
+          toggelWidget2:
+              DesignationAddForm(editPage: true, uiColor: widget.uiColor),
         ),
       ],
     );

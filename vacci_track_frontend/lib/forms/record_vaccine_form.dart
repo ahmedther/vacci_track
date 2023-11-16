@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/components/record_vac_form_profile.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 import '../ui/spinner.dart';
 
 class RecordVaccineForm extends StatefulWidget {
@@ -39,6 +41,8 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   String? designation;
   List? empData1;
   bool textSelectionCount = false;
+
+  late Color themeContainerColor;
 
   @override
   void initState() {
@@ -187,7 +191,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     final double deviceWidth = MediaQuery.of(context).size.width;
     late final Color profileColor =
         Helpers.getUIandBackgroundColor(gender ?? "male")[0];
-    late final themeColor = Helpers.getThemeColorWithUIColor(
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
 
     return _isSpinning
@@ -207,44 +211,25 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                 elevation: 100,
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
-                  color: themeColor,
+                  color: themeContainerColor,
                   padding: const EdgeInsets.all(30),
                   width: deviceWidth * 0.70,
                   child: Column(
                     children: [
                       SearchAnchor(
+                        viewBackgroundColor: themeContainerColor,
                         builder: (BuildContext _context,
                             SearchController controller) {
-                          return SearchBar(
+                          return CustomSearchBar(
+                            deviceWidth: deviceWidth,
+                            onPressed: () {
+                              searchEmployee(context, controller.text,
+                                  spinning: true);
+                            },
                             controller: controller,
-                            hintText: "Search Employee",
-                            leading: FaIcon(
-                              FontAwesomeIcons.magnifyingGlass,
-                              color: widget.uiColor,
-                            ),
-                            trailing: Iterable.generate(
-                              1,
-                              (index) {
-                                return OutlinedButton(
-                                  style: const ButtonStyle(
-                                    enableFeedback: true,
-                                    animationDuration: Duration(seconds: 2),
-                                  ),
-                                  child:
-                                      Text(deviceWidth < 900 ? '🔎' : 'Search'),
-                                  onPressed: () {
-                                    searchEmployee(context, controller.text,
-                                        spinning: true);
-                                  },
-                                );
-                              },
-                            ),
-                            // onChanged: (_) async {
-                            //   if (controller.text.length <= 3) return;
-                            //   await searchEmployee(context, controller.text);
-                            //   if (empData1 == null || empData1!.isEmpty) return;
-                            //   controller.openView();
-                            // },
+                            uiColor: widget.uiColor,
+                            backgroundColor: themeContainerColor,
+                            hintText: "Search For A Dose",
                             onTap: () async {
                               final query = controller.text.length > 3
                                   ? controller.text
@@ -266,6 +251,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                           return empData1!.map(
                             (item) {
                               return Card(
+                                color: Colors.white,
                                 child: ListTile(
                                   hoverColor: const Color.fromARGB(31, 0, 0, 0),
                                   onTap: () async {
@@ -281,26 +267,31 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                   leading: CircleAvatar(
                                     backgroundColor: Helpers.getRandomColor(),
                                     child: item['first_name'] != null
-                                        ? Text(item['first_name'][0],
-                                            style: const TextStyle(
-                                                color: Colors.white))
+                                        ? CustomTextStyle(
+                                            text: item['first_name'][0],
+                                            isBold: true,
+                                            color: Colors.white)
                                         : const FaIcon(FontAwesomeIcons.userAlt,
                                             color: Colors.white),
                                   ),
-                                  title: Text(
-                                      '${item['prefix'] ?? ""} ${item['first_name'] ?? ""} ${item['middle_name'] ?? ""}  ${item['last_name'] ?? ""}'),
+                                  title: CustomTextStyle(
+                                      text:
+                                          '${item['prefix'] ?? ""} ${item['first_name'] ?? ""} ${item['middle_name'] ?? ""}  ${item['last_name'] ?? ""}',
+                                      isBold: true,
+                                      color: widget.uiColor),
                                   subtitle: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'UHID: ${item['uhid'] ?? ''}',
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                      Text(
-                                        'PR Number: ${item['pr_number'] ?? ''}',
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
+                                      CustomTextStyle(
+                                          text: 'UHID: ${item['uhid'] ?? ''}',
+                                          isBold: true,
+                                          color: Colors.black),
+                                      CustomTextStyle(
+                                          text:
+                                              'PR Number: ${item['pr_number'] ?? ''}',
+                                          isBold: true,
+                                          color: Colors.black),
                                     ],
                                   ),
                                 ),
@@ -344,11 +335,17 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                 children: [
                                   TextButton(
                                     onPressed: resetBtnHandler,
-                                    child: const Text('Reset'),
+                                    child: CustomTextStyle(
+                                        text: "Reset",
+                                        color: widget.uiColor,
+                                        isBold: true),
                                   ),
                                   ElevatedButton(
                                     onPressed: submitHandler,
-                                    child: const Text('Submit'),
+                                    child: CustomTextStyle(
+                                        text: 'Submit',
+                                        color: widget.uiColor,
+                                        isBold: true),
                                   ),
                                 ],
                               ),

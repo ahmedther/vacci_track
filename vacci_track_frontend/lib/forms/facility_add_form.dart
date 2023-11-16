@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
@@ -126,14 +128,15 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
     return _isSpinning
-        ? const SpinnerWithOverlay(
-            spinnerColor: Colors.blue,
+        ? SpinnerWithOverlay(
+            spinnerColor: widget.uiColor,
           )
         : Card(
             borderOnForeground: true,
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
+              color: themeContainerColor,
               padding: const EdgeInsets.all(30),
               width: inputWidth + 20,
               child: Form(
@@ -141,39 +144,22 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                 child: Column(
                   children: [
                     if (widget.editPage) ...{
-                      SearchBar(
+                      CustomSearchBar(
+                        deviceWidth: deviceWidth,
+                        onPressed: () {
+                          _searchDesignation(context);
+                        },
                         controller: _searchController,
-                        elevation: const MaterialStatePropertyAll(2),
-                        hintText: "Search For A Facility ",
-                        leading: FaIcon(
-                          FontAwesomeIcons.magnifyingGlass,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        trailing: Iterable.generate(
-                          1,
-                          (index) {
-                            return OutlinedButton(
-                              style: const ButtonStyle(
-                                enableFeedback: true,
-                                animationDuration: Duration(seconds: 2),
-                              ),
-                              child: Text(
-                                deviceWidth < 900 ? '🔎' : 'Search',
-                              ),
-                              onPressed: () {
-                                _searchDesignation(context);
-                              },
-                            );
-                          },
-                        ),
-                        onChanged: (value) {},
+                        uiColor: widget.uiColor,
+                        backgroundColor: themeContainerColor,
+                        hintText: "Search For A Facility",
                       ),
                       const SizedBox(height: 32)
                     },
                     CustomInputField(
+                      uiColor: widget.uiColor,
                       label: "Name",
                       initialValue: _name,
-                      border: const OutlineInputBorder(),
                       width: inputWidth,
                       onSaved: (value) {
                         if (value == null) return;
@@ -191,8 +177,8 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                     const SizedBox(height: 20),
                     CustomInputField(
                       label: "Facility Code",
+                      uiColor: widget.uiColor,
                       initialValue: _facilityId,
-                      border: const OutlineInputBorder(),
                       width: inputWidth,
                       onSaved: (value) {
                         if (value == null) return;
@@ -217,11 +203,17 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                       children: [
                         TextButton(
                           onPressed: resetBtnHandler,
-                          child: const Text('Reset'),
+                          child: CustomTextStyle(
+                              text: "Reset",
+                              color: widget.uiColor,
+                              isBold: true),
                         ),
                         ElevatedButton(
                           onPressed: submitHandler,
-                          child: const Text('Submit'),
+                          child: CustomTextStyle(
+                              text: 'Submit',
+                              color: widget.uiColor,
+                              isBold: true),
                         ),
                       ],
                     ),
@@ -237,8 +229,12 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              "Multiple Facility Found with the keyword ${_searchController.text}"),
+          backgroundColor: themeContainerColor,
+          title: CustomTextStyle(
+              text:
+                  "Multiple Facility Found with the keyword '${_searchController.text}'",
+              color: widget.uiColor,
+              isBold: true),
           content: SizedBox(
             height: 200,
             width: 200,
@@ -261,15 +257,20 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                         color: Colors.white,
                       ),
                     ),
-                    title: Text(
-                      facility["name"],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    title: CustomTextStyle(
+                      text: facility["name"],
+                      color: widget.uiColor,
+                      isBold: true,
                     ),
                     subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                              "Facility Code : ${facility["facility_id"] ?? ''}"),
+                          CustomTextStyle(
+                            text:
+                                "Facility Code : ${facility['facility_id'] ?? "Not Available"} ",
+                            color: Colors.black,
+                            isBold: true,
+                          ),
                         ]),
                   ),
                 );
@@ -281,7 +282,8 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Cancel'),
+              child: CustomTextStyle(
+                  text: 'Cancel', isBold: true, color: widget.uiColor),
               onPressed: () {
                 Navigator.of(context).pop();
               },

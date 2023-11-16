@@ -170,7 +170,6 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                           uiColor: widget.uiColor,
                           label: "Name",
                           initialValue: _name,
-                          border: const OutlineInputBorder(),
                           width: Helpers.min_max(deviceWidth, .10, 350, 400),
                           onSaved: (value) {
                             if (value == null) return;
@@ -193,7 +192,6 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                             FilteringTextInputFormatter
                                 .digitsOnly, // Only allow digits
                           ],
-                          border: const OutlineInputBorder(),
                           width: Helpers.min_max(deviceWidth, .10, 70, 70),
                           onSaved: (value) {
                             if (value == null) return;
@@ -215,7 +213,6 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                       uiColor: widget.uiColor,
                       label: "Other Notes",
                       initialValue: _otherNotes,
-                      border: const OutlineInputBorder(),
                       width: inputWidth - 70,
                       onSaved: (value) {
                         if (value == null) return;
@@ -259,6 +256,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: themeContainerColor,
           title: CustomTextStyle(
               text:
                   "Multiple Vaccine Found with the keyword '${_searchController.text}'",
@@ -272,6 +270,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
               itemBuilder: (context, index) {
                 Map<String, dynamic> vaccine = vaccineData[index];
                 return Card(
+                  color: Colors.white,
                   child: ListTile(
                     hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {

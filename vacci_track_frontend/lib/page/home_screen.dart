@@ -18,8 +18,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   UserData userData = UserData(gender: "male", isLoggedIn: false);
-  int currentIndex = 5;
-  int? navCurrentIndex = null;
+  int currentIndex = 2;
+  int? navCurrentIndex = 2;
   bool isSpinning = true;
 
   late Color uiColor =

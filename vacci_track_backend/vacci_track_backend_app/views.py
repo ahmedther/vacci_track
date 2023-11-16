@@ -134,9 +134,10 @@ def get_facility_list(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_prefix(request):
-    alchemy = SqlAlchemyConnection()
-    genders = alchemy.get_distict_prefix()
-    genders = [{"gender": row[0]} for row in genders if row[0]]
+    # alchemy = SqlAlchemyConnection()
+    # genders = alchemy.get_distict_prefix()
+    # genders = [{"gender": row[0]} for row in genders if row[0]]
+    genders = [{"gender": "Mr."}, {"gender": "Ms"}, {"gender": "Mrs."}, {"gender": "Miss."}, {"gender": "Ms."}]
     return Response(genders, status=200)
 
 

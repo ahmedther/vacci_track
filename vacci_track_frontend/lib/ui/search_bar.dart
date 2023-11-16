@@ -7,16 +7,22 @@ class CustomSearchBar extends StatelessWidget {
   final Color uiColor;
   final Color backgroundColor;
   final void Function()? onPressed;
+  final void Function(String)? onChanged;
   final double deviceWidth;
   final String? hintText;
+  final String buttonText;
+  final void Function()? onTap;
 
   const CustomSearchBar(
       {required this.onPressed,
       required this.deviceWidth,
       this.uiColor = Colors.blue,
       this.backgroundColor = Colors.white,
+      this.buttonText = 'Search',
       this.controller,
+      this.onChanged,
       this.hintText,
+      this.onTap,
       super.key});
 
   @override
@@ -45,13 +51,14 @@ class CustomSearchBar extends StatelessWidget {
             ),
             onPressed: onPressed,
             child: CustomTextStyle(
-                text: deviceWidth < 900 ? '🔎' : 'Search',
+                text: deviceWidth < 900 ? '🔎' : buttonText,
                 color: uiColor,
                 isBold: true),
           );
         },
       ),
-      onChanged: (value) {},
+      onChanged: onChanged,
+      onTap: onTap,
     );
   }
 }

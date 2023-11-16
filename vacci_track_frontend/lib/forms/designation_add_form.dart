@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import "package:vacci_track_frontend/components/ui_scaler.dart";
+import 'package:vacci_track_frontend/ui/text_input.dart';
 
 class DesignationAddForm extends StatefulWidget {
   final bool editPage;
-  const DesignationAddForm({required this.editPage, super.key});
+  final Color uiColor;
+  const DesignationAddForm(
+      {required this.uiColor, required this.editPage, super.key});
 
   @override
   State<DesignationAddForm> createState() => _DesignationAddFormState();
@@ -18,6 +22,8 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   int? _id = 0;
+
+  late Color themeContainerColor;
 
   @override
   void dispose() {
@@ -111,58 +117,51 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
+    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
+
     return _isSpinning
-        ? const SpinnerWithOverlay(
-            spinnerColor: Colors.blue,
+        ? SpinnerWithOverlay(
+            spinnerColor: widget.uiColor,
           )
         : Card(
             borderOnForeground: true,
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
+              color: themeContainerColor,
               padding: const EdgeInsets.all(30),
               width: Helpers.min_max(deviceWidth, 50, 200, 400),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (widget.editPage) ...{
-                    SearchBar(
+                    CustomSearchBar(
+                      deviceWidth: deviceWidth,
+                      onPressed: () {
+                        _searchDesignation(context);
+                      },
                       controller: _searchController,
-                      elevation: const MaterialStatePropertyAll(2),
+                      uiColor: widget.uiColor,
+                      backgroundColor: themeContainerColor,
                       hintText: "Search For Designation",
-                      leading: FaIcon(
-                        FontAwesomeIcons.magnifyingGlass,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      trailing: Iterable.generate(
-                        1,
-                        (index) {
-                          return OutlinedButton(
-                            style: const ButtonStyle(
-                              enableFeedback: true,
-                              animationDuration: Duration(seconds: 2),
-                            ),
-                            child: Text(deviceWidth < 900 ? '🔎' : 'Search'),
-                            onPressed: () {
-                              _searchDesignation(context);
-                            },
-                          );
-                        },
-                      ),
                     ),
                     const SizedBox(height: 32)
                   },
-                  TextField(
+                  CustomInputField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(),
-                    ),
+                    label: "Name",
+                    width: inputWidth,
+                    uiColor: widget.uiColor,
+                    onSaved: (_) {},
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _submitHandler,
-                    child: const Text('Submit'),
+                    child: CustomTextStyle(
+                        text: 'Submit', color: widget.uiColor, isBold: true),
                   ),
                 ],
               ),
@@ -176,41 +175,43 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              "Multiple Designations Found with the keyword ${_searchController.text}"),
-          content: UiScaler(
-            alignment: Alignment.center,
-            child: SizedBox(
-              height: 200,
-              width: 200,
-              child: ListView.builder(
-                itemCount: _designationData.length,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> designationData =
-                      _designationData[index];
-                  return Card(
-                    child: ListTile(
-                      hoverColor: const Color.fromARGB(31, 0, 0, 0),
-                      onTap: () async {
-                        await updateForm(designationData);
-                        // ignore: use_build_context_synchronously
-                        context.pop();
-                      },
-                      leading: CircleAvatar(
-                        backgroundColor: Helpers.getRandomColor(),
-                        child: const FaIcon(
-                          FontAwesomeIcons.userTag,
-                          color: Colors.white,
-                        ),
-                      ),
-                      title: Text(
-                        designationData["name"],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+          backgroundColor: themeContainerColor,
+          title: CustomTextStyle(
+              text:
+                  "Multiple Designations Found with the keyword '${_searchController.text}'",
+              color: widget.uiColor,
+              isBold: true),
+          content: SizedBox(
+            height: 200,
+            width: 200,
+            child: ListView.builder(
+              itemCount: _designationData.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> designationData = _designationData[index];
+                return Card(
+                  color: Colors.white,
+                  child: ListTile(
+                    hoverColor: const Color.fromARGB(31, 0, 0, 0),
+                    onTap: () async {
+                      await updateForm(designationData);
+                      // ignore: use_build_context_synchronously
+                      context.pop();
+                    },
+                    leading: CircleAvatar(
+                      backgroundColor: Helpers.getRandomColor(),
+                      child: const FaIcon(
+                        FontAwesomeIcons.userTag,
+                        color: Colors.white,
                       ),
                     ),
-                  );
-                },
-              ),
+                    title: CustomTextStyle(
+                      text: designationData["name"],
+                      color: widget.uiColor,
+                      isBold: true,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           actions: [

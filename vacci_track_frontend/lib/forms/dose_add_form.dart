@@ -212,7 +212,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             CustomInputField(
                               label: "Name",
                               initialValue: _name,
-                              border: const OutlineInputBorder(),
                               width: inputWidth,
                               onSaved: (value) {
                                 if (value == null) return;
@@ -238,7 +237,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             CustomInputField(
                               label: "",
                               initialValue: _doseNumber,
-                              border: const OutlineInputBorder(),
                               width: inputWidth * .15,
                               inputFormatters: [
                                 FilteringTextInputFormatter
@@ -271,7 +269,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             CustomInputField(
                               label: "",
                               initialValue: _gapBeforNextDose,
-                              border: const OutlineInputBorder(),
                               width: inputWidth * .15,
                               inputFormatters: [
                                 FilteringTextInputFormatter
@@ -315,7 +312,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             CustomInputField(
                               label: "Details",
                               initialValue: _detail,
-                              border: const OutlineInputBorder(),
                               width: inputWidth,
                               onSaved: (value) {
                                 if (value == null) return;

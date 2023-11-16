@@ -1,7 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
+import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,6 +28,8 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
   final TextEditingController _searchController = TextEditingController();
   late List<DropdownMenuItem<String>>? hodList = null;
   int? _id = 0;
+
+  late Color themeContainerColor;
 
   @override
   void dispose() {
@@ -164,10 +169,12 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
 
     return isSpinning
-        ? const SpinnerWithOverlay(
-            spinnerColor: Colors.blue,
+        ? SpinnerWithOverlay(
+            spinnerColor: widget.uiColor,
           )
         : Column(
             children: [
@@ -177,32 +184,15 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                 ),
                 SizedBox(
                   width: inputWidth + 20,
-                  child: SearchBar(
+                  child: CustomSearchBar(
+                    deviceWidth: deviceWidth,
+                    onPressed: () {
+                      _searchDepartment(context);
+                    },
                     controller: _searchController,
-                    elevation: const MaterialStatePropertyAll(2),
+                    uiColor: widget.uiColor,
+                    backgroundColor: themeContainerColor,
                     hintText: "Search For A Department ",
-                    leading: FaIcon(
-                      FontAwesomeIcons.magnifyingGlass,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    trailing: Iterable.generate(
-                      1,
-                      (index) {
-                        return OutlinedButton(
-                          style: const ButtonStyle(
-                            enableFeedback: true,
-                            animationDuration: Duration(seconds: 2),
-                          ),
-                          child: Text(
-                            deviceWidth < 900 ? '🔎' : 'Search',
-                          ),
-                          onPressed: () {
-                            _searchDepartment(context);
-                          },
-                        );
-                      },
-                    ),
-                    onChanged: (value) {},
                   ),
                 ),
                 SizedBox(
@@ -214,6 +204,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                 elevation: 100,
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
+                  color: themeContainerColor,
                   padding: const EdgeInsets.all(30),
                   width: inputWidth + 20,
                   child: Form(
@@ -221,9 +212,9 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                     child: Column(
                       children: [
                         CustomInputField(
+                          uiColor: widget.uiColor,
                           label: "Name",
                           initialValue: departmentName,
-                          border: const OutlineInputBorder(),
                           width: inputWidth,
                           onSaved: (value) {
                             if (value == null) return;
@@ -242,49 +233,30 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                           },
                         ),
                         const SizedBox(height: 40),
-                        SearchBar(
+                        CustomSearchBar(
+                          deviceWidth: deviceWidth,
+                          onPressed: () {
+                            hod = null;
+                            _searchHOD(context);
+                          },
                           controller: _searchControllerHOD,
-                          elevation: const MaterialStatePropertyAll(2),
+                          uiColor: widget.uiColor,
+                          backgroundColor: themeContainerColor,
                           hintText: "Enter PR No Or Name",
-                          leading: FaIcon(
-                            FontAwesomeIcons.magnifyingGlass,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          trailing: Iterable.generate(
-                            1,
-                            (index) {
-                              return OutlinedButton(
-                                style: const ButtonStyle(
-                                  enableFeedback: true,
-                                  animationDuration: Duration(seconds: 2),
-                                ),
-                                child: Text(
-                                  deviceWidth < 900
-                                      ? '🔎'
-                                      : 'Search in Employees',
-                                ),
-                                onPressed: () {
-                                  hod = null;
-                                  _searchHOD(context);
-                                },
-                              );
-                            },
-                          ),
-                          onChanged: (value) {},
                         ),
                         const SizedBox(height: 40),
                         CustomDropDownField(
-                          decoration: const InputDecoration(
-                            labelText: 'Head of Department',
-                            border: OutlineInputBorder(),
-                          ),
+                          decoration: dropdownDecoration(
+                              label: 'Head of Department',
+                              color: widget.uiColor),
+                          width: inputWidth,
                           value: hod,
                           items: hodList ?? [],
-                          width: inputWidth,
                           hint: "Head Of Department",
                           onChanged: (value) {
                             hod = value;
                           },
+                          uiColor: widget.uiColor,
                         ),
                         SizedBox(
                           height: deviceHeight * 0.02,
@@ -296,11 +268,17 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                           children: [
                             TextButton(
                               onPressed: resetBtnHandler,
-                              child: const Text('Reset'),
+                              child: CustomTextStyle(
+                                  text: "Reset",
+                                  color: widget.uiColor,
+                                  isBold: true),
                             ),
                             ElevatedButton(
                               onPressed: submitHandler,
-                              child: const Text('Submit'),
+                              child: CustomTextStyle(
+                                  text: 'Submit',
+                                  color: widget.uiColor,
+                                  isBold: true),
                             ),
                           ],
                         ),
@@ -318,8 +296,12 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              "Multiple Departments Found with the keyword ${_searchController.text}"),
+          backgroundColor: themeContainerColor,
+          title: CustomTextStyle(
+              text:
+                  "Multiple Departments Found with the keyword '${_searchController.text}' ",
+              color: widget.uiColor,
+              isBold: true),
           content: SizedBox(
             height: 200,
             width: 200,
@@ -328,6 +310,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
               itemBuilder: (context, index) {
                 Map<String, dynamic> department = departmentData[index];
                 return Card(
+                  color: Colors.white,
                   child: ListTile(
                     hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {
@@ -342,21 +325,30 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                         color: Colors.white,
                       ),
                     ),
-                    title: Text(
-                      department["name"],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    title: CustomTextStyle(
+                      text: department["name"],
+                      color: widget.uiColor,
+                      isBold: true,
                     ),
                     subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (department["department_hod"] != null) ...{
-                            Text(
-                                "HOD : ${department["department_hod"]["prefix"] ?? ''}"
-                                " ${department["department_hod"]["first_name"] ?? ''}"
-                                " ${department["department_hod"]["middle_name"] ?? ''}"
-                                " ${department["department_hod"]["last_name"] ?? ''}"),
+                            CustomTextStyle(
+                              text:
+                                  "HOD : ${department["department_hod"]["prefix"] ?? ''}"
+                                  " ${department["department_hod"]["first_name"] ?? ''}"
+                                  " ${department["department_hod"]["middle_name"] ?? ''}"
+                                  " ${department["department_hod"]["last_name"] ?? ''}",
+                              color: Colors.black,
+                              isBold: true,
+                            ),
                           } else ...{
-                            const Text("No HOD is Assigned."),
+                            const CustomTextStyle(
+                              text: "No HOD is Assigned.",
+                              color: Colors.black,
+                              isBold: true,
+                            ),
                           }
                         ]),
                   ),
