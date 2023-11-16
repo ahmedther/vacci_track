@@ -10,6 +10,7 @@ import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
+import 'package:recase/recase.dart';
 
 class EmployeeAddForm extends StatefulWidget {
   final Function assignAvatar;
@@ -80,6 +81,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   }
 
   Future allFuture() async {
+    await widget.assignAvatar(
+      newgender: "",
+      newprefix: "",
+      newfirstName: "",
+      newmiddleName: "",
+      newlastName: "",
+    );
+
     final API_URL = await Helpers.load_env();
 
     final List prefixData =
@@ -251,7 +260,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             child: Container(
               color: themeContainerColor,
               padding: const EdgeInsets.all(30),
-              width: deviceWidth * 0.70,
+              width: Helpers.min_max(deviceWidth, 0.70, 10, 745),
               child: Column(
                 children: [
                   CustomSearchBar(
@@ -461,7 +470,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                       }
                                     },
                                     icon: const FaIcon(
-                                        FontAwesomeIcons.calendarDays),
+                                        FontAwesomeIcons.calendarDays,
+                                        color: Colors.black),
                                   ),
                                 ],
                               ),
@@ -656,84 +666,91 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                 return null;
                               },
                             ),
-                            MultiSelectDialogField(
-                                backgroundColor: themeContainerColor,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                        color: initialValueVaccine == []
-                                            ? Colors.black
-                                            : widget.uiColor,
-                                        width: 2),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: MultiSelectDialogField(
+                                  backgroundColor: themeContainerColor,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                          color: initialValueVaccine.isEmpty
+                                              ? Colors.black
+                                              : widget.uiColor,
+                                          width: 2),
+                                    ),
                                   ),
-                                ),
-                                cancelText: getCustomTextStyle(
-                                    text: "Cancel",
-                                    color: widget.uiColor,
-                                    isBold: true,
-                                    fontSize: 16),
-                                confirmText: getCustomTextStyle(
-                                    text: "OK",
-                                    color: widget.uiColor,
-                                    isBold: true,
-                                    fontSize: 16),
-                                searchTextStyle: const TextStyle(
+                                  cancelText: getCustomTextStyle(
+                                      text: "Cancel",
+                                      color: widget.uiColor,
+                                      isBold: true,
+                                      fontSize: 16),
+                                  confirmText: getCustomTextStyle(
+                                      text: "OK",
+                                      color: widget.uiColor,
+                                      isBold: true,
+                                      fontSize: 16),
+                                  searchTextStyle: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                  itemsTextStyle: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                  searchIcon: Icon(Icons.search,
+                                      color: widget.uiColor, size: 43),
+                                  closeSearchIcon: Icon(Icons.close,
+                                      color: widget.uiColor, size: 43),
+                                  items: vaccineList,
+                                  checkColor: widget.uiColor,
+                                  unselectedColor: Colors.white,
+                                  dialogWidth: deviceWidth * .3,
+                                  buttonIcon: const Icon(
+                                    FontAwesomeIcons.syringe,
                                     color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                                itemsTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                                searchIcon: Icon(Icons.search,
-                                    color: widget.uiColor, size: 43),
-                                closeSearchIcon: Icon(Icons.close,
-                                    color: widget.uiColor, size: 43),
-                                items: vaccineList,
-                                checkColor: widget.uiColor,
-                                unselectedColor: Colors.white,
-                                dialogWidth: deviceWidth * .3,
-                                buttonIcon:
-                                    const Icon(FontAwesomeIcons.syringe),
-                                buttonText: getCustomTextStyle(
-                                    text: "Assign Vaccines",
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    isBold: true),
-                                initialValue: initialValueVaccine,
-                                listType: MultiSelectListType.CHIP,
-                                selectedColor: widget.uiColor,
-                                selectedItemsTextStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                searchHint: 'Search Vaccine',
-                                searchHintStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                                chipDisplay: MultiSelectChipDisplay(
-                                    chipColor: widget.uiColor,
-                                    scroll: true,
-                                    textStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                    onTap: (chip) {
-                                      setState(() {
-                                        if (initialValueVaccine.length > 1) {
-                                          initialValueVaccine.remove(chip);
-                                        } else {
-                                          initialValueVaccine = [];
-                                        }
-                                      });
-                                    }),
-                                title: CustomTextStyle(
-                                    text: "Multi-Select Vaccines to Assign",
-                                    color: widget.uiColor,
-                                    isBold: true),
-                                searchable: true,
-                                separateSelectedItems: true,
-                                onConfirm: (value) {
-                                  initialValueVaccine = value;
-                                }),
+                                  ),
+                                  buttonText: getCustomTextStyle(
+                                      text: "Assign Vaccines",
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      isBold: true),
+                                  initialValue: initialValueVaccine,
+                                  listType: MultiSelectListType.CHIP,
+                                  selectedColor: widget.uiColor,
+                                  selectedItemsTextStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  searchHint: 'Search Vaccine',
+                                  searchHintStyle: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                  chipDisplay: MultiSelectChipDisplay(
+                                      chipColor: widget.uiColor,
+                                      scroll: true,
+                                      textStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                      onTap: (chip) {
+                                        setState(() {
+                                          if (initialValueVaccine.length > 1) {
+                                            initialValueVaccine.remove(chip);
+                                          } else {
+                                            initialValueVaccine = [];
+                                          }
+                                        });
+                                      }),
+                                  title: CustomTextStyle(
+                                      text: "Multi-Select Vaccines to Assign",
+                                      color: widget.uiColor,
+                                      isBold: true),
+                                  searchable: true,
+                                  separateSelectedItems: true,
+                                  onConfirm: (value) {
+                                    setState(() {
+                                      initialValueVaccine = value;
+                                    });
+                                  }),
+                            ),
                             CustomInputField(
                               lableIsBold: true,
                               labelFontSize: 14,
@@ -760,11 +777,17 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           children: [
                             TextButton(
                               onPressed: resetBtnHandler,
-                              child: const Text('Reset'),
+                              child: CustomTextStyle(
+                                  text: "Reset",
+                                  color: widget.uiColor,
+                                  isBold: true),
                             ),
                             ElevatedButton(
                               onPressed: submitHandler,
-                              child: const Text('Submit'),
+                              child: CustomTextStyle(
+                                  text: 'Submit',
+                                  color: widget.uiColor,
+                                  isBold: true),
                             ),
                           ],
                         ),
@@ -782,7 +805,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Results Found With ${_searchController.text} '),
+          backgroundColor: themeContainerColor,
+          title: CustomTextStyle(
+              text: 'Results Found With  "${_searchController.text}" ',
+              color: widget.uiColor,
+              isBold: true),
           content: SizedBox(
             height: MediaQuery.of(context).size.height * .5,
             width: MediaQuery.of(context).size.width * .3,
@@ -807,17 +834,45 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           : const FaIcon(FontAwesomeIcons.userAlt,
                               color: Colors.white),
                     ),
-                    title: Text(
-                        '${user['prefix'] ?? ""} ${user['first_name'] ?? ""} ${user['middle_name'] ?? ""}  ${user['last_name'] ?? ""}'),
+                    title: CustomTextStyle(
+                      text:
+                          '${user['prefix'] ?? ""} ${user['first_name'] ?? ""} ${user['middle_name'] ?? ""}  ${user['last_name'] ?? ""}',
+                      color: widget.uiColor,
+                      isBold: true,
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('UHID: ${user['uhid'] ?? ''}'),
-                        Text('PR Number: ${user['pr_number'] ?? ''}'),
-                        Text('Gender: ${user['gender'] ?? ''}'),
-                        Text('Phone Number: ${user['phone_number'] ?? ''}'),
-                        Text('Email ID: ${user['email_id'] ?? ''}'),
-                        Text('Facility: ${user['facility']['name'] ?? ''}'),
+                        CustomTextStyle(
+                          text: 'UHID: ${user['uhid'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'PR Number: ${user['pr_number'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Gender: ${user['gender'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Phone Number: ${user['phone_number'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Email ID: ${user['email_id'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Facility: ${user['facility']['name'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
                       ],
                     ),
                   ),
@@ -909,14 +964,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
 
   Future updateEmpForm(Map empData) async {
     prefix = empData["prefix"] ?? "Mr.";
-    firstName = empData["first_name"];
-    middleName = empData["middle_name"];
-    lastName = empData["last_name"];
+    firstName = ReCase(empData["first_name"] ?? "").titleCase;
+    middleName = ReCase(empData["middle_name"] ?? "").titleCase;
+    lastName = ReCase(empData["last_name"] ?? "").titleCase;
     gender = empData["gender"];
     prNumber = empData["pr_number"];
     uhid = empData["uhid"];
     phoneNumber = empData["phone_number"];
-    emailID = empData["email_id"];
+    emailID = empData["email_id"]?.toString().toLowerCase();
     facility = empData["facility"]["id"]?.toString();
     await widget.assignAvatar(
       newgender: gender ?? "",

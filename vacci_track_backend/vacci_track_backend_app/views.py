@@ -137,7 +137,14 @@ def get_prefix(request):
     # alchemy = SqlAlchemyConnection()
     # genders = alchemy.get_distict_prefix()
     # genders = [{"gender": row[0]} for row in genders if row[0]]
-    genders = [{"gender": "Mr."}, {"gender": "Ms"}, {"gender": "Mrs."}, {"gender": "Miss."}, {"gender": "Ms."}]
+    genders = [
+        {"gender": "Mr."},
+        {"gender": "Ms"},
+        {"gender": "Mrs."},
+        {"gender": "Miss."},
+        {"gender": "Ms."},
+        {"gender": "Dr"},
+    ]
     return Response(genders, status=200)
 
 
