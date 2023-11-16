@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 
 class VaccineAddForm extends StatefulWidget {
-  const VaccineAddForm({required this.editPage, super.key});
+  const VaccineAddForm(
+      {required this.uiColor, required this.editPage, super.key});
   final bool editPage;
+  final Color uiColor;
 
   @override
   State<VaccineAddForm> createState() => _VaccineAddFormState();
@@ -22,6 +26,8 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
   String? _name;
   String? _totalDose;
   String? _otherNotes;
+
+  late Color themeContainerColor;
 
   @override
   void dispose() {
@@ -123,15 +129,20 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
+
     return _isSpinning
-        ? const SpinnerWithOverlay(
-            spinnerColor: Colors.blue,
+        ? SpinnerWithOverlay(
+            spinnerColor: widget.uiColor,
           )
         : Card(
             borderOnForeground: true,
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
+              color: themeContainerColor,
               padding: const EdgeInsets.all(30),
               width: inputWidth + 20,
               child: Form(
@@ -139,32 +150,15 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                 child: Column(
                   children: [
                     if (widget.editPage) ...{
-                      SearchBar(
-                        controller: _searchController,
-                        elevation: const MaterialStatePropertyAll(2),
+                      CustomSearchBar(
                         hintText: "Search For A Vaccine ",
-                        leading: FaIcon(
-                          FontAwesomeIcons.magnifyingGlass,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        trailing: Iterable.generate(
-                          1,
-                          (index) {
-                            return OutlinedButton(
-                              style: const ButtonStyle(
-                                enableFeedback: true,
-                                animationDuration: Duration(seconds: 2),
-                              ),
-                              child: Text(
-                                deviceWidth < 900 ? '🔎' : 'Search',
-                              ),
-                              onPressed: () {
-                                _searchDesignation(context);
-                              },
-                            );
-                          },
-                        ),
-                        onChanged: (value) {},
+                        deviceWidth: deviceWidth,
+                        onPressed: () {
+                          _searchDesignation(context);
+                        },
+                        controller: _searchController,
+                        uiColor: widget.uiColor,
+                        backgroundColor: themeContainerColor,
                       ),
                       const SizedBox(height: 32)
                     },
@@ -173,6 +167,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                       spacing: 10,
                       children: [
                         CustomInputField(
+                          uiColor: widget.uiColor,
                           label: "Name",
                           initialValue: _name,
                           border: const OutlineInputBorder(),
@@ -191,6 +186,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                           },
                         ),
                         CustomInputField(
+                          uiColor: widget.uiColor,
                           label: "Doses",
                           initialValue: _totalDose,
                           inputFormatters: [
@@ -216,6 +212,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                     ),
                     const SizedBox(height: 20),
                     CustomInputField(
+                      uiColor: widget.uiColor,
                       label: "Other Notes",
                       initialValue: _otherNotes,
                       border: const OutlineInputBorder(),
@@ -236,11 +233,17 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                       children: [
                         TextButton(
                           onPressed: resetBtnHandler,
-                          child: const Text('Reset'),
+                          child: CustomTextStyle(
+                              text: "Reset",
+                              color: widget.uiColor,
+                              isBold: true),
                         ),
                         ElevatedButton(
                           onPressed: submitHandler,
-                          child: const Text('Submit'),
+                          child: CustomTextStyle(
+                              text: 'Submit',
+                              color: widget.uiColor,
+                              isBold: true),
                         ),
                       ],
                     ),
@@ -256,8 +259,11 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-              "Multiple Vaccine Found with the keyword ${_searchController.text}"),
+          title: CustomTextStyle(
+              text:
+                  "Multiple Vaccine Found with the keyword '${_searchController.text}'",
+              color: widget.uiColor,
+              isBold: true),
           content: SizedBox(
             height: 200,
             width: 200,
@@ -280,16 +286,25 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                         color: Colors.white,
                       ),
                     ),
-                    title: Text(
-                      vaccine["name"],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    title: CustomTextStyle(
+                      text: vaccine["name"],
+                      color: widget.uiColor,
+                      isBold: true,
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                            "Total Number of Doses : ${vaccine['total_number_of_doses']}"),
-                        Text("Other Notes : ${vaccine['other_notes'] ?? ""}"),
+                        CustomTextStyle(
+                          text:
+                              "Total Number of Doses : ${vaccine['total_number_of_doses']}",
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: "Other Notes : ${vaccine['other_notes'] ?? ""}",
+                          color: Colors.black,
+                          isBold: true,
+                        ),
                       ],
                     ),
                   ),
@@ -302,7 +317,8 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Cancel'),
+              child: CustomTextStyle(
+                  text: 'Cancel', isBold: true, color: widget.uiColor),
               onPressed: () {
                 Navigator.of(context).pop();
               },

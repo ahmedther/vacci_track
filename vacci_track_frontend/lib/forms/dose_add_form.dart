@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
@@ -30,6 +31,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
   String? _gapBeforNextDose;
   String? _detail;
   String? _vaccination;
+
+  late Color themeContainerColor;
 
   late List<DropdownMenuItem<String>>? vaccinationList;
 
@@ -160,8 +163,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
-
-    late final Color themeContainerColor = Helpers.getThemeColorWithUIColor(
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
     return _isSpinning
         ? SpinnerWithOverlay(
@@ -183,6 +185,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                     controller: _searchController,
                     uiColor: widget.uiColor,
                     backgroundColor: themeContainerColor,
+                    hintText: "Search For A Dose",
                   ),
                 ),
                 SizedBox(
@@ -230,10 +233,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             ),
                             SizedBox(
                                 width: inputWidth * .4,
-                                child: const Text(
-                                  "Dose Number",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )),
+                                child: const CustomTextStyle(
+                                    text: "Dose Number", isBold: true)),
                             CustomInputField(
                               label: "",
                               initialValue: _doseNumber,
@@ -263,10 +264,10 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             SizedBox(width: inputWidth * .23),
                             SizedBox(
                                 width: inputWidth * .4,
-                                child: const Text(
-                                  "Gap Before Next Dose is Due. In Months",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )),
+                                child: const CustomTextStyle(
+                                    text:
+                                        "Gap Before Next Dose is Due. In Months",
+                                    isBold: true)),
                             CustomInputField(
                               label: "",
                               initialValue: _gapBeforNextDose,
@@ -335,17 +336,17 @@ class _DoseAddFormState extends State<DoseAddForm> {
                           children: [
                             TextButton(
                               onPressed: resetBtnHandler,
-                              child: Text('Reset',
-                                  style: TextStyle(
-                                      color: widget.uiColor,
-                                      fontWeight: FontWeight.bold)),
+                              child: CustomTextStyle(
+                                  text: "Reset",
+                                  color: widget.uiColor,
+                                  isBold: true),
                             ),
                             ElevatedButton(
                               onPressed: submitHandler,
-                              child: Text('Submit',
-                                  style: TextStyle(
-                                      color: widget.uiColor,
-                                      fontWeight: FontWeight.bold)),
+                              child: CustomTextStyle(
+                                  text: 'Submit',
+                                  color: widget.uiColor,
+                                  isBold: true),
                             ),
                           ],
                         ),
@@ -363,7 +364,11 @@ class _DoseAddFormState extends State<DoseAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Multiple Dose Found with  ${_searchController.text} '),
+          backgroundColor: themeContainerColor,
+          title: CustomTextStyle(
+              text: 'Multiple Dose Found with  "${_searchController.text}" ',
+              color: widget.uiColor,
+              isBold: true),
           content: SizedBox(
             height: MediaQuery.of(context).size.height * .5,
             width: MediaQuery.of(context).size.width * .01,
@@ -372,10 +377,12 @@ class _DoseAddFormState extends State<DoseAddForm> {
               itemBuilder: (context, index) {
                 Map dose = doseData[index];
                 return Card(
+                  color: Colors.white,
                   child: ListTile(
                     hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {
-                      updateForm(dose);
+                      await updateForm(dose);
+                      // ignore: use_build_context_synchronously
                       context.pop();
                     },
                     leading: CircleAvatar(
@@ -383,15 +390,35 @@ class _DoseAddFormState extends State<DoseAddForm> {
                       child: const FaIcon(FontAwesomeIcons.syringe,
                           color: Colors.white),
                     ),
-                    title: Text(dose["name"]),
+                    title: CustomTextStyle(
+                      text: dose["name"],
+                      color: widget.uiColor,
+                      isBold: true,
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Dose Number : ${dose['dose_number']}'),
-                        Text(
-                            'Gap Before Next Dose : ${dose["gap_before_next_dose"]} Month(s)'),
-                        Text('Vaccination : ${dose['vaccination']['name']}'),
-                        Text('Details : ${dose['detail']}'),
+                        CustomTextStyle(
+                          text: 'Dose Number : ${dose['dose_number']}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text:
+                              'Gap Before Next Dose : ${dose["gap_before_next_dose"]} Month(s)',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Vaccination : ${dose['vaccination']['name']}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Details : ${dose['detail']}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
                       ],
                     ),
                   ),
@@ -404,7 +431,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Cancel'),
+              child: CustomTextStyle(
+                  text: 'Cancel', isBold: true, color: widget.uiColor),
               onPressed: () {
                 Navigator.of(context).pop();
               },

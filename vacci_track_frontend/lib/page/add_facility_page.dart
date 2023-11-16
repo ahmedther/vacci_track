@@ -36,8 +36,8 @@ class _AddFacilityPageState extends State<AddFacilityPage> {
       toggelIcon2: const FaIcon(FontAwesomeIcons.buildingCircleArrowRight),
       toggelText1: "Add a Facility",
       toggelText2: "Edit Facility",
-      toggelWidget1: FacilityAddForm(editPage: false),
-      toggelWidget2: FacilityAddForm(editPage: true),
+      toggelWidget1: FacilityAddForm(editPage: false, uiColor: widget.uiColor),
+      toggelWidget2: FacilityAddForm(editPage: true, uiColor: widget.uiColor),
     );
   }
 }

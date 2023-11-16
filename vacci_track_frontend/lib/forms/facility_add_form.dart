@@ -6,8 +6,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 
 class FacilityAddForm extends StatefulWidget {
-  const FacilityAddForm({required this.editPage, super.key});
+  const FacilityAddForm(
+      {required this.uiColor, required this.editPage, super.key});
   final bool editPage;
+  final Color uiColor;
 
   @override
   State<FacilityAddForm> createState() => _FacilityAddFormState();
@@ -20,6 +22,8 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
   String? _name;
   String? _facilityId;
   int? _id = 0;
+
+  late Color themeContainerColor;
 
   @override
   void dispose() {
@@ -118,6 +122,9 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+
+    themeContainerColor = Helpers.getThemeColorWithUIColor(
+        context: context, uiColor: widget.uiColor);
     return _isSpinning
         ? const SpinnerWithOverlay(
             spinnerColor: Colors.blue,

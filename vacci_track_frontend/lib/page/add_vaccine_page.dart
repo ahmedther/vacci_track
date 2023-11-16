@@ -35,8 +35,8 @@ class _AddVaccinePageState extends State<AddVaccinePage> {
       toggelIcon2: const FaIcon(FontAwesomeIcons.vialCircleCheck),
       toggelText1: "Add New Vaccine",
       toggelText2: "Edit Vaccine",
-      toggelWidget1: VaccineAddForm(editPage: false),
-      toggelWidget2: VaccineAddForm(editPage: true),
+      toggelWidget1: VaccineAddForm(editPage: false, uiColor: widget.uiColor),
+      toggelWidget2: VaccineAddForm(editPage: true, uiColor: widget.uiColor),
     );
   }
 }
