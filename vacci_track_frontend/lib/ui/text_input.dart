@@ -12,14 +12,14 @@ class CustomInputField extends StatelessWidget {
     this.initialValue,
     this.inputFormatters,
     this.maxLines,
-    this.enabled,
+    this.enabled = true,
     this.underlineBorder = false,
     this.uiColor,
     this.controller,
     this.labelFontSize,
     this.lableIsBold = true,
     required this.width,
-    required this.onSaved,
+    this.onSaved,
     required this.label,
   });
 
@@ -45,7 +45,10 @@ class CustomInputField extends StatelessWidget {
       width: width,
       child: TextFormField(
         controller: controller,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: enabled! ? Colors.black : Colors.grey,
+            fontWeight: FontWeight.bold,
+            fontSize: 16),
         cursorColor: uiColor,
         enabled: enabled,
         inputFormatters: inputFormatters,
@@ -59,7 +62,7 @@ class CustomInputField extends StatelessWidget {
                 label: label,
                 fontSize: labelFontSize,
                 isBold: lableIsBold,
-              )
+                isDisabled: !enabled!)
             : InputDecoration(
                 focusedBorder: OutlineInputBorder(
                   borderSide:

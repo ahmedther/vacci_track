@@ -6,6 +6,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/ui/date_picker.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
@@ -315,7 +316,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           spacing: 10,
                           children: [
                             CustomDropDownField(
-                              uiColor: widget.uiColor,
                               value: prefix,
                               width:
                                   Helpers.min_max(deviceWidth, .12, 163, 300),
@@ -404,7 +404,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDropDownField(
-                              uiColor: widget.uiColor,
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               width:
@@ -436,45 +435,17 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                 return null;
                               },
                             ),
-                            Container(
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.black,
-                                    width: 2.0,
-                                  ),
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomTextStyle(
-                                    text: joiningDate != null
-                                        ? formater.format(joiningDate!)
-                                        : "Joining Date",
-                                    color: Colors.black,
-                                    isBold: true,
-                                    fontSize: 14,
-                                  ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      joiningDate =
-                                          await Helpers.openDatePicker(context);
-                                      if (joiningDate != null) {
-                                        setState(() {});
-                                      }
-                                    },
-                                    icon: const FaIcon(
-                                        FontAwesomeIcons.calendarDays,
-                                        color: Colors.black),
-                                  ),
-                                ],
-                              ),
+                            CustomDatePicker(
+                              deviceWidth: deviceWidth,
+                              dateTimeVal: joiningDate,
+                              defaultLabel: "Joining Date",
+                              onPressed: () async {
+                                joiningDate =
+                                    await Helpers.openDatePicker(context);
+                                if (joiningDate != null) {
+                                  setState(() {});
+                                }
+                              },
                             ),
                             CustomInputField(
                               lableIsBold: true,
@@ -567,7 +538,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               label: "Email ID",
                             ),
                             CustomDropDownField(
-                              uiColor: widget.uiColor,
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               width:
@@ -587,7 +557,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDropDownField(
-                              uiColor: widget.uiColor,
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               value: designation,
@@ -607,7 +576,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDropDownField(
-                              uiColor: widget.uiColor,
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               value: facility,
@@ -641,7 +609,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               label: "Status",
                             ),
                             CustomDropDownField(
-                              uiColor: widget.uiColor,
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               value: eligibility,
@@ -869,7 +836,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           isBold: true,
                         ),
                         CustomTextStyle(
-                          text: 'Facility: ${user['facility']['name'] ?? ''}',
+                          text: 'Facility: ${user['facility']?['name'] ?? ''}',
                           color: Colors.black,
                           isBold: true,
                         ),
@@ -972,7 +939,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     uhid = empData["uhid"];
     phoneNumber = empData["phone_number"];
     emailID = empData["email_id"]?.toString().toLowerCase();
-    facility = empData["facility"]["id"]?.toString();
+    facility = empData["facility"]?["id"]?.toString();
     await widget.assignAvatar(
       newgender: gender ?? "",
       newprefix: prefix ?? "",
@@ -998,7 +965,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         empData["designation"] != null && empData["designation"]["id"] != null
             ? empData["designation"]["id"].toString()
             : null;
-    empData["designation"]["id"].toString();
+    empData["designation"]?["id"].toString();
 
     status = empData["status"];
     eligibility = empData["eligibility"];

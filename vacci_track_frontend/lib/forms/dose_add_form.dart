@@ -66,7 +66,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
     super.dispose();
   }
 
-  void _searchDose(BuildContext context) async {
+  Future<void> _searchDose(BuildContext context) async {
     setState(() {
       _isSpinning = true;
     });
@@ -289,7 +289,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 }
                                 return null;
                               },
-                              uiColor: widget.uiColor,
                             ),
                             CustomDropDownField(
                               decoration: dropdownDecoration(
@@ -307,7 +306,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 }
                                 return null;
                               },
-                              uiColor: widget.uiColor,
                             ),
                             CustomInputField(
                               label: "Details",

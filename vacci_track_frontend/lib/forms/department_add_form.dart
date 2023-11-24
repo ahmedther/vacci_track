@@ -212,7 +212,6 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                     child: Column(
                       children: [
                         CustomInputField(
-                          uiColor: widget.uiColor,
                           label: "Name",
                           initialValue: departmentName,
                           width: inputWidth,
@@ -256,7 +255,6 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                           onChanged: (value) {
                             hod = value;
                           },
-                          uiColor: widget.uiColor,
                         ),
                         SizedBox(
                           height: deviceHeight * 0.02,

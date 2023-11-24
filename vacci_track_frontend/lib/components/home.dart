@@ -16,6 +16,7 @@ class Home extends StatelessWidget {
     GoRouter router = GoRouter(routes: [
       GoRoute(
         path: HomeScreen.routeName,
+        
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(

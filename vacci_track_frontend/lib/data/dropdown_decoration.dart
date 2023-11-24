@@ -20,15 +20,17 @@ InputDecoration dropdownDecorationAddEmployee({
   String? label,
   bool? isBold = true,
   double? fontSize,
+  bool? isDisabled = false,
 }) {
   return InputDecoration(
     label: CustomTextStyle(
         text: label ?? "",
         isBold: isBold!,
-        color: Colors.black,
+        color: isDisabled! ? Colors.grey : Colors.black,
         fontSize: fontSize),
-    enabledBorder: const UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.black, width: 2),
+    enabledBorder: UnderlineInputBorder(
+      borderSide:
+          BorderSide(color: isDisabled ? Colors.grey : Colors.black, width: 2),
     ),
     focusColor: color,
     focusedBorder: UnderlineInputBorder(

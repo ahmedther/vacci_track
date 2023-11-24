@@ -433,8 +433,13 @@ def add_dose(request):
 @permission_classes([IsAuthenticated])
 def search_dose(request):
     try:
-        query = request.query_params["query"].split("=")[-1]
-        dose = Dose.objects.filter(name__icontains=query)
+        query: str = request.query_params["query"].split("=")[-1]
+
+        dose = (
+            Dose.objects.filter(vaccination_id=query)
+            if query.isdigit()
+            else Dose.objects.filter(name__icontains=query)
+        )
 
         if not dose:
             raise Exception(f"No Dose found with Search Query '{query}'")

@@ -10,7 +10,7 @@ import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/provider/user_provider.dart';
 import 'package:vacci_track_frontend/ui/error_snackbar.dart';
 
-final formater = DateFormat('dd-MMM-yyyy');
+final DateFormat formater = DateFormat('dd-MMM-yyyy');
 
 class Helpers {
   static double min_max(deviceWidth, double percent, min_val, max_val) {
@@ -350,12 +350,6 @@ class Helpers {
     );
   }
 
-  static Future<String> getAppUserGender() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String genderString = prefs.getString("gender") ?? "male";
-    return genderString;
-  }
-
   static Future genderChange(WidgetRef? ref) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     UserData userData = ref!.watch(userProvider);
@@ -382,24 +376,21 @@ class Helpers {
 
   static Color getThemeColor(
       {required BuildContext context, required String gender}) {
-    late final Color themeColor = gender.toLowerCase() == 'male'
+    return gender.toLowerCase() == 'male'
         ? Theme.of(context).colorScheme.primaryContainer
         : Theme.of(context).colorScheme.secondaryContainer;
-    return themeColor;
   }
 
   static Color getThemeColorWithUIColor(
       {required BuildContext context, required Color uiColor}) {
-    late final Color themeColor = uiColor == const Color(0xFF01579b)
+    return uiColor == const Color(0xFF01579b)
         ? Theme.of(context).colorScheme.primaryContainer
         : Theme.of(context).colorScheme.secondaryContainer;
-    return themeColor;
   }
 
   static Color getGraditentWithGender(String gender) {
-    late final Color gradientColor = gender.toLowerCase() == "male"
+    return gender.toLowerCase() == "male"
         ? const Color.fromARGB(255, 47, 114, 165)
         : const Color.fromARGB(255, 237, 68, 124);
-    return gradientColor;
   }
 }
