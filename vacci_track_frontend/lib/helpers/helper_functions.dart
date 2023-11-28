@@ -181,13 +181,14 @@ class Helpers {
     prefs.clear();
   }
 
-  static Future<DateTime?> openDatePicker(BuildContext context) async {
+  static Future<DateTime?> openDatePicker(
+      {required BuildContext context, String? helpText}) async {
     DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2008),
       lastDate: DateTime.now(),
-      helpText: "Select Joining Date",
+      helpText: helpText,
     );
     if (selectedDate != null) return selectedDate;
     return null;

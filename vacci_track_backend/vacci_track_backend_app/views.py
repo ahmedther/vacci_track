@@ -448,3 +448,19 @@ def search_dose(request):
         return Response(serializer.data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_vaccination_data(request):
+    # try:
+    data: dict = json.loads(request.body)
+    print(data)
+    emp_vac = Helper().save_employee_vaccination(data)
+    print(emp_vac)
+
+    return JsonResponse({"success": True}, status=200)
+
+
+# except Exception as e:
+#     return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)

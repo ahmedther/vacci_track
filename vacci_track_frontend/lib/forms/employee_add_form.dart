@@ -436,12 +436,14 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDatePicker(
-                              deviceWidth: deviceWidth,
+                              width:
+                                  Helpers.min_max(deviceWidth, .12, 163, 300),
                               dateTimeVal: joiningDate,
                               defaultLabel: "Joining Date",
                               onPressed: () async {
-                                joiningDate =
-                                    await Helpers.openDatePicker(context);
+                                joiningDate = await Helpers.openDatePicker(
+                                    context: context,
+                                    helpText: "Select Joining Date");
                                 if (joiningDate != null) {
                                   setState(() {});
                                 }

@@ -5,9 +5,11 @@ class CustomTextStyle extends StatelessWidget {
   final Color? color;
   final bool isBold;
   final double? fontSize;
+  final TextAlign? textAlign;
 
   const CustomTextStyle(
       {required this.text,
+      this.textAlign,
       this.color,
       this.isBold = false,
       this.fontSize,
@@ -17,6 +19,8 @@ class CustomTextStyle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: textAlign,
+      
       style: TextStyle(
           color: color,
           fontWeight: isBold ? FontWeight.bold : null,
@@ -35,6 +39,8 @@ Text getCustomTextStyle(
     style: TextStyle(
         color: color,
         fontWeight: isBold ? FontWeight.bold : null,
-        fontSize: fontSize),
+        fontSize: fontSize,
+        
+        ),
   );
 }

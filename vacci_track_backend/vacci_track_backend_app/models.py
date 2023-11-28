@@ -227,3 +227,10 @@ class EmployeeVaccination(models.Model):
             f" {' - ' + self.dose.name if self.dose else ''}"
             f" {' - ' + str(self.dose_date) if self.dose_date else ''}"
         )
+
+    class Meta:
+        unique_together = (
+            "employee",
+            "vaccination",
+            "dose",
+        )

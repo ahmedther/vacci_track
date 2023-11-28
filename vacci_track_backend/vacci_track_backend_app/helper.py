@@ -126,3 +126,14 @@ class Helper:
         ).first()
         dose, created = Dose.objects.update_or_create(id=dose_id, defaults=data)
         return dose, created
+
+    def save_employee_vaccination(self, data: dict):
+        data["next_dose_due_date"] = (
+            datetime.datetime.strptime(data["next_dose_due_date"], "%d-%b-%Y")
+            if data["next_dose_due_date"] is not None
+            else None
+        )
+
+        print(data["next_dose_due_date"])
+        dose = EmployeeVaccination.objects.create(**data)
+        return dose
