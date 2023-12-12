@@ -117,7 +117,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
 
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
@@ -133,7 +133,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
             child: Container(
               color: themeContainerColor,
               padding: const EdgeInsets.all(30),
-              width: Helpers.min_max(deviceWidth, 50, 200, 400),
+              width: inputWidth,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

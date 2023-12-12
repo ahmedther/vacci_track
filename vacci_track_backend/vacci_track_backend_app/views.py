@@ -15,6 +15,7 @@ from vacci_track_backend_app.serializers import (
     EmployeeSerializer,
     VaccinationSerializer,
     DoseSerializer,
+    EmpVaccFilterSerializer,
 )
 from vacci_track_backend_app.helper import Helper
 from django.shortcuts import render
@@ -134,17 +135,17 @@ def get_facility_list(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_prefix(request):
-    # alchemy = SqlAlchemyConnection()
-    # genders = alchemy.get_distict_prefix()
-    # genders = [{"gender": row[0]} for row in genders if row[0]]
-    genders = [
-        {"gender": "Mr."},
-        {"gender": "Ms"},
-        {"gender": "Mrs."},
-        {"gender": "Miss."},
-        {"gender": "Ms."},
-        {"gender": "Dr"},
-    ]
+    try:
+        alchemy = SqlAlchemyConnection()
+        genders = alchemy.get_distict_prefix()
+        genders = [{"gender": row[0]} for row in genders if row[0]]
+    except:
+        genders = [
+            {"gender": "Mr."},
+            {"gender": "Ms."},
+            {"gender": "Mrs."},
+            {"gender": "Dr"},
+        ]
     return Response(genders, status=200)
 
 
@@ -214,17 +215,27 @@ def search_employee_by_name(request):
     try:
         query = request.query_params["query"].split("=")[-1]
         if query == "":
-            emp_data = Employee.objects.all().order_by("-id")[:15]
+            emp_data = (
+                Employee.objects.filter(employee_vaccination__dose_date__isnull=True)
+                .order_by("-id")
+                .distinct()[:15]
+            )
         else:
-            emp_data = Employee.objects.filter(
-                Q(pr_number__contains=query)
-                | Q(uhid__icontains=query)
-                | Q(first_name__icontains=query)
-                | Q(middle_name__icontains=query)
-                | Q(last_name__icontains=query)
-            )[:15]
-
-        serializer = EmployeeSerializer(emp_data, many=True)
+            emp_data = (
+                Employee.objects.filter(
+                    Q(employee_vaccination__dose_date__isnull=True)
+                    & (
+                        Q(pr_number__contains=query)
+                        | Q(uhid__icontains=query)
+                        | Q(first_name__icontains=query)
+                        | Q(middle_name__icontains=query)
+                        | Q(last_name__icontains=query)
+                    )
+                )
+                .order_by("-id")
+                .distinct()[:15]
+            )
+        serializer = EmpVaccFilterSerializer(emp_data, many=True)
         return Response(serializer.data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
@@ -434,9 +445,14 @@ def add_dose(request):
 def search_dose(request):
     try:
         query: str = request.query_params["query"].split("=")[-1]
+        emp_id: str = request.query_params["query"].split("=")[-2]
 
         dose = (
-            Dose.objects.filter(vaccination_id=query)
+            Dose.objects.filter(
+                employee_vaccination__employee=emp_id,
+                employee_vaccination__vaccination=query,
+                employee_vaccination__dose_date__isnull=True,
+            ).order_by("dose_number")[:1]
             if query.isdigit()
             else Dose.objects.filter(name__icontains=query)
         )
@@ -444,7 +460,9 @@ def search_dose(request):
         if not dose:
             raise Exception(f"No Dose found with Search Query '{query}'")
 
-        serializer = DoseSerializer(dose, many=True)
+        serializer = DoseSerializer(
+            dose, many=True, context={"emp_id": emp_id, "query": query}
+        )
         return Response(serializer.data, status=200)
     except Exception as e:
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
@@ -453,14 +471,14 @@ def search_dose(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_vaccination_data(request):
-    # try:
-    data: dict = json.loads(request.body)
-    print(data)
-    emp_vac = Helper().save_employee_vaccination(data)
-    print(emp_vac)
-
-    return JsonResponse({"success": True}, status=200)
-
-
-# except Exception as e:
-#     return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+    try:
+        data: dict = json.loads(request.body)
+        dose, created = Helper().save_employee_vaccination(data)
+        if created:
+            return JsonResponse(
+                {"error": f"This shouldn't happen. Report this error immediately"},
+                status=405,
+            )
+        return JsonResponse({"success": True}, status=200)
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)

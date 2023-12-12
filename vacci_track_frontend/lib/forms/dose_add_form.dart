@@ -27,14 +27,18 @@ class _DoseAddFormState extends State<DoseAddForm> {
 
   int? _id = 0;
   String? _name;
-  String? _doseNumber;
+  int? _doseNumber;
   String? _gapBeforNextDose;
+  int? _totalVacDose;
   String? _detail;
   String? _vaccination;
 
   late Color themeContainerColor;
 
+  late List vacciData;
   late List<DropdownMenuItem<String>>? vaccinationList;
+
+  bool isVacSelected = false;
 
   @override
   void initState() {
@@ -47,7 +51,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
   Future<void> getVaccinationList() async {
     final API_URL = await Helpers.load_env();
 
-    final List vacciData = await Helpers.makeGetRequest(
+    vacciData = await Helpers.makeGetRequest(
         "http://$API_URL/api/get_vaccination_list/");
     vaccinationList = vacciData.map((item) {
       return DropdownMenuItem<String>(
@@ -74,7 +78,6 @@ class _DoseAddFormState extends State<DoseAddForm> {
     final List doseList = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_dose/",
         query: "param1=${_searchController.text}");
-
     if (doseList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, doseList[0]['error']);
@@ -106,12 +109,13 @@ class _DoseAddFormState extends State<DoseAddForm> {
           data: {
             if (widget.editPage) "id": _id,
             "name": _name,
-            "dose_number": int.parse(_doseNumber!),
+            "dose_number": _doseNumber!,
             "gap_before_next_dose": int.parse(_gapBeforNextDose!),
             'vaccination': _vaccination,
             "detail": _detail,
             if (widget.editPage) "edit": widget.editPage,
           });
+
       if (data.containsKey('error')) {
         setState(() {
           _isSpinning = false;
@@ -134,16 +138,65 @@ class _DoseAddFormState extends State<DoseAddForm> {
     }
   }
 
+  Future<void> getDoseNumber(String value) async {
+    setState(() {
+      _isSpinning = true;
+    });
+    _gapBeforNextDose = null;
+    final Map element =
+        vacciData.firstWhere((e) => e['id'] == int.parse(value));
+    _doseNumber = element['dose_count'] + 1;
+    _totalVacDose = element['total_number_of_doses'];
+    isVacSelected = true;
+
+    if (_doseNumber == _totalVacDose) {
+      _gapBeforNextDose = "0";
+    }
+
+    await Future.delayed(const Duration(milliseconds: 10), () {
+      setState(() {
+        _isSpinning = false;
+      });
+    });
+  }
+
+  String? getDoseText() {
+    if (_doseNumber == null) {
+      return null;
+    } else if (_totalVacDose != null &&
+        _doseNumber != null &&
+        _doseNumber! > _totalVacDose!) {
+      return "Max Limit is $_totalVacDose";
+    } else {
+      return "${_doseNumber.toString()} Out Of ${_totalVacDose.toString()}";
+    }
+  }
+
+  bool getEnableStatus() {
+    if (!isVacSelected) {
+      return false;
+    } else if (_doseNumber != null &&
+        _totalVacDose != null &&
+        _doseNumber != _totalVacDose &&
+        _doseNumber! < _totalVacDose!) {
+      return true;
+    }
+    return false;
+  }
+
   Future updateForm(Map data) async {
     _id = data["id"];
     _name = data["name"];
-    _doseNumber = data["dose_number"].toString();
+    _doseNumber = data["dose_number"];
     _gapBeforNextDose = data["gap_before_next_dose"].toString();
     _detail = data["detail"];
     _vaccination = data["vaccination"]['id'].toString();
+    _totalVacDose = data["vaccination"]["total_number_of_doses"];
+    isVacSelected = true;
   }
 
   Future resetBtnHandler() async {
+    await getVaccinationList();
     setState(() {
       if (_formKey.currentState != null) {
         _formKey.currentState!.reset();
@@ -162,7 +215,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
+    bool isEnabled = getEnableStatus();
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
     return _isSpinning
@@ -180,7 +234,10 @@ class _DoseAddFormState extends State<DoseAddForm> {
                   child: CustomSearchBar(
                     deviceWidth: deviceWidth,
                     onPressed: () {
-                      _searchDose(context);
+                      _searchController.text.length < 3
+                          ? Helpers.showSnackBar(
+                              context, "Please enter at least 3 characters")
+                          : _searchDose(context);
                     },
                     controller: _searchController,
                     uiColor: widget.uiColor,
@@ -198,18 +255,44 @@ class _DoseAddFormState extends State<DoseAddForm> {
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
                   color: themeContainerColor,
-                  padding: const EdgeInsets.all(30),
-                  width: inputWidth + 20,
+                  padding: const EdgeInsets.all(40),
+                  width: inputWidth + 40,
                   child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
                         Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 20,
+                          spacing: inputWidth * .1,
                           runSpacing: 20,
                           children: [
+                            CustomDropDownField(
+                              disabledHint: const Text("Select A Vaccine"),
+                              decoration: dropdownDecoration(
+                                  isDisabled: widget.editPage,
+                                  label: "Vaccination",
+                                  color: widget.uiColor),
+                              width: inputWidth,
+                              value: _vaccination,
+                              items: vaccinationList ?? [],
+                              hint: "Select a Vaccination",
+                              onChanged: widget.editPage
+                                  ? null
+                                  : (value) async {
+                                      if (value != null) {
+                                        _vaccination = value;
+                                        await getDoseNumber(value);
+                                      }
+                                    },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Assign to Vaccination Cannot be Empty";
+                                }
+                                return null;
+                              },
+                            ),
                             CustomInputField(
+                              enabled: isVacSelected,
                               label: "Name",
                               initialValue: _name,
                               width: inputWidth,
@@ -223,8 +306,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    value.trim().isEmpty) {
-                                  return "Dose name can not be empty or less then 1 characters!";
+                                    value.trim().length < 3) {
+                                  return "Dose name can not be empty or less then 3 characters!";
                                 }
                                 return null;
                               },
@@ -233,50 +316,51 @@ class _DoseAddFormState extends State<DoseAddForm> {
                             SizedBox(
                                 width: inputWidth * .4,
                                 child: const CustomTextStyle(
-                                    text: "Dose Number", isBold: true)),
+                                    color: Colors.grey,
+                                    text: "Dose Number",
+                                    isBold: true)),
                             CustomInputField(
+                              enabled: false,
                               label: "",
-                              initialValue: _doseNumber,
-                              width: inputWidth * .15,
+                              initialValue: getDoseText(),
+                              width: inputWidth * .3,
                               inputFormatters: [
                                 FilteringTextInputFormatter
                                     .digitsOnly, // Only allow digits
                               ],
-                              onSaved: (value) {
-                                if (value == null) return;
-                                _doseNumber = value;
-                              },
-                              onChanged: (value) {
-                                _doseNumber = value;
-                              },
-                              validator: (value) {
-                                if (value == null ||
-                                    value.isEmpty ||
-                                    value.trim().isEmpty) {
-                                  return "Dose name can not be empty or less then 1 characters!";
-                                }
-                                return null;
-                              },
                               uiColor: widget.uiColor,
                             ),
-                            SizedBox(width: inputWidth * .23),
                             SizedBox(
                                 width: inputWidth * .4,
-                                child: const CustomTextStyle(
+                                child: CustomTextStyle(
+                                    color: isEnabled ? null : Colors.grey,
                                     text:
                                         "Gap Before Next Dose is Due. In Months",
                                     isBold: true)),
                             CustomInputField(
+                              enabled: isEnabled,
                               label: "",
-                              initialValue: _gapBeforNextDose,
-                              width: inputWidth * .15,
+                              initialValue:
+                                  isVacSelected && _gapBeforNextDose == "0"
+                                      ? "$_gapBeforNextDose Months.\nLast Dose"
+                                      : _doseNumber != null &&
+                                              _totalVacDose != null &&
+                                              _doseNumber! > _totalVacDose!
+                                          ? "Limit Reached"
+                                          : _gapBeforNextDose,
+                              uiColor: widget.uiColor,
+                              width: inputWidth * .3,
                               inputFormatters: [
                                 FilteringTextInputFormatter
                                     .digitsOnly, // Only allow digits
                               ],
                               onSaved: (value) {
                                 if (value == null) return;
-                                _gapBeforNextDose = value;
+                                if (value.length > 10) {
+                                  _gapBeforNextDose = "0";
+                                } else {
+                                  _gapBeforNextDose = value;
+                                }
                               },
                               onChanged: (value) {
                                 _gapBeforNextDose = value;
@@ -290,24 +374,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
                                 return null;
                               },
                             ),
-                            CustomDropDownField(
-                              decoration: dropdownDecoration(
-                                  label: "Vaccination", color: widget.uiColor),
-                              width: inputWidth,
-                              value: _vaccination,
-                              items: vaccinationList ?? [],
-                              hint: "Select a Vaccination",
-                              onChanged: (value) {
-                                _vaccination = value;
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Assign to Vaccination Cannot be Empty";
-                                }
-                                return null;
-                              },
-                            ),
                             CustomInputField(
+                              enabled: isVacSelected,
                               label: "Details",
                               initialValue: _detail,
                               width: inputWidth,
@@ -329,17 +397,21 @@ class _DoseAddFormState extends State<DoseAddForm> {
                           spacing: 40,
                           children: [
                             TextButton(
-                              onPressed: resetBtnHandler,
+                              onPressed: isVacSelected ? resetBtnHandler : null,
                               child: CustomTextStyle(
                                   text: "Reset",
-                                  color: widget.uiColor,
+                                  color: isVacSelected
+                                      ? widget.uiColor
+                                      : Colors.grey,
                                   isBold: true),
                             ),
                             ElevatedButton(
-                              onPressed: submitHandler,
+                              onPressed: isVacSelected ? submitHandler : null,
                               child: CustomTextStyle(
                                   text: 'Submit',
-                                  color: widget.uiColor,
+                                  color: isVacSelected
+                                      ? widget.uiColor
+                                      : Colors.grey,
                                   isBold: true),
                             ),
                           ],

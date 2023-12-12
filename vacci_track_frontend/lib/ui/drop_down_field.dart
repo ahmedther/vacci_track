@@ -41,7 +41,7 @@ class CustomDropDownField extends StatelessWidget {
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold)),
         isExpanded: true,
-        onChanged: onChanged ?? (String? value) {},
+        onChanged: onChanged,
         onSaved: onSaved ?? (String? value) {},
         items: items,
         validator: validator,

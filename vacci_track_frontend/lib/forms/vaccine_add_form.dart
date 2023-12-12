@@ -128,7 +128,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
 
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
@@ -140,11 +140,10 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
         : Card(
             borderOnForeground: true,
             elevation: 100,
-            margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
               color: themeContainerColor,
+              width: inputWidth + 30,
               padding: const EdgeInsets.all(30),
-              width: inputWidth + 20,
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -165,12 +164,15 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                     Wrap(
                       crossAxisAlignment: WrapCrossAlignment.end,
                       spacing: 10,
+                      runSpacing: 20,
                       children: [
                         CustomInputField(
                           uiColor: widget.uiColor,
                           label: "Name",
                           initialValue: _name,
-                          width: Helpers.min_max(deviceWidth, .10, 350, 400),
+                          width: inputWidth > 400
+                              ? (inputWidth - 40) * .7
+                              : inputWidth,
                           onSaved: (value) {
                             if (value == null) return;
                             _name = value;
@@ -186,13 +188,15 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                         ),
                         CustomInputField(
                           uiColor: widget.uiColor,
-                          label: "Doses",
+                          label: "Total Doses",
                           initialValue: _totalDose,
                           inputFormatters: [
                             FilteringTextInputFormatter
                                 .digitsOnly, // Only allow digits
                           ],
-                          width: Helpers.min_max(deviceWidth, .10, 70, 70),
+                          width: inputWidth > 400
+                              ? (inputWidth - 40) * .3
+                              : inputWidth,
                           onSaved: (value) {
                             if (value == null) return;
                             _totalDose = value;
@@ -206,19 +210,18 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                             return null;
                           },
                         ),
+                        CustomInputField(
+                          uiColor: widget.uiColor,
+                          label: "Other Notes",
+                          initialValue: _otherNotes,
+                          width: inputWidth,
+                          onSaved: (value) {
+                            if (value == null) return;
+                            _otherNotes = value;
+                          },
+                          maxLines: 5,
+                        ),
                       ],
-                    ),
-                    const SizedBox(height: 20),
-                    CustomInputField(
-                      uiColor: widget.uiColor,
-                      label: "Other Notes",
-                      initialValue: _otherNotes,
-                      width: inputWidth - 70,
-                      onSaved: (value) {
-                        if (value == null) return;
-                        _otherNotes = value;
-                      },
-                      maxLines: 5,
                     ),
                     SizedBox(
                       height: deviceHeight * 0.02,

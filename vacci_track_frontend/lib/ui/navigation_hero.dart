@@ -19,7 +19,6 @@ class NavigationHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
-    double deviceWidth = MediaQuery.of(context).size.width;
     return Column(
       children: [
         Image(
@@ -42,8 +41,8 @@ class NavigationHero extends StatelessWidget {
           ],
         ),
         Container(
-          padding: EdgeInsets.only(top: deviceHeight * 0.02),
-          height: Helpers.min_max(deviceWidth, 0.12, 106, 120),
+          margin: EdgeInsets.only(top: deviceHeight * 0.02),
+          height: Helpers.minAndMax(deviceHeight * .1, 90, 500),
           child: Column(
             children: [
               InkWell(

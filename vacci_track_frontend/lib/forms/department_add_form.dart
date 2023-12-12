@@ -168,7 +168,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
 
@@ -179,9 +179,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
         : Column(
             children: [
               if (widget.editPage) ...{
-                SizedBox(
-                  height: deviceHeight * 0.02,
-                ),
+                SizedBox(height: deviceHeight * 0.02),
                 SizedBox(
                   width: inputWidth + 20,
                   child: CustomSearchBar(
@@ -195,9 +193,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                     hintText: "Search For A Department ",
                   ),
                 ),
-                SizedBox(
-                  height: deviceHeight * 0.01,
-                ),
+                SizedBox(height: deviceHeight * 0.01),
               },
               Card(
                 borderOnForeground: true,

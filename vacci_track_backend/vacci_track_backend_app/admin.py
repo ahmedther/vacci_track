@@ -10,7 +10,7 @@ from .models import (
     Dose,
     Vaccination,
     Employee,
-    EmployeeVaccination,
+    EmployeeVaccinationRecord,
     AppUser,
 )
 
@@ -61,8 +61,8 @@ class VaccinationAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 
-class EmployeeVaccinationInline(admin.TabularInline):
-    model = EmployeeVaccination
+class EmployeeVaccinationRecordInline(admin.TabularInline):
+    model = EmployeeVaccinationRecord
     extra = 1
 
 
@@ -75,10 +75,10 @@ class EmployeeAdmin(admin.ModelAdmin):
         "phone_number",
         "email_address",
     ]
-    inlines = [EmployeeVaccinationInline]
+    inlines = [EmployeeVaccinationRecordInline]
 
 
-class EmployeeVaccinationAdmin(admin.ModelAdmin):
+class EmployeeVaccinationRecordAdmin(admin.ModelAdmin):
     search_fields = [
         "employee__first_name",
         "employee__middle_name",
@@ -97,7 +97,7 @@ models_and_admins = [
     (Dose, DoseAdmin),
     (Vaccination, VaccinationAdmin),
     (Employee, EmployeeAdmin),
-    (EmployeeVaccination, EmployeeVaccinationAdmin),
+    (EmployeeVaccinationRecord, EmployeeVaccinationRecordAdmin),
 ]
 
 

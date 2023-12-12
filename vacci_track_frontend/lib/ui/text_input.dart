@@ -15,6 +15,7 @@ class CustomInputField extends StatelessWidget {
     this.enabled = true,
     this.underlineBorder = false,
     this.uiColor,
+    this.textColor,
     this.controller,
     this.labelFontSize,
     this.lableIsBold = true,
@@ -30,6 +31,7 @@ class CustomInputField extends StatelessWidget {
   final bool? enabled;
   final bool? underlineBorder;
   final Color? uiColor;
+  final Color? textColor;
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final void Function(String)? onChanged;
@@ -46,7 +48,7 @@ class CustomInputField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         style: TextStyle(
-            color: enabled! ? Colors.black : Colors.grey,
+            color: textColor ?? (enabled! ? Colors.black : Colors.grey),
             fontWeight: FontWeight.bold,
             fontSize: 16),
         cursorColor: uiColor,
@@ -68,12 +70,15 @@ class CustomInputField extends StatelessWidget {
                   borderSide:
                       BorderSide(color: uiColor ?? Colors.amber, width: 2.0),
                 ),
+                disabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                ),
                 // enabledBorder: const OutlineInputBorder(
                 //   borderSide: BorderSide(color: Colors.red, width: 2.0),
                 // ),Text(label, style: TextStyle(color: uiColor))
                 label: CustomTextStyle(
                     text: label,
-                    color: uiColor,
+                    color: enabled! ? uiColor : Colors.grey,
                     fontSize: labelFontSize,
                     isBold: lableIsBold),
                 enabledBorder: const OutlineInputBorder(

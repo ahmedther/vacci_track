@@ -13,11 +13,14 @@ import 'package:vacci_track_frontend/ui/error_snackbar.dart';
 final DateFormat formater = DateFormat('dd-MMM-yyyy');
 
 class Helpers {
-  static double min_max(deviceWidth, double percent, min_val, max_val) {
-    return min(
-      max(deviceWidth * percent, min_val),
-      max_val,
-    );
+  static double minAndMax(double size, minSize, maxSize) {
+    if (size < minSize) {
+      return minSize;
+    } else if (size > maxSize) {
+      return maxSize;
+    } else {
+      return size;
+    }
   }
 
   static Future<void> setUserValuesONLocalStorage(data) async {

@@ -10,7 +10,6 @@ import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/components/record_vac_form_profile.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
-
 import '../ui/spinner.dart';
 
 class RecordVaccineForm extends StatefulWidget {
@@ -36,7 +35,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   bool _isSpinning = false;
   bool _isForm = false;
 
-  late int? id;
+  late int? empId;
   String? prefix;
   String? firstName;
   String? middleName;
@@ -55,8 +54,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   String? doseAdministeredBy;
   String? doseAdministeredPrNum;
   DateTime? doseAdministeredDate;
-
   String? doseDueDate;
+  String? isDoseDueText;
+  bool? isDoseDue;
 
   late List<DropdownMenuItem<String>>? vaccineList;
   late List<DropdownMenuItem<String>>? doseList;
@@ -78,7 +78,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
       _isSpinning = true;
     });
 
-    id = empData["id"];
+    empId = empData["id"];
     prefix = empData["prefix"] ?? "Mr.";
     firstName = empData["first_name"];
     middleName = empData["middle_name"];
@@ -163,14 +163,16 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
       final Map data = await Helpers.makePostRequest(
           url: "http://$API_URL/api/add_vaccination_data/",
           data: {
-            "employee_id": id,
+            "employee_id": empId,
             "vaccination_id": vaccine,
             "dose_id": dose,
             "dose_administered_by_name": doseAdministeredBy,
             "dose_administered_by_pr_number": doseAdministeredPrNum,
-            "dose_date": doseAdministeredDate,
+            "dose_date": doseAdministeredDate.toString(),
             "next_dose_due_date":
                 doseDueDate == "Last Dose" ? null : doseDueDate,
+            "is_dose_due": false,
+            "is_completed": doseDueDate == "Last Dose" ? true : false,
             "notes_remarks": notes,
             if (widget.editPage) "edit": widget.editPage,
           });
@@ -242,7 +244,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     });
     final API_URL = await Helpers.load_env();
     doseData = await Helpers.makeGetRequest("http://$API_URL/api/search_dose/",
-        query: "param1=$value");
+        query: "$empId=$value");
 
     if (doseData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
@@ -251,6 +253,14 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         _isSpinning = false;
       });
       return;
+    }
+    isDoseDue = doseData[0]["is_dose_due"];
+    if (doseData[0]["dose_due_date"] != null) {
+      isDoseDueText = isDoseDue == true
+          ? "Yes! This Dose Is Due As of \n${formater.format(DateTime.parse(doseData[0]["dose_due_date"]))}."
+          : "No! This Dose is not Due Before \n${formater.format(DateTime.parse(doseData[0]["dose_due_date"]))}. \nPlease note that you are administering this dose before its due date!";
+    } else {
+      isDoseDueText = "Dose due date is not available.";
     }
 
     doseList = generateDropDownList(doseData);
@@ -273,7 +283,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   }
 
   void softFormReset() {
-    doseDueDate = "";
+    doseDueDate = null;
     doseList = null;
 
     dose = null;
@@ -281,22 +291,16 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     doseAdministeredBy = null;
     doseAdministeredPrNum = null;
     doseAdministeredDate = null;
-
+    isDoseDue = false;
+    isDoseDueText = null;
     notes = null;
   }
-
-  // @override
-  // void dispose() {
-  //   doseDueDate.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
     final double deviceHeight = MediaQuery.of(context).size.height;
     final double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 600, 800);
-
+    double inputWidth = Helpers.minAndMax(deviceWidth * .8, 200, 600);
     late final Color profileColor =
         Helpers.getUIandBackgroundColor(gender ?? "male")[0];
     themeContainerColor = Helpers.getThemeColorWithUIColor(
@@ -321,7 +325,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                 child: Container(
                   color: themeContainerColor,
                   padding: const EdgeInsets.all(30),
-                  width: inputWidth + inputWidth * .10,
+                  width: inputWidth + 30,
                   child: Column(
                     children: [
                       SearchAnchor(
@@ -493,6 +497,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                       dose = value!;
                                     },
                                     onChanged: (value) {
+                                      print(value);
                                       calculateDueDate(value!);
                                     },
                                     validator: (value) {
@@ -503,7 +508,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     },
                                   ),
                                   SizedBox(
-                                    width: inputWidth * .50,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     child: CustomTextStyle(
                                       text: "Dose Administered By Name",
                                       isBold: true,
@@ -517,7 +524,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     underlineBorder: true,
                                     labelFontSize: 14,
                                     uiColor: widget.uiColor,
-                                    width: inputWidth * .50,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     initialValue: doseAdministeredBy,
                                     onSaved: (value) {
                                       if (value == null) return;
@@ -527,14 +536,16 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     validator: (value) {
                                       if (value == null ||
                                           value.isEmpty ||
-                                          value.trim().isEmpty) {
-                                        return "Name Cannot be Empty";
+                                          value.trim().length < 3) {
+                                        return "Name cannot be less than 3 characters";
                                       }
                                       return null;
                                     },
                                   ),
                                   SizedBox(
-                                    width: inputWidth * .50,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     child: CustomTextStyle(
                                       text: "Dose Administered By PR Number",
                                       isBold: true,
@@ -547,7 +558,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     labelFontSize: 14,
                                     uiColor: widget.uiColor,
                                     underlineBorder: true,
-                                    width: inputWidth * .50,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     inputFormatters: [
                                       FilteringTextInputFormatter
                                           .digitsOnly, // Only allow digits
@@ -561,7 +574,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     validator: (value) {
                                       if (value == null ||
                                           value.isEmpty ||
-                                          value.trim().isEmpty) {
+                                          value.trim().length < 3) {
                                         return "PR Number Cannot be Empty";
                                       }
                                       return null;
@@ -572,7 +585,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     width: inputWidth,
                                   ),
                                   SizedBox(
-                                    width: inputWidth * .50,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     child: CustomTextStyle(
                                       text: "Dose Administered By Date",
                                       isBold: true,
@@ -582,7 +597,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                   ),
                                   CustomDatePicker(
                                     isDisabled: doseList == null,
-                                    width: inputWidth * .50,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     dateTimeVal: doseAdministeredDate,
                                     fontSize: 16,
                                     onPressed: () async {
@@ -597,21 +614,49 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     },
                                   ),
                                   SizedBox(
-                                    width: inputWidth * .50,
+                                    height: 20,
+                                    width: inputWidth,
+                                  ),
+                                  SizedBox(
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
                                     child: const CustomTextStyle(
                                       text: "Next Dose Due Date",
                                       isBold: true,
                                       color: Colors.grey,
                                     ),
                                   ),
+                                  CustomDatePicker(
+                                    isDisabled: true,
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
+                                    defaultLabel: doseDueDate,
+                                    fontSize: 16,
+                                  ),
+                                  SizedBox(
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
+                                    child: const CustomTextStyle(
+                                      text: "Is This Dose Due?",
+                                      isBold: true,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                   CustomInputField(
                                     enabled: false,
-                                    lableIsBold: true,
-                                    labelFontSize: 16,
+                                    labelFontSize: 14,
                                     uiColor: widget.uiColor,
+                                    textColor:
+                                        isDoseDue! ? null : Colors.red[900],
                                     underlineBorder: true,
-                                    width: inputWidth * .50,
-                                    label: doseDueDate ?? "",
+                                    width: inputWidth > 560
+                                        ? (inputWidth - 40) * .5
+                                        : inputWidth,
+                                    initialValue: isDoseDueText,
+                                    label: "",
                                   ),
                                   CustomInputField(
                                     enabled: doseList == null ? false : true,

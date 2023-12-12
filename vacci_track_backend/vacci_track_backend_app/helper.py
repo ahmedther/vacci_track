@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from vacci_track_backend_app.models import *
 
 
@@ -10,9 +10,7 @@ class Helper:
         if date is not None:
             try:
                 date_only = date[:10]  # Extract the first 10 characters (YYYY-MM-DD)
-                validated_date = datetime.datetime.strptime(
-                    date_only, "%Y-%m-%d"
-                ).date()
+                validated_date = datetime.strptime(date_only, "%Y-%m-%d").date()
             except:
                 validated_date = None
         else:
@@ -109,31 +107,57 @@ class Helper:
         return vaccine, created
 
     def save_dose(self, data: dict):
-        dose_id = data.get("id")
+        dose_id = data.pop("id", None)
         data.pop("edit", None)
-        data.pop("id", None)
+
+        vaccination = Vaccination.objects.filter(pk=data.get("vaccination")).first()
+        if not vaccination:
+            raise ValueError("Invalid vaccination ID.")
+
+        data["vaccination"] = vaccination
 
         if not dose_id:
             existing_dose = Dose.objects.filter(
-                name=data["name"], vaccination_id=data["vaccination"]
+                name=data["name"], vaccination=vaccination
             ).first()
             if existing_dose:
-                # The existing_dose is associated with the specified vaccination
                 return None, existing_dose
 
-        data["vaccination"] = Vaccination.objects.filter(
-            pk=data.get("vaccination")
-        ).first()
-        dose, created = Dose.objects.update_or_create(id=dose_id, defaults=data)
-        return dose, created
+        if dose_id or vaccination.dose.count() < vaccination.total_number_of_doses:
+            dose, created = Dose.objects.update_or_create(id=dose_id, defaults=data)
+            return dose, created
+
+        raise ValueError(
+            "The total number of doses for this vaccination has been reached."
+        )
 
     def save_employee_vaccination(self, data: dict):
-        data["next_dose_due_date"] = (
-            datetime.datetime.strptime(data["next_dose_due_date"], "%d-%b-%Y")
+        data["dose_date"] = self.get_validated_date(data.get("dose_date"))
+        next_dose_due_date = (
+            datetime.strptime(data["next_dose_due_date"], "%d-%b-%Y")
             if data["next_dose_due_date"] is not None
             else None
         )
+        data.pop("next_dose_due_date", None)
+        dose, created = EmployeeVaccinationRecord.objects.update_or_create(
+            employee_id=data["employee_id"],
+            vaccination_id=data["vaccination_id"],
+            dose_id=data["dose_id"],
+            defaults=data,
+        )
 
-        print(data["next_dose_due_date"])
-        dose = EmployeeVaccination.objects.create(**data)
-        return dose
+        record = (
+            EmployeeVaccinationRecord.objects.filter(
+                employee_id=data["employee_id"],
+                vaccination_id=data["vaccination_id"],
+                dose_date__isnull=True,
+            )
+            .order_by("dose")
+            .first()
+        )
+
+        if record:
+            record.dose_due_date = next_dose_due_date
+            record.save()
+
+        return dose, created

@@ -123,7 +123,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    double inputWidth = Helpers.min_max(deviceWidth, .20, 500, 600);
+    double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
 
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);

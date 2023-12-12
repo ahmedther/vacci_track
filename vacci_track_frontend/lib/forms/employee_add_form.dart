@@ -248,6 +248,9 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
+    double inputWidth = deviceWidth < 540
+        ? deviceWidth
+        : Helpers.minAndMax(deviceWidth * .8, 80, 175);
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
     return _isSpinning
@@ -260,8 +263,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
               color: themeContainerColor,
+              width: Helpers.minAndMax(deviceWidth * .8, 80, 800),
               padding: const EdgeInsets.all(30),
-              width: Helpers.min_max(deviceWidth, 0.70, 10, 745),
               child: Column(
                 children: [
                   CustomSearchBar(
@@ -317,8 +320,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                           children: [
                             CustomDropDownField(
                               value: prefix,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               hint: "Prefix",
                               items: prefixlist,
                               decoration: dropdownDecorationAddEmployee(
@@ -341,8 +343,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               labelFontSize: 14,
                               uiColor: widget.uiColor,
                               underlineBorder: true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               initialValue: firstName,
                               onChanged: (value) {
                                 widget.assignAvatar(newfirstName: value);
@@ -366,8 +367,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               labelFontSize: 14,
                               uiColor: widget.uiColor,
                               underlineBorder: true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               onChanged: (value) async {
                                 await widget.assignAvatar(newmiddleName: value);
                               },
@@ -383,8 +383,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               labelFontSize: 14,
                               uiColor: widget.uiColor,
                               underlineBorder: true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               onChanged: (value) async {
                                 await widget.assignAvatar(newlastName: value);
                               },
@@ -406,8 +405,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                             CustomDropDownField(
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               hint: "Gender",
                               onSaved: (value) {
                                 gender = value!;
@@ -436,8 +434,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               },
                             ),
                             CustomDatePicker(
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               dateTimeVal: joiningDate,
                               defaultLabel: "Joining Date",
                               onPressed: () async {
@@ -455,8 +452,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               uiColor: widget.uiColor,
                               underlineBorder: true,
                               enabled: uhid != null ? false : true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               onSaved: (value) {
                                 if (value == null) return;
                                 uhid = value;
@@ -478,8 +474,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               uiColor: widget.uiColor,
                               underlineBorder: true,
                               enabled: prNumber != null ? false : true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               inputFormatters: [
                                 FilteringTextInputFormatter
                                     .digitsOnly, // Only allow digits
@@ -504,8 +499,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               labelFontSize: 14,
                               uiColor: widget.uiColor,
                               underlineBorder: true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               inputFormatters: [
                                 FilteringTextInputFormatter
                                     .digitsOnly, // Only allow digits
@@ -530,8 +524,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               labelFontSize: 14,
                               uiColor: widget.uiColor,
                               underlineBorder: true,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               onSaved: (value) {
                                 if (value == null) return;
                                 emailID = value;
@@ -542,8 +535,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                             CustomDropDownField(
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               hint: "Department",
                               onChanged: (v) {},
                               onSaved: (value) {
@@ -563,8 +555,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                   color: widget.uiColor),
                               value: designation,
                               onChanged: (v) {},
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               hint: "Designation",
                               onSaved: (value) {
                                 designation = value!;
@@ -582,8 +573,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                   color: widget.uiColor),
                               value: facility,
                               onChanged: (v) {},
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               hint: "Facility",
                               onSaved: (value) {
                                 facility = value!;
@@ -602,8 +592,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               uiColor: widget.uiColor,
                               underlineBorder: true,
                               initialValue: status,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               onSaved: (value) {
                                 if (value == null) return;
                                 status = value;
@@ -614,8 +603,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               value: eligibility,
-                              width:
-                                  Helpers.min_max(deviceWidth, .12, 163, 300),
+                              width: inputWidth,
                               hint: "Eligibilty",
                               onSaved: (value) {
                                 eligibility = value!;

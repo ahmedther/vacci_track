@@ -20,7 +20,6 @@ class CustomTextStyle extends StatelessWidget {
     return Text(
       text,
       textAlign: textAlign,
-      
       style: TextStyle(
           color: color,
           fontWeight: isBold ? FontWeight.bold : null,
@@ -37,10 +36,9 @@ Text getCustomTextStyle(
   return Text(
     text,
     style: TextStyle(
-        color: color,
-        fontWeight: isBold ? FontWeight.bold : null,
-        fontSize: fontSize,
-        
-        ),
+      color: color,
+      fontWeight: isBold ? FontWeight.bold : null,
+      fontSize: fontSize,
+    ),
   );
 }

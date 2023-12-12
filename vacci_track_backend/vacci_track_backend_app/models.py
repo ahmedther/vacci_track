@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
+from datetime import date
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 
 
 class AppUser(models.Model):
@@ -164,18 +166,18 @@ class Employee(models.Model):
             f"{self.first_name}"
             f" {' '.join(filter(None, [self.middle_name, self.last_name]))}"
             f" {'(' + self.department.name + ')' if self.department else ''}"
-            f" {'-' + self.designation.name if self.designation else ''}"
+            f" {'- ' + self.designation.name if self.designation else ''}"
         )
 
 
-class EmployeeVaccination(models.Model):
+class EmployeeVaccinationRecord(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.PROTECT,
         blank=False,
         null=False,
         db_index=True,
-        related_name="employee_vaccinations",
+        related_name="employee_vaccination",
     )
     vaccination = models.ForeignKey(
         Vaccination,
@@ -193,29 +195,59 @@ class EmployeeVaccination(models.Model):
         db_index=True,
         related_name="employee_vaccination",
     )
-    dose_date = models.DateField(blank=False, null=False, db_index=True)
+    dose_date = models.DateField(blank=True, null=True, db_index=True)
     dose_administered_by_name = models.CharField(
         max_length=255, blank=True, null=True, db_index=True
     )
     dose_administered_by_pr_number = models.CharField(
         max_length=20, blank=True, null=True, db_index=True
     )
-    next_dose_due_date = models.DateField(blank=True, null=True, db_index=True)
+    dose_due_date = models.DateField(
+        blank=True, null=True, db_index=True, verbose_name="Dose Due Date"
+    )
     is_dose_due = models.BooleanField(
         default=False, db_index=True, verbose_name="Is This Dose Due?"
     )
+    is_completed = models.BooleanField(
+        default=False, db_index=True, verbose_name="Is All The Dose Completed?"
+    )
+
     notes_remarks = models.TextField(blank=True, null=True, db_index=True)
 
-    def save(self, *args, **kwargs):
-        if self.dose_date is None or not isinstance(self.dose_date, timezone.datetime):
-            self.dose_date = timezone.now()
-        if self.dose.gap_before_next_dose != 0:
-            self.next_dose_due_date = self.dose_date + timezone.timedelta(
-                days=self.dose.gap_before_next_dose * 30
+    # def save(self, *args, **kwargs):
+    #     if self.dose_date is None or not isinstance(self.dose_date, timezone.datetime):
+    #         self.dose_date = timezone.now()
+    #     if self.dose.gap_before_next_dose != 0:
+    #         self.next_dose_due_date = self.dose_date + timezone.timedelta(
+    #             days=self.dose.gap_before_next_dose * 30
+    #         )
+    #     else:
+    #         self.next_dose_due_date = None
+    #     super().save(*args, **kwargs)
+
+    @receiver(m2m_changed, sender=Employee.vaccinations.through)
+    def update_employee_vaccination_record(sender, instance, action, **kwargs):
+        vaccinations = kwargs.get("pk_set")
+        if action == "post_add":
+            vaccinations_qs = Vaccination.objects.filter(pk__in=vaccinations)
+            doses_qs = Dose.objects.filter(vaccination__in=vaccinations_qs).order_by(
+                "vaccination__name", "dose_number"
             )
-        else:
-            self.next_dose_due_date = None
-        super().save(*args, **kwargs)
+            records = [
+                EmployeeVaccinationRecord(
+                    employee=instance,
+                    vaccination=dose.vaccination,
+                    dose=dose,
+                    is_dose_due=dose.dose_number == 1,
+                    dose_due_date=date.today() if dose.dose_number == 1 else None,
+                )
+                for dose in doses_qs
+            ]
+            EmployeeVaccinationRecord.objects.bulk_create(records)
+        elif action == "post_remove":
+            EmployeeVaccinationRecord.objects.filter(
+                employee=instance, vaccination_id__in=vaccinations
+            ).delete()
 
     def __str__(self):
         return (
