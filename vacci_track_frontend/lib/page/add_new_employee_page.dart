@@ -122,7 +122,8 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
               editPage: true,
               resetAvatar: resetAvatar,
               uiColor: widget.uiColor,
-            ),
+            )
+            ,
       widgetsToDisplay: [
         CircleAvatar(
           backgroundColor: gender == "" ? widget.uiColor : genderWiseColor,

@@ -18,7 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   UserData userData = UserData(gender: "male", isLoggedIn: false);
-  int currentIndex = 7;
+  int currentIndex = 1;
   int? navCurrentIndex = 1;
   bool isSpinning = true;
 

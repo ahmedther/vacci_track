@@ -39,7 +39,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
     _facilityId = data["facility_id"];
   }
 
-  void _searchDesignation(BuildContext context) async {
+  void _searchFacility(BuildContext context) async {
     setState(() {
       _isSpinning = true;
     });
@@ -147,7 +147,10 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                       CustomSearchBar(
                         deviceWidth: deviceWidth,
                         onPressed: () {
-                          _searchDesignation(context);
+                          _searchController.text.length < 3
+                              ? Helpers.showSnackBar(
+                                  context, "Please enter at least 3 characters")
+                              : _searchFacility(context);
                         },
                         controller: _searchController,
                         uiColor: widget.uiColor,

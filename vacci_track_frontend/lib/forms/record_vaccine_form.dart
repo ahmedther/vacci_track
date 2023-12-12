@@ -54,7 +54,8 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
   String? doseAdministeredBy;
   String? doseAdministeredPrNum;
   DateTime? doseAdministeredDate;
-  String? doseDueDate;
+  String? nextDoseDueDate;
+  DateTime? doseDueDate;
   String? isDoseDueText;
   bool? isDoseDue;
 
@@ -170,11 +171,10 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
             "dose_administered_by_pr_number": doseAdministeredPrNum,
             "dose_date": doseAdministeredDate.toString(),
             "next_dose_due_date":
-                doseDueDate == "Last Dose" ? null : doseDueDate,
+                nextDoseDueDate == "Last Dose" ? null : nextDoseDueDate,
             "is_dose_due": false,
-            "is_completed": doseDueDate == "Last Dose" ? true : false,
+            "is_completed": nextDoseDueDate == "Last Dose" ? true : false,
             "notes_remarks": notes,
-            if (widget.editPage) "edit": widget.editPage,
           });
       if (data.containsKey('error')) {
         setState(() {
@@ -188,12 +188,10 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
-          message: widget.editPage
-              ? "Vaccination Record Updated"
-              : "Vaccination Administered",
+          message: "Vaccination Administered",
           onPressed: () {},
         );
-        await resetBtnHandler();
+        await resetBtnHandler(useSoftReset: true);
       }
     }
   }
@@ -255,13 +253,10 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
       return;
     }
     isDoseDue = doseData[0]["is_dose_due"];
-    if (doseData[0]["dose_due_date"] != null) {
-      isDoseDueText = isDoseDue == true
-          ? "Yes! This Dose Is Due As of \n${formater.format(DateTime.parse(doseData[0]["dose_due_date"]))}."
-          : "No! This Dose is not Due Before \n${formater.format(DateTime.parse(doseData[0]["dose_due_date"]))}. \nPlease note that you are administering this dose before its due date!";
-    } else {
-      isDoseDueText = "Dose due date is not available.";
-    }
+
+    doseDueDate = doseData[0]["dose_due_date"] != null
+        ? DateTime.parse(doseData[0]["dose_due_date"])
+        : null;
 
     doseList = generateDropDownList(doseData);
     setState(() {
@@ -269,30 +264,40 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     });
   }
 
-  void calculateDueDate(String value) {
+  Future<void> calculateDueDate(String value) async {
+    setState(() {
+      _isSpinning = true;
+    });
     final int gap = doseData.firstWhere(
         (dose) => dose['id'] == int.parse(value))["gap_before_next_dose"];
     doseAdministeredDate = DateTime.now();
-    if (gap > 0) {
-      doseDueDate = formater.format(DateTime(doseAdministeredDate!.year,
-          doseAdministeredDate!.month + gap, doseAdministeredDate!.day));
-    } else {
-      doseDueDate = "Last Dose";
-    }
-    setState(() {});
+    nextDoseDueDate = gap > 0
+        ? formater.format(DateTime(doseAdministeredDate!.year,
+            doseAdministeredDate!.month + gap, doseAdministeredDate!.day))
+        : "Last Dose";
+    isDoseDueText = doseDueDate != null
+        ? (isDoseDue == true
+            ? "Yes! This Dose Is Due As of \n${formater.format(doseDueDate!)}."
+            : "No! This Dose is not Due Before \n${formater.format(doseDueDate!)}. \nPlease note that you are administering this dose before its due date!")
+        : "Dose due date is not available.";
+
+    await Future.delayed(const Duration(milliseconds: 10), () {
+      setState(() {
+        _isSpinning = false;
+      });
+    });
   }
 
   void softFormReset() {
-    doseDueDate = null;
+    nextDoseDueDate = null;
     doseList = null;
-
     dose = null;
-
+    doseDueDate = null;
+    isDoseDueText = null;
     doseAdministeredBy = null;
     doseAdministeredPrNum = null;
     doseAdministeredDate = null;
     isDoseDue = false;
-    isDoseDueText = null;
     notes = null;
   }
 
@@ -328,113 +333,138 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                   width: inputWidth + 30,
                   child: Column(
                     children: [
-                      SearchAnchor(
-                        viewBackgroundColor: themeContainerColor,
-                        builder: (BuildContext _context,
-                            SearchController controller) {
-                          return CustomSearchBar(
-                            deviceWidth: deviceWidth,
-                            onPressed: () async {
-                              await searchEmployee(context, controller.text,
-                                  spinning: true);
-                            },
-                            controller: controller,
-                            uiColor: widget.uiColor,
-                            backgroundColor: themeContainerColor,
-                            hintText:
-                                "Search For Employees With Name or UHID/PR Number",
-                            onTap: () async {
-                              final query = controller.text.length > 3
-                                  ? controller.text
-                                  : "";
-                              await searchEmployee(context, query);
-                              controller.openView();
-                            },
-                          );
-                        },
-                        viewElevation: 100,
-                        suggestionsBuilder: (BuildContext context,
-                            SearchController controller) async {
-                          Future.delayed(Duration.zero, () {
-                            controller.selection = TextSelection.collapsed(
-                                offset: controller.text.length);
-                          });
-                          await searchEmployee(context, controller.text);
-                          if (empData1 == null || empData1!.isEmpty) return [];
-                          return empData1!.map(
-                            (item) {
-                              return Card(
-                                color: Colors.white,
-                                child: ListTile(
-                                  hoverColor: const Color.fromARGB(31, 0, 0, 0),
-                                  onTap: () async {
-                                    await resetBtnHandler(useSoftReset: true);
-                                    await updateEmpForm(item);
-                                    setState(() {
-                                      _isForm = true;
-                                    });
+                      if (!widget.editPage) ...{
+                        SearchAnchor(
+                          viewBackgroundColor: themeContainerColor,
+                          builder: (BuildContext _context,
+                              SearchController controller) {
+                            return CustomSearchBar(
+                              deviceWidth: deviceWidth,
+                              onPressed: () async {
+                                await searchEmployee(context, controller.text,
+                                    spinning: true);
+                              },
+                              controller: controller,
+                              uiColor: widget.uiColor,
+                              backgroundColor: themeContainerColor,
+                              hintText:
+                                  "Search For Employees With Name or UHID/PR Number",
+                              onTap: () async {
+                                final query = controller.text.length > 3
+                                    ? controller.text
+                                    : "";
+                                await searchEmployee(context, query);
+                                controller.openView();
+                              },
+                            );
+                          },
+                          viewElevation: 100,
+                          suggestionsBuilder: (BuildContext context,
+                              SearchController controller) async {
+                            Future.delayed(Duration.zero, () {
+                              controller.selection = TextSelection.collapsed(
+                                  offset: controller.text.length);
+                            });
+                            await searchEmployee(context, controller.text);
+                            if (empData1 == null || empData1!.isEmpty)
+                              return [];
+                            return empData1!.map(
+                              (item) {
+                                return Card(
+                                  color: Colors.white,
+                                  child: ListTile(
+                                    hoverColor:
+                                        const Color.fromARGB(31, 0, 0, 0),
+                                    onTap: () async {
+                                      setState(() {
+                                        _isSpinning = true;
+                                      });
+                                      Future.delayed(
+                                          const Duration(milliseconds: 10),
+                                          () async {
+                                        await resetBtnHandler(
+                                            useSoftReset: true);
+                                        await updateEmpForm(item);
+                                        setState(() {
+                                          _isForm = true;
+                                        });
+                                      });
 
-                                    controller.closeView(controller.text);
-                                    // _useUpdateOthers
-                                    //     ? await updateOtherDeatils(user)
-                                    //     : null;
-                                  },
-                                  leading: CircleAvatar(
-                                    backgroundColor: Helpers.getRandomColor(),
-                                    child: item['first_name'] != null
-                                        ? CustomTextStyle(
-                                            text: item['first_name'][0],
+                                      controller.closeView(controller.text);
+                                      // _useUpdateOthers
+                                      //     ? await updateOtherDeatils(user)
+                                      //     : null;
+                                    },
+                                    leading: CircleAvatar(
+                                      backgroundColor: Helpers.getRandomColor(),
+                                      child: item['first_name'] != null
+                                          ? CustomTextStyle(
+                                              text: item['first_name'][0],
+                                              isBold: true,
+                                              color: Colors.white)
+                                          : const FaIcon(
+                                              FontAwesomeIcons.userAlt,
+                                              color: Colors.white),
+                                    ),
+                                    title: CustomTextStyle(
+                                        text:
+                                            '${item['prefix'] ?? ""} ${item['first_name'] ?? ""} ${item['middle_name'] ?? ""}  ${item['last_name'] ?? ""}',
+                                        isBold: true,
+                                        color: widget.uiColor),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        CustomTextStyle(
+                                            text: 'UHID: ${item['uhid'] ?? ''}',
                                             isBold: true,
-                                            color: Colors.white)
-                                        : const FaIcon(FontAwesomeIcons.userAlt,
-                                            color: Colors.white),
+                                            color: Colors.black),
+                                        CustomTextStyle(
+                                            text:
+                                                'PR Number: ${item['pr_number'] ?? ''}',
+                                            isBold: true,
+                                            color: Colors.black),
+                                      ],
+                                    ),
                                   ),
-                                  title: CustomTextStyle(
-                                      text:
-                                          '${item['prefix'] ?? ""} ${item['first_name'] ?? ""} ${item['middle_name'] ?? ""}  ${item['last_name'] ?? ""}',
-                                      isBold: true,
-                                      color: widget.uiColor),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CustomTextStyle(
-                                          text: 'UHID: ${item['uhid'] ?? ''}',
-                                          isBold: true,
-                                          color: Colors.black),
-                                      CustomTextStyle(
-                                          text:
-                                              'PR Number: ${item['pr_number'] ?? ''}',
-                                          isBold: true,
-                                          color: Colors.black),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        viewBuilder: (Iterable<Widget> suggestions) {
-                          return ListView.builder(
-                              itemCount: suggestions.length,
-                              itemBuilder: ((context, index) {
-                                return suggestions.elementAt(index);
-                              }));
-                        },
-                      ),
+                                );
+                              },
+                            );
+                          },
+                          viewBuilder: (Iterable<Widget> suggestions) {
+                            return ListView.builder(
+                                itemCount: suggestions.length,
+                                itemBuilder: ((context, index) {
+                                  return suggestions.elementAt(index);
+                                }));
+                          },
+                        ),
+                      },
                       if (!_isForm) ...{
                         const SizedBox(height: 50),
                         FaIcon(
-                          FontAwesomeIcons.handPointUp,
-                          color: widget.uiColor,
+                          widget.editPage
+                              ? FontAwesomeIcons.solidCircleXmark
+                              : FontAwesomeIcons.handPointUp,
+                          color: widget.editPage
+                              ? const Color.fromARGB(255, 255, 17, 0)
+                              : widget.uiColor,
                           size: 50,
                         ).animate().fadeIn().shake().shimmer(),
                         const SizedBox(height: 40),
                         CustomTextStyle(
-                          text: "Please Search For An Employee To Continue...",
+                          text: widget.editPage
+                              ? """Please note that once a Dose record has been administered, it cannot be modified. 
+                              
+If you believe that a mistake has been made contact the I.T Department for assistance. 
+                              
+They can be reached at extension 33333."""
+                              : "Please Search For An Employee To Continue...",
                           textAlign: TextAlign.center,
-                          color: widget.uiColor,
-                          fontSize: 32,
+                          color: widget.editPage
+                              ? const Color.fromARGB(255, 255, 17, 0)
+                              : widget.uiColor,
+                          fontSize: widget.editPage ? 20 : 32,
                           isBold: true,
                         ).animate().fadeIn().shake().shimmer(),
                       },
@@ -496,9 +526,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     onSaved: (value) {
                                       dose = value!;
                                     },
-                                    onChanged: (value) {
-                                      print(value);
-                                      calculateDueDate(value!);
+                                    onChanged: (value) async {
+                                      dose = value!;
+                                      await calculateDueDate(value);
                                     },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -632,7 +662,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     width: inputWidth > 560
                                         ? (inputWidth - 40) * .5
                                         : inputWidth,
-                                    defaultLabel: doseDueDate,
+                                    defaultLabel: nextDoseDueDate,
                                     fontSize: 16,
                                   ),
                                   SizedBox(
@@ -649,8 +679,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                     enabled: false,
                                     labelFontSize: 14,
                                     uiColor: widget.uiColor,
-                                    textColor:
-                                        isDoseDue! ? null : Colors.red[900],
+                                    textColor: isDoseDue!
+                                        ? null
+                                        : const Color.fromARGB(255, 255, 0, 0),
                                     underlineBorder: true,
                                     width: inputWidth > 560
                                         ? (inputWidth - 40) * .5

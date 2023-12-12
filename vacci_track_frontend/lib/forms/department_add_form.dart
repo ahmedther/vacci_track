@@ -185,7 +185,10 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                   child: CustomSearchBar(
                     deviceWidth: deviceWidth,
                     onPressed: () {
-                      _searchDepartment(context);
+                      _searchController.text.length < 3
+                          ? Helpers.showSnackBar(
+                              context, "Please enter at least 3 characters")
+                          : _searchDepartment(context);
                     },
                     controller: _searchController,
                     uiColor: widget.uiColor,
@@ -231,6 +234,12 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                         CustomSearchBar(
                           deviceWidth: deviceWidth,
                           onPressed: () {
+                            if (_searchControllerHOD.text.length < 3) {
+                              Helpers.showSnackBar(context,
+                                  "Please enter at least 3 characters");
+                              return;
+                            }
+
                             hod = null;
                             _searchHOD(context);
                           },
@@ -241,12 +250,15 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                         ),
                         const SizedBox(height: 40),
                         CustomDropDownField(
+                          disabledHint:
+                              const Text("Head Of Department Not Searched"),
                           decoration: dropdownDecoration(
+                              isDisabled: hodList == null ? true : false,
                               label: 'Head of Department',
                               color: widget.uiColor),
                           width: inputWidth,
                           value: hod,
-                          items: hodList ?? [],
+                          items: hodList,
                           hint: "Head Of Department",
                           onChanged: (value) {
                             hod = value;

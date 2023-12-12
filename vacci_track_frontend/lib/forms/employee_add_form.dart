@@ -288,9 +288,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                         : "Search PR or UHID EHIS Database",
                     buttonText: widget.editPage ? 'Search' : 'Search in EHIS',
                     onChanged: (value) {
-                      setState(() {
-                        _searchError = false;
-                      });
+                      if (_searchError) {
+                        setState(() {
+                          _searchError = false;
+                        });
+                      }
                       _searchController.value = TextEditingValue(
                         text: value.toUpperCase(),
                         selection: _searchController.selection,
@@ -298,14 +300,15 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     },
                   ),
                   _searchError
-                      ? Align(
+                      ? const Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 40),
+                            padding: EdgeInsets.only(left: 40),
                             child: Text(
                               "Enter a Valid UHID / PR Number",
                               style: TextStyle(
-                                  color: Colors.red.shade800, fontSize: 12),
+                                  color: Color.fromARGB(255, 255, 0, 0),
+                                  fontSize: 12),
                             ),
                           ),
                         )

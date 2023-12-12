@@ -153,7 +153,10 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                         hintText: "Search For A Vaccine ",
                         deviceWidth: deviceWidth,
                         onPressed: () {
-                          _searchDesignation(context);
+                          _searchController.text.length < 3
+                              ? Helpers.showSnackBar(
+                                  context, "Please enter at least 3 characters")
+                              : _searchDesignation(context);
                         },
                         controller: _searchController,
                         uiColor: widget.uiColor,

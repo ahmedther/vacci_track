@@ -251,6 +251,7 @@ class EmployeeVaccinationRecord(models.Model):
 
     def __str__(self):
         return (
+            f"{self.id} - "
             f"{self.employee.prefix + ' ' if self.employee.prefix else ''}"
             f"{self.employee.first_name}"
             f" {' '.join(filter(None, [self.employee.middle_name, self.employee.last_name]))}"
