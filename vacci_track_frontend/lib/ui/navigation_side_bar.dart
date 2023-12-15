@@ -4,6 +4,7 @@ import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/navigation_hero.dart';
 import 'package:vacci_track_frontend/data/navigationrail_data.dart';
 import 'package:vacci_track_frontend/data/other_sub_navigation_rail.dart';
@@ -16,19 +17,13 @@ class NavigationSideBar extends ConsumerStatefulWidget {
   final Color uiColor;
   final Color backgroundColor;
 
-  final int? currentIndex;
-  final Function(int) changePage;
-  final void Function(dynamic) changeNavIndex;
   final void Function() changeUiColor;
   const NavigationSideBar({
     super.key,
     required this.userData,
     required this.uiColor,
     required this.backgroundColor,
-    required this.changePage,
-    required this.changeNavIndex,
     required this.changeUiColor,
-    this.currentIndex = 2,
   });
 
   @override
@@ -38,6 +33,13 @@ class NavigationSideBar extends ConsumerStatefulWidget {
 class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
   bool isVaccineHover = false;
+  late int? selectedIndex = GoRouter.of(context).location == "/0"
+      ? 0
+      : ref.watch(navProvider).selectedIndex;
+
+  late int? otherIndex = ref.watch(navProvider).otherIndex;
+  late int? vaccineIndex = ref.watch(navProvider).vaccineIndex;
+
   late List<NavigationRailDestination> nagivationList =
       getNavigationRailDestinations(widget.uiColor);
 
@@ -68,18 +70,30 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
     context.go('/login');
   }
 
-  void onDestinationOthers(value) {
-    widget.changeNavIndex(null);
-    value += nagivationList.length;
-    widget.changePage(value);
-    print(value);
+  void pageChange(int value) {
+    context.go("/$value");
   }
 
-  void onDestinationVaccine(value) {
-    widget.changeNavIndex(null);
+  void changeNavIndex(int? value) {
+    ref.watch(navProvider.notifier).updatIndex(selectedIndex: value);
+  }
+
+  void changeNavIndexOfExtended(bool isOtherHover, int value) {
+    isOtherHover
+        ? ref.watch(navProvider.notifier).updatIndex(otherIndex: value)
+        : ref.watch(navProvider.notifier).updatIndex(vaccineIndex: value);
+  }
+
+  void onDestinationOthers(bool isOtherHover, int value) {
+    changeNavIndexOfExtended(isOtherHover, value);
+    value += nagivationList.length;
+    pageChange(value);
+  }
+
+  void onDestinationVaccine(bool isOtherHover, int value) {
+    changeNavIndexOfExtended(isOtherHover, value);
     value = nagivationList.length + value + otherSubNavigationList.length;
-    widget.changePage(value);
-    print(value);
+    pageChange(value);
   }
 
   @override
@@ -87,6 +101,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
     nagivationList = getNavigationRailDestinations(widget.uiColor);
     otherSubNavigationList = getotherSubNavigationList(widget.uiColor);
     vaccinationNavigationList = getvaccinationNavigationList(widget.uiColor);
+
     return Row(
       children: [
         NavigationRail(
@@ -137,11 +152,10 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
               ),
             ],
           ),
-          selectedIndex: widget.currentIndex,
+          selectedIndex: selectedIndex,
           onDestinationSelected: (value) {
-            widget.changeNavIndex(value);
-            widget.changePage(value);
-            print(value);
+            changeNavIndex(value);
+            pageChange(value);
           },
           indicatorColor: const Color.fromARGB(255, 255, 255, 255),
           backgroundColor: widget.backgroundColor,
@@ -159,19 +173,21 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
           MouseRegion(
             onExit: isOtherHover ? _toggleExtended : _toggleVacineHover,
             child: NavigationRail(
-              groupAlignment: 0.0,
-              useIndicator: true,
-              labelType: NavigationRailLabelType.all,
-              elevation: 10,
-              selectedIndex: null,
-              indicatorColor: const Color.fromARGB(141, 255, 255, 255),
-              backgroundColor: widget.backgroundColor,
-              destinations: isOtherHover
-                  ? otherSubNavigationList
-                  : vaccinationNavigationList,
-              onDestinationSelected:
-                  isOtherHover ? onDestinationOthers : onDestinationVaccine,
-            ).animate().slideX().fadeIn().then().shimmer(),
+                groupAlignment: 0.0,
+                useIndicator: true,
+                labelType: NavigationRailLabelType.all,
+                elevation: 10,
+                selectedIndex: isOtherHover ? otherIndex : vaccineIndex,
+                indicatorColor: const Color.fromARGB(141, 255, 255, 255),
+                backgroundColor: widget.backgroundColor,
+                destinations: isOtherHover
+                    ? otherSubNavigationList
+                    : vaccinationNavigationList,
+                onDestinationSelected: (int value) {
+                  isOtherHover
+                      ? onDestinationOthers(isOtherHover, value)
+                      : onDestinationVaccine(isOtherHover, value);
+                }).animate().slideX().fadeIn().then().shimmer(),
           ),
         },
       ],

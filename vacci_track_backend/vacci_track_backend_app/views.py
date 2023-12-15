@@ -197,6 +197,18 @@ def searh_emp_on_oracle_db(request):
         return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def edit_app_user(request):
+    try:
+        data: dict = json.loads(request.body)
+        Helper().edit_user(data)
+        return JsonResponse({"success": True}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def search_employee(request):

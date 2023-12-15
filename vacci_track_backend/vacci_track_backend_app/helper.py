@@ -17,6 +17,11 @@ class Helper:
             validated_date = None
         return validated_date
 
+    def edit_user(self, data: dict):
+        AppUser.objects.filter(user__pk=data.get("id")).update(
+            gender=data.get("gender").capitalize()
+        )
+
     def save_employee(self, request, data: dict):
         validated_join_date = self.get_validated_date(data.get("joining_date"))
 

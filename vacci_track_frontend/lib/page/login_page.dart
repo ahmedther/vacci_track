@@ -35,7 +35,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void checkAuthRedirect() async {
     userData = await Helpers.checkLogin(ref);
     // ignore: use_build_context_synchronously
-    if (userData.isLoggedIn! == true) context.go('/');
+    if (userData.isLoggedIn! == true) context.go('/0');
     if (userData.isLoggedIn! == false) {
       setState(() {
         isSpinning = userData.isLoggedIn!;
@@ -92,7 +92,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       );
       ref.watch(userProvider.notifier).setUserData(userData);
       // ignore: use_build_context_synchronously
-      context.go('/');
+      context.go('/0');
     }
   }
 

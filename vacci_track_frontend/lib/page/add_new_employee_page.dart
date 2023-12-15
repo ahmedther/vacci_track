@@ -1,35 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/forms/employee_add_form.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/page/nav_wrapper.dart';
+import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
 import 'package:vacci_track_frontend/forms/record_vaccine_form.dart';
 
-class AddNewEmployee extends StatefulWidget {
-  const AddNewEmployee(
-      {required this.heading,
-      required this.toggleIcon1,
-      required this.toggleIcon2,
-      required this.toggelText1,
-      required this.toggelText2,
-      required this.employeeAddFrom,
-      required this.backgroundColor,
-      required this.uiColor,
-      super.key});
-
-  final String heading;
-  final Widget toggleIcon1;
-  final Widget toggleIcon2;
-  final String toggelText1;
-  final String toggelText2;
-  final bool employeeAddFrom;
-  final Color backgroundColor;
-  final Color uiColor;
+class AddNewEmployee extends ConsumerStatefulWidget {
+  static const String routeName = '/1';
+  static const String routeName2 = '/2';
+  const AddNewEmployee({super.key});
 
   @override
-  State<AddNewEmployee> createState() => _AddNewEmployeeState();
+  ConsumerState<AddNewEmployee> createState() => _AddNewEmployeeState();
 }
 
-class _AddNewEmployeeState extends State<AddNewEmployee> {
+class _AddNewEmployeeState extends ConsumerState<AddNewEmployee> {
+  late final bool employeeAddFrom = GoRouter.of(context).location == "/2";
+
+  late final Color backgroundColor = ref.watch(navProvider).backgroundColor!;
+  late final Color uiColor = ref.watch(navProvider).uiColor!;
+
   String gender = "";
   String prefix = "";
   String firstName = "";
@@ -74,84 +68,90 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
-    final themeColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
     final genderWiseColor = Helpers.getUIandBackgroundColor(gender)[0];
 
-    return FormUI(
-      uiColor: widget.employeeAddFrom
-          ? widget.uiColor
-          : gender.isNotEmpty
-              ? genderWiseColor
-              : widget.uiColor,
-      backgroundColor: widget.backgroundColor,
-      selectedToggle: _selectedToggle,
-      toggleFunction: (int index) {
-        setState(() {
-          // The button that is tapped is set to true, and the others to false.
-          for (int i = 0; i < _selectedToggle.length; i++) {
-            _selectedToggle[i] = i == index;
-          }
-        });
-      },
-      heading: widget.heading,
-      toggelIcon1: widget.toggleIcon1,
-      toggelIcon2: widget.toggleIcon2,
-      toggelText1: widget.toggelText1,
-      toggelText2: widget.toggelText2,
-      toggelWidget1: widget.employeeAddFrom
-          ? EmployeeAddForm(
-              assignAvatar: assignAvatar,
-              editPage: false,
-              uiColor: widget.uiColor,
-            )
-          : RecordVaccineForm(
-              assignAvatar: assignAvatar,
-              editPage: false,
-              resetAvatar: resetAvatar,
-              uiColor: widget.uiColor,
-            ),
-      toggelWidget2: widget.employeeAddFrom
-          ? EmployeeAddForm(
-              assignAvatar: assignAvatar,
-              editPage: true,
-              uiColor: widget.uiColor,
-            )
-          : RecordVaccineForm(
-              assignAvatar: assignAvatar,
-              editPage: true,
-              resetAvatar: resetAvatar,
-              uiColor: widget.uiColor,
-            )
-            ,
-      widgetsToDisplay: [
-        CircleAvatar(
-          backgroundColor: gender == "" ? widget.uiColor : genderWiseColor,
-          maxRadius: deviceHeight * 0.09,
-          child: CircleAvatar(
-            backgroundColor: themeColor,
-            maxRadius: deviceHeight * 0.08,
-            child: Image.asset(
-              'assets/img/${gender.isNotEmpty ? gender : "both"}.png',
+    final themeColor =
+        Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
+    return NavWrapper(
+      child: FormUI(
+        uiColor: employeeAddFrom
+            ? uiColor
+            : gender.isNotEmpty
+                ? genderWiseColor
+                : uiColor,
+        backgroundColor: backgroundColor,
+        selectedToggle: _selectedToggle,
+        toggleFunction: (int index) {
+          setState(() {
+            // The button that is tapped is set to true, and the others to false.
+            for (int i = 0; i < _selectedToggle.length; i++) {
+              _selectedToggle[i] = i == index;
+            }
+          });
+        },
+        heading:
+            employeeAddFrom ? "Add/Edit Employee" : "Record a Vaccine Dose",
+        toggelIcon1: employeeAddFrom
+            ? const FaIcon(FontAwesomeIcons.userPlus)
+            : const FaIcon(FontAwesomeIcons.bookMedical),
+        toggelIcon2: employeeAddFrom
+            ? const FaIcon(FontAwesomeIcons.userEdit)
+            : const FaIcon(FontAwesomeIcons.bookMedical),
+        toggelText1: employeeAddFrom ? "Add A New" : "Record a Dose",
+        toggelText2: employeeAddFrom ? "Edit Old" : "❌ Edit A Dose",
+        toggelWidget1: employeeAddFrom
+            ? EmployeeAddForm(
+                assignAvatar: assignAvatar,
+                editPage: false,
+                uiColor: uiColor,
+              )
+            : RecordVaccineForm(
+                assignAvatar: assignAvatar,
+                editPage: false,
+                resetAvatar: resetAvatar,
+                uiColor: uiColor,
+              ),
+        toggelWidget2: employeeAddFrom
+            ? EmployeeAddForm(
+                assignAvatar: assignAvatar,
+                editPage: true,
+                uiColor: uiColor,
+              )
+            : RecordVaccineForm(
+                assignAvatar: assignAvatar,
+                editPage: true,
+                resetAvatar: resetAvatar,
+                uiColor: uiColor,
+              ),
+        widgetsToDisplay: [
+          CircleAvatar(
+            backgroundColor: gender == "" ? uiColor : genderWiseColor,
+            maxRadius: deviceHeight * 0.09,
+            child: CircleAvatar(
+              backgroundColor: themeColor,
+              maxRadius: deviceHeight * 0.08,
+              child: Image.asset(
+                'assets/img/${gender.isNotEmpty ? gender : "both"}.png',
+              ),
             ),
           ),
-        ),
-        SizedBox(
-          height: deviceHeight * 0.01,
-        ),
-        Text(
-          "$prefix $firstName $middleName $lastName",
-          style: TextStyle(
-            fontSize: deviceHeight * 0.02,
-            letterSpacing: 2,
-            fontWeight: FontWeight.bold,
-            color: genderWiseColor,
+          SizedBox(
+            height: deviceHeight * 0.01,
           ),
-        ),
-        SizedBox(
-          height: deviceHeight * 0.02,
-        ),
-      ],
+          Text(
+            "$prefix $firstName $middleName $lastName",
+            style: TextStyle(
+              fontSize: deviceHeight * 0.02,
+              letterSpacing: 2,
+              fontWeight: FontWeight.bold,
+              color: genderWiseColor,
+            ),
+          ),
+          SizedBox(
+            height: deviceHeight * 0.02,
+          ),
+        ],
+      ),
     );
   }
 }

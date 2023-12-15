@@ -134,9 +134,11 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       return MultiSelectItem(item['id'], item['name']);
     }).toList();
 
-    setState(() {
-      _isSpinning = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isSpinning = false;
+      });
+    }
   }
 
   void submitHandler() async {

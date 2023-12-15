@@ -361,6 +361,11 @@ class Helpers {
         userData.gender?.toLowerCase() == "male" ? "female" : "male";
     ref.watch(userProvider.notifier).setUserData(userData);
     prefs.setString("gender", userData.gender!);
+    final API_URL = await Helpers.load_env();
+    Helpers.makePostRequest(url: "http://$API_URL/api/edit_app_user/", data: {
+      "id": userData.id,
+      "gender": userData.gender,
+    });
   }
 
   static List<Color> getUIandBackgroundColor(String gender) {

@@ -310,6 +310,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         Helpers.getUIandBackgroundColor(gender ?? "male")[0];
     themeContainerColor = Helpers.getThemeColorWithUIColor(
         context: context, uiColor: widget.uiColor);
+    if (widget.editPage) _isForm = false;
 
     return _isSpinning
         ? SpinnerWithOverlay(
