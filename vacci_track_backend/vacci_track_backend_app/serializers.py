@@ -152,3 +152,34 @@ class EmpVaccFilterSerializer(serializers.ModelSerializer):
             employee_vaccination__employee__id=obj.id,
         ).distinct()
         return VaccinationSerializer(vaccinations, many=True).data
+
+
+class EmployeeVaccinationRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeVaccinationRecord
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["vaccination"] = {
+            "id": instance.vaccination.id,
+            "name": instance.vaccination.name,
+        }
+        representation["dose"] = {"id": instance.dose.id, "name": instance.dose.name}
+        representation["employee"] = {
+            "prefix": instance.employee.prefix,
+            "gender": instance.employee.gender,
+            "first_name": instance.employee.first_name,
+            "middle_name": instance.employee.middle_name,
+            "last_name": instance.employee.last_name,
+            "pr_number": instance.employee.pr_number,
+            "uhid": instance.employee.uhid,
+            "phone_number": instance.employee.phone_number,
+            "department": instance.employee.department.name
+            if instance.employee.department
+            else None,
+            "designation": instance.employee.designation.name
+            if instance.employee.designation
+            else None,
+        }
+        return representation

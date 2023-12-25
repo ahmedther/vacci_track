@@ -15,7 +15,6 @@ class AppUser(models.Model):
     gender = models.CharField(
         max_length=10, choices=GENDER_CHOICES, blank=False, null=False, db_index=True
     )
-    
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name

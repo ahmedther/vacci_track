@@ -90,7 +90,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
     final API_URL = await Helpers.load_env();
     final List _designationData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_designation/",
-        query: "param1=${_searchController.text}");
+        query: {"query": "param1=${_searchController.text}"});
 
     if (_designationData.isEmpty || _designationData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously

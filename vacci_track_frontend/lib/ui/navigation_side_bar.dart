@@ -33,20 +33,20 @@ class NavigationSideBar extends ConsumerStatefulWidget {
 class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
   bool isVaccineHover = false;
-  late int? selectedIndex = GoRouter.of(context).location == "/0"
-      ? 0
-      : ref.watch(navProvider).selectedIndex;
-
+  late int? selectedIndex =
+      GoRouter.of(context).routeInformationProvider.value.uri.toString() == "/0"
+          ? 0
+          : ref.watch(navProvider).selectedIndex;
   late int? otherIndex = ref.watch(navProvider).otherIndex;
   late int? vaccineIndex = ref.watch(navProvider).vaccineIndex;
 
-  late List<NavigationRailDestination> nagivationList =
+  late final List<NavigationRailDestination> nagivationList =
       getNavigationRailDestinations(widget.uiColor);
 
-  late List<NavigationRailDestination> otherSubNavigationList =
+  late final List<NavigationRailDestination> otherSubNavigationList =
       getotherSubNavigationList(widget.uiColor);
 
-  late List<NavigationRailDestination> vaccinationNavigationList =
+  late final List<NavigationRailDestination> vaccinationNavigationList =
       getvaccinationNavigationList(widget.uiColor);
 
   void _toggleExtended(event) {
@@ -98,10 +98,6 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
 
   @override
   Widget build(BuildContext context) {
-    nagivationList = getNavigationRailDestinations(widget.uiColor);
-    otherSubNavigationList = getotherSubNavigationList(widget.uiColor);
-    vaccinationNavigationList = getvaccinationNavigationList(widget.uiColor);
-
     return Row(
       children: [
         NavigationRail(
@@ -157,6 +153,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
             changeNavIndex(value);
             pageChange(value);
           },
+
           indicatorColor: const Color.fromARGB(255, 255, 255, 255),
           backgroundColor: widget.backgroundColor,
           elevation: 10,

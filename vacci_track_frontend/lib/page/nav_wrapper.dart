@@ -77,7 +77,7 @@ class _NavWrapperState extends ConsumerState<NavWrapper> {
             : Stack(
                 children: [
                   Positioned.fill(
-                    left: 120,
+                    left: 100,
                     child: widget.child,
                   ),
                   Positioned(

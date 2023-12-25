@@ -23,6 +23,12 @@ class _InputFieldState extends State<InputField> {
   final bool _validate = false;
 
   @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       width: 250,

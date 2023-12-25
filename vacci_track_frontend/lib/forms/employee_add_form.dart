@@ -865,7 +865,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     final API_URL = await Helpers.load_env();
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/searh_emp_on_oracle_db/",
-        query: "param1=${_searchController.text}");
+        query: {"query": "param1=${_searchController.text}"});
     if ((empData[0] as Map).containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, empData[0]['error']);
@@ -893,7 +893,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     final API_URL = await Helpers.load_env();
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_employee/",
-        query: "param1=${_searchController.text}");
+        query: {"query": "param1=${_searchController.text}"});
     if (empData.isEmpty || (empData[0] as Map).containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(

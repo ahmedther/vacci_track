@@ -77,7 +77,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
     final API_URL = await Helpers.load_env();
     final List doseList = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_dose/",
-        query: "param1=${_searchController.text}");
+        query: {"query": "param1=${_searchController.text}"});
     if (doseList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, doseList[0]['error']);

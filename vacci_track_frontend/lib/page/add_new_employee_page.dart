@@ -19,7 +19,9 @@ class AddNewEmployee extends ConsumerStatefulWidget {
 }
 
 class _AddNewEmployeeState extends ConsumerState<AddNewEmployee> {
-  late final bool employeeAddFrom = GoRouter.of(context).location == "/2";
+  late final bool employeeAddFrom =
+      GoRouter.of(context).routeInformationProvider.value.uri.toString() ==
+          "/2";
 
   late final Color backgroundColor = ref.watch(navProvider).backgroundColor!;
   late final Color uiColor = ref.watch(navProvider).uiColor!;

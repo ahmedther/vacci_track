@@ -124,7 +124,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     final API_URL = await Helpers.load_env();
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_employee_by_name/",
-        query: "param1=$query");
+        query: {"query": "param1=$query"});
     if (spinning &&
         (empData.isEmpty || (empData[0] as Map).containsKey("error"))) {
       // ignore: use_build_context_synchronously
@@ -242,7 +242,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     });
     final API_URL = await Helpers.load_env();
     doseData = await Helpers.makeGetRequest("http://$API_URL/api/search_dose/",
-        query: "$empId=$value");
+        query: {"query": "$empId=$value"});
 
     if (doseData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously

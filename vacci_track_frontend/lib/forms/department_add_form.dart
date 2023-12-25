@@ -45,7 +45,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
     final API_URL = await Helpers.load_env();
     final List hodData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_hod/",
-        query: "param1=${_searchControllerHOD.text}");
+        query: {"query": "param1=${_searchControllerHOD.text}"});
     if (hodData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, hodData[0]['error']);
@@ -78,7 +78,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
     final API_URL = await Helpers.load_env();
     final List departmentList = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_department/",
-        query: "param1=${_searchController.text}");
+        query: {"query": "param1=${_searchController.text}"});
     if (departmentList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, departmentList[0]['error']);

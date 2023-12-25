@@ -1,5 +1,7 @@
 from datetime import datetime
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from vacci_track_backend_app.models import *
+from django.db.models import Q
 
 
 class Helper:
@@ -166,3 +168,33 @@ class Helper:
             record.save()
 
         return dose, created
+
+    def paginator(self, page, object):
+        records_per_page = 5
+        paginator = Paginator(object, records_per_page)
+        if not page:
+            page = 1
+        try:
+            results = paginator.page(page)
+        except PageNotAnInteger:
+            page = 1
+            results = paginator.page(page)
+        except EmptyPage:
+            page = paginator.num_pages
+            results = paginator.page(page)
+
+        return results
+
+    def get_emp_vac_rec(self, query):
+        filters = Q(dose_due_date__lt=datetime.now().date())
+        if query:
+            filters &= (
+                Q(employee__first_name__icontains=query)
+                | Q(employee__last_name__icontains=query)
+                | Q(employee__pr_number=query)
+                | Q(employee__uhid=query)
+            )
+        emp_rec = EmployeeVaccinationRecord.objects.filter(filters).order_by(
+            "-dose_due_date", "-id", "vaccination", "dose"
+        )
+        return emp_rec

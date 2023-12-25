@@ -49,7 +49,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
     final API_URL = await Helpers.load_env();
     final List vaccinieData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_vaccine/",
-        query: "param1=${_searchController.text}");
+        query: {"query": "param1=${_searchController.text}"});
 
     if (vaccinieData.isEmpty || vaccinieData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously

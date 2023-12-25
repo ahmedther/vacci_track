@@ -239,7 +239,8 @@ class Helpers {
     }
   }
 
-  static Future makeGetRequest(String url, {String? query = ""}) async {
+  static Future makeGetRequest(String url,
+      {Map<String, dynamic>? query}) async {
     // final csrfToken = await get_csrfToken();
     // if (csrfToken.containsKey('error')) return csrfToken;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -252,13 +253,17 @@ class Helpers {
       };
 
       var response = await http.get(
-        Uri.parse(url).replace(queryParameters: {'query': query}),
+        Uri.parse(url).replace(queryParameters: query),
         headers: headers,
       );
       if (response.statusCode == 200) {
         // Success! Do something with the response
         final List data = jsonDecode(response.body);
         return data;
+      } else if (response.statusCode == 401) {
+        return [
+          {'error': "You’ve are logged out. Please Login to continue."}
+        ];
       } else {
         final List data = jsonDecode(response.body);
         return data;
@@ -275,39 +280,40 @@ class Helpers {
   }
 
   static Color getRandomColor() {
-    List<String> colors = [
-      "#fca311",
-      "#FFDD00",
-      "#FF4301",
-      "#F66B0E",
-      "#ff006e",
-      "#F806CC",
-      "#31E1F7",
-      "#0096FF",
-      "#00B7A8",
-      "#3DB2FF",
-      "#113CFC",
-      "#3B44F6",
-      "#000000",
-      "#4C0070",
-      "#8200FF",
-      "#45046A",
-      "#FF0000",
-      "#379237",
-      "#49FF00",
-      "#A6CB12",
-      "#864000",
-      "#290001",
-      "#6A492B",
-      "#696464",
-      "#414141",
-      "#FF7F5B"
-    ];
+    return Colors.primaries[Random().nextInt(Colors.primaries.length)];
+    // List<String> colors = [
+    //   "#fca311",
+    //   "#FFDD00",
+    //   "#FF4301",
+    //   "#F66B0E",
+    //   "#ff006e",
+    //   "#F806CC",
+    //   "#31E1F7",
+    //   "#0096FF",
+    //   "#00B7A8",
+    //   "#3DB2FF",
+    //   "#113CFC",
+    //   "#3B44F6",
+    //   "#000000",
+    //   "#4C0070",
+    //   "#8200FF",
+    //   "#45046A",
+    //   "#FF0000",
+    //   "#379237",
+    //   "#49FF00",
+    //   "#A6CB12",
+    //   "#864000",
+    //   "#290001",
+    //   "#6A492B",
+    //   "#696464",
+    //   "#414141",
+    //   "#FF7F5B"
+    // ];
 
-    Random random = Random();
-    String randomColorCode = colors[random.nextInt(colors.length)];
-    return Color(
-        int.parse(randomColorCode.substring(1, 7), radix: 16) + 0xFF000000);
+    // Random random = Random();
+    // String randomColorCode = colors[random.nextInt(colors.length)];
+    // return Color(
+    //     int.parse(randomColorCode.substring(1, 7), radix: 16) + 0xFF000000);
   }
 
   static void showSnackBar(BuildContext context, String? errorMessage) {

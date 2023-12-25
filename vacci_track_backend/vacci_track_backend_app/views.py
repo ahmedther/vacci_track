@@ -16,6 +16,7 @@ from vacci_track_backend_app.serializers import (
     VaccinationSerializer,
     DoseSerializer,
     EmpVaccFilterSerializer,
+    EmployeeVaccinationRecordSerializer,
 )
 from vacci_track_backend_app.helper import Helper
 from django.shortcuts import render
@@ -214,7 +215,9 @@ def edit_app_user(request):
 def search_employee(request):
     try:
         query = request.query_params["query"].split("=")[-1]
-        emp_data = Employee.objects.filter(Q(pr_number=query) | Q(uhid__contains=query))
+        emp_data = Employee.objects.filter(
+            Q(pr_number=query) | Q(uhid__icontains=query)
+        )
         serializer = EmployeeSerializer(emp_data, many=True)
         return Response(serializer.data, status=200)
     except Exception as e:
@@ -237,7 +240,7 @@ def search_employee_by_name(request):
                 Employee.objects.filter(
                     Q(employee_vaccination__dose_date__isnull=True)
                     & (
-                        Q(pr_number__contains=query)
+                        Q(pr_number__icontains=query)
                         | Q(uhid__icontains=query)
                         | Q(first_name__icontains=query)
                         | Q(middle_name__icontains=query)
@@ -458,7 +461,6 @@ def search_dose(request):
     try:
         query: str = request.query_params["query"].split("=")[-1]
         emp_id: str = request.query_params["query"].split("=")[-2]
-
         dose = (
             Dose.objects.filter(
                 employee_vaccination__employee=emp_id,
@@ -494,3 +496,30 @@ def add_vaccination_data(request):
         return JsonResponse({"success": True}, status=200)
     except Exception as e:
         return JsonResponse({"error": f"Error has occurred. Error: {e}"}, status=405)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_vaccine_records(request):
+    try:
+        due_date_filter = bool(request.query_params.get("due_date_filter", None))
+        page = request.query_params.get("page", None)
+        query = request.query_params.get("query", None)
+
+        print(due_date_filter)
+        print(page)
+        print(query)
+
+        if due_date_filter:
+            emp_vac_rec = Helper().get_emp_vac_rec(query)
+
+        if not due_date_filter:
+            raise Exception(f"Something went wrong. Try again later")
+
+        emp_vac_rec_page = Helper().paginator(page, emp_vac_rec)
+
+        serializer = EmployeeVaccinationRecordSerializer(emp_vac_rec_page, many=True)
+        print(serializer.data)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)

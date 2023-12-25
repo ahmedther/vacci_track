@@ -46,8 +46,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
     final API_URL = await Helpers.load_env();
     final List facilityData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_facility/",
-        query: "param1=${_searchController.text}");
-
+        query: {"query": "param1=${_searchController.text}"});
     if (facilityData.isEmpty || facilityData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, facilityData[0]['error']);

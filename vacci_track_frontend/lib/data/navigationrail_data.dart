@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 List<NavigationRailDestination> getNavigationRailDestinations(Color iconColor) {
-  final List<NavigationRailDestination> nagivationList = [
+  return <NavigationRailDestination>[
     NavigationRailDestination(
       icon: FaIcon(
         FontAwesomeIcons.houseMedical,
@@ -34,6 +34,4 @@ List<NavigationRailDestination> getNavigationRailDestinations(Color iconColor) {
     //   label: Text("Add Others", maxLines: 3),
     // ),
   ];
-
-  return nagivationList;
 }
