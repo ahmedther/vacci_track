@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -172,6 +174,7 @@ class Helpers {
     Map data = await Helpers.checkLoggedInPost(userData.token);
     if (data["success"] == false) {
       clearProviderAndPrefs(ref);
+      return UserData(isLoggedIn: false);
     }
 
     // ignore: invalid_use_of_protected_member
@@ -252,10 +255,12 @@ class Helpers {
         // 'X-CSRFToken': csrfToken['csrfToken'],
       };
 
-      var response = await http.get(
-        Uri.parse(url).replace(queryParameters: query),
-        headers: headers,
-      );
+      Response response = await http
+          .get(
+            Uri.parse(url).replace(queryParameters: query),
+            headers: headers,
+          )
+          .timeout(const Duration(minutes: 2));
       if (response.statusCode == 200) {
         // Success! Do something with the response
         final List data = jsonDecode(response.body);
@@ -407,5 +412,13 @@ class Helpers {
     return gender.toLowerCase() == "male"
         ? const Color.fromARGB(255, 47, 114, 165)
         : const Color.fromARGB(255, 237, 68, 124);
+  }
+
+  static Future<bool> checkError(Map data, BuildContext context) async {
+    if (data.containsKey("error")) {
+      context.go("/0");
+      return true;
+    }
+    return false;
   }
 }

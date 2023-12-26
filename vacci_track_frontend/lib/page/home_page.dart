@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,10 +29,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   final ScrollController scrollController = ScrollController();
 
   final String headingText = "Home";
+  int? totalNumberOfPages;
   bool isSpinning = true;
   bool isfetching = false;
+  bool hasMore = true;
   List fullEmpData = [];
   int page = 1;
+  final int recordsPerPage = 20;
 
   late final List<NavigationDestination> homeNavigationList =
       getHomNavigationDestination(uiColor);
@@ -41,12 +45,18 @@ class _HomePageState extends ConsumerState<HomePage> {
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/get_vaccine_records/",
         query: {
+          "records_per_page": recordsPerPage.toString(),
           "due_date_filter": "True",
           "page": page.toString(),
           "query": query,
         });
 
-    return empData;
+    if (empData[0] is Map) {
+      return empData;
+    }
+    hasMore = !((empData[0] as List).length < recordsPerPage);
+    totalNumberOfPages = empData[1];
+    return empData[0];
   }
 
   Future<void> getEmpData({String? query, bool? showError = false}) async {
@@ -65,6 +75,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           context, "No Data Found with Keyword : ${searchController.text}");
     }
 
+    changeStateFalse();
+  }
+
+  void changeStateFalse() {
     if (mounted) {
       setState(() {
         isSpinning = false;
@@ -73,18 +87,37 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  Future<void> onRefresh({bool resetEmp = true}) async {
+    totalNumberOfPages = 0;
+    hasMore = true;
+    page = 1;
+    isSpinning = true;
+    if (resetEmp) {
+      searchController.clear();
+
+      await getEmpData();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     Future.delayed(Duration.zero, () async {
-      print("ponki");
-
       await getEmpData();
     });
 
-    scrollController.addListener(() {
-      print("ss");
+    scrollController.addListener(() async {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.offset) {
+        if (isfetching || !hasMore) return;
+        page++;
+        isfetching = true;
+
+        final empData = await getEmployeesData(query: searchController.text);
+        fullEmpData.addAll(empData);
+      }
+      changeStateFalse();
     });
   }
 
@@ -102,7 +135,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     final themeColor =
         Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
     double containerWidth = Helpers.minAndMax(deviceWidth * .9, 100, 1290);
-
     return NavWrapper(
       child: Container(
         color: backgroundColor,
@@ -147,6 +179,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     setState(() {
                       isSpinning = true;
                     });
+                    onRefresh(resetEmp: false);
                     await getEmpData(
                         query: searchController.text.trim(), showError: true);
                   } else {
@@ -160,6 +193,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 hintText: "Search For Employees With Name or UHID/PR Number",
                 onChanged: (String value) async {
                   if (value.trim().length > 3 || value.trim() == '') {
+                    onRefresh(resetEmp: false);
                     await getEmpData(query: value);
                   }
                 },
@@ -233,154 +267,176 @@ class _HomePageState extends ConsumerState<HomePage> {
                       margin: const EdgeInsets.only(left: 30, right: 20),
                       width: containerWidth,
                       child: fullEmpData.isNotEmpty
-                          ? ListView.builder(
-                              controller: scrollController,
-                              shrinkWrap: true,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: fullEmpData.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index < fullEmpData.length) {
-                                  Map dosePendings = fullEmpData[index];
-                                  // print(dosePendings);
-                                  return Card(
-                                    color: themeColor,
-                                    surfaceTintColor: Colors.white,
-                                    child: ListTile(
-                                      hoverColor:
-                                          const Color.fromARGB(31, 0, 0, 0),
-                                      onTap: () async {},
-                                      leading: CircleAvatar(
-                                        backgroundColor:
-                                            Helpers.getRandomColor(),
-                                        child: dosePendings['employee']
-                                                    ['first_name'] !=
-                                                null
-                                            ? CustomTextStyle(
-                                                text: dosePendings['employee']
-                                                    ['first_name'][0],
-                                                color: Colors.white,
-                                                fontSize: 24,
-                                                isBold: true,
-                                              )
-                                            : const FaIcon(
-                                                FontAwesomeIcons.userAlt,
-                                                color: Colors.white),
-                                      ),
-                                      title: CustomTextStyle(
-                                        text:
-                                            '${dosePendings['employee']['prefix'] ?? ""} ${dosePendings['employee']['first_name'] ?? ""} ${dosePendings['employee']['middle_name'] ?? ""} ${dosePendings['employee']['last_name'] ?? ""}',
-                                        color: uiColor,
-                                        isBold: true,
-                                      ),
-                                      subtitle: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          if (containerWidth > 801) ...{
-                                            SizedBox(
-                                              width: containerWidth > 1234
-                                                  ? containerWidth * 0.5
-                                                  : null,
-                                              child: Row(
-                                                children: [
-                                                  buildCustomTextColumn(
-                                                      column1Texts: [
-                                                        [
-                                                          "Gender",
-                                                          ":",
-                                                          "${dosePendings['employee']['gender'] ?? 'Not Available'}"
-                                                        ],
-                                                        [
-                                                          "PR Number",
-                                                          ":",
-                                                          "${dosePendings['employee']['pr_number'] ?? 'Not Available'}"
-                                                        ],
-                                                        [
-                                                          "Designation",
-                                                          ":",
-                                                          "${dosePendings['employee']['designation'] ?? 'Not Available'}"
-                                                        ]
+                          ? ScrollConfiguration(
+                              behavior: MyCustomScrollBehavior(),
+                              child: RefreshIndicator(
+                                onRefresh: onRefresh,
+                                child: ListView.builder(
+                                  controller: scrollController,
+                                  shrinkWrap: true,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: fullEmpData.length + 1,
+                                  itemBuilder: (context, index) {
+                                    if (index < fullEmpData.length) {
+                                      Map dosePendings = fullEmpData[index];
+                                      // print(dosePendings);
+                                      return Card(
+                                        color: themeColor,
+                                        surfaceTintColor: Colors.white,
+                                        child: ListTile(
+                                          hoverColor:
+                                              const Color.fromARGB(31, 0, 0, 0),
+                                          onTap: () async {},
+                                          leading: CircleAvatar(
+                                            backgroundColor:
+                                                Helpers.getRandomColor(),
+                                            child: dosePendings['employee']
+                                                        ['first_name'] !=
+                                                    null
+                                                ? CustomTextStyle(
+                                                    text:
+                                                        dosePendings['employee']
+                                                            ['first_name'][0],
+                                                    color: Colors.white,
+                                                    fontSize: 24,
+                                                    isBold: true,
+                                                  )
+                                                : const FaIcon(
+                                                    FontAwesomeIcons.userAlt,
+                                                    color: Colors.white),
+                                          ),
+                                          title: CustomTextStyle(
+                                            text:
+                                                '${dosePendings['employee']['prefix'] ?? ""} ${dosePendings['employee']['first_name'] ?? ""} ${dosePendings['employee']['middle_name'] ?? ""} ${dosePendings['employee']['last_name'] ?? ""}',
+                                            color: uiColor,
+                                            isBold: true,
+                                          ),
+                                          subtitle: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              if (containerWidth > 801) ...{
+                                                SizedBox(
+                                                  width: containerWidth > 1234
+                                                      ? containerWidth * 0.5
+                                                      : null,
+                                                  child: Row(
+                                                    children: [
+                                                      buildCustomTextColumn(
+                                                          column1Texts: [
+                                                            [
+                                                              "Gender",
+                                                              ":",
+                                                              "${dosePendings['employee']['gender'] ?? 'Not Available'}"
+                                                            ],
+                                                            [
+                                                              "PR Number",
+                                                              ":",
+                                                              "${dosePendings['employee']['pr_number'] ?? 'Not Available'}"
+                                                            ],
+                                                            [
+                                                              "Designation",
+                                                              ":",
+                                                              "${dosePendings['employee']['designation'] ?? 'Not Available'}"
+                                                            ]
+                                                          ],
+                                                          width:
+                                                              deviceWidth * .2),
+                                                      buildVerticalDivider(
+                                                          deviceHeight:
+                                                              deviceHeight,
+                                                          deviceWidth:
+                                                              deviceWidth,
+                                                          uiColor: uiColor),
+                                                      if (containerWidth >
+                                                          1234) ...{
+                                                        buildCustomTextColumn(
+                                                            column1Texts: [
+                                                              [
+                                                                "Phone Number",
+                                                                ":",
+                                                                "${dosePendings['employee']['phone_number'] ?? 'Not Available'}"
+                                                              ],
+                                                              [
+                                                                "UHID",
+                                                                ":",
+                                                                "${dosePendings['employee']['uhid'] ?? 'Not Available'}",
+                                                              ],
+                                                              [
+                                                                "Department",
+                                                                ":",
+                                                                "${dosePendings['employee']['department'] ?? 'Not Available'}",
+                                                              ]
+                                                            ],
+                                                            width: deviceWidth *
+                                                                .2,
+                                                            labelWidth: 97),
+                                                        buildVerticalDivider(
+                                                            deviceHeight:
+                                                                deviceHeight,
+                                                            deviceWidth:
+                                                                deviceWidth,
+                                                            uiColor: uiColor),
+                                                      }
+                                                    ],
+                                                  ),
+                                                )
+                                              } else if (containerWidth >
+                                                  592) ...{
+                                                buildCustomTextColumn(
+                                                    column1Texts: [
+                                                      [
+                                                        "${dosePendings['employee']['gender'] ?? 'Not Available'}"
                                                       ],
-                                                      width: deviceWidth * .2),
-                                                  buildVerticalDivider(
-                                                      deviceHeight:
-                                                          deviceHeight,
-                                                      deviceWidth: deviceWidth,
-                                                      uiColor: uiColor),
-                                                  if (containerWidth >
-                                                      1234) ...{
-                                                    buildCustomTextColumn(
-                                                        column1Texts: [
-                                                          [
-                                                            "Phone Number",
-                                                            ":",
-                                                            "${dosePendings['employee']['gender'] ?? 'Not Available'}"
-                                                          ],
-                                                          [
-                                                            "UHID",
-                                                            ":",
-                                                            "${dosePendings['employee']['uhid'] ?? 'Not Available'}",
-                                                          ],
-                                                          [
-                                                            "Department",
-                                                            ":",
-                                                            "${dosePendings['employee']['department'] ?? 'Not Available'}",
-                                                          ]
-                                                        ],
-                                                        width: deviceWidth * .2,
-                                                        labelWidth: 97),
-                                                    buildVerticalDivider(
-                                                        deviceHeight:
-                                                            deviceHeight,
-                                                        deviceWidth:
-                                                            deviceWidth,
-                                                        uiColor: uiColor),
-                                                  }
-                                                ],
-                                              ),
+                                                      [
+                                                        "${dosePendings['employee']['pr_number'] ?? 'Not Available'}"
+                                                      ],
+                                                      [
+                                                        "${dosePendings['employee']['designation'] ?? 'Not Available'}"
+                                                      ]
+                                                    ],
+                                                    width: deviceWidth * .2),
+                                                buildVerticalDivider(
+                                                    deviceHeight: deviceHeight,
+                                                    deviceWidth: deviceWidth,
+                                                    uiColor: uiColor),
+                                              },
+                                              ...buildColumnBox(
+                                                  text: [
+                                                    "${dosePendings['vaccination']['name'] ?? 'Not Available'}",
+                                                    "${dosePendings['dose']['name'] ?? 'Not Available'}",
+                                                    "${dosePendings['dose_due_date'] ?? 'Not Available'}",
+                                                  ],
+                                                  width: containerWidth * .1,
+                                                  deviceHeight: deviceHeight,
+                                                  deviceWidth: deviceWidth,
+                                                  uiColor: uiColor),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return hasMore
+                                          ? SpinnerWithOverlay(
+                                              spinnerColor: uiColor,
+                                              message:
+                                                  "Loading Page... $page of ${totalNumberOfPages.toString()}",
+                                              size: 50,
                                             )
-                                          } else if (containerWidth > 592) ...{
-                                            buildCustomTextColumn(
-                                                column1Texts: [
-                                                  [
-                                                    "${dosePendings['employee']['gender'] ?? ''}"
-                                                  ],
-                                                  [
-                                                    "5100${dosePendings['employee']['pr_number'] ?? 'Not Available'}"
-                                                  ],
-                                                  [
-                                                    "${dosePendings['employee']['designation'] ?? 'Not Available'}"
-                                                  ]
-                                                ],
-                                                width: deviceWidth * .2),
-                                            buildVerticalDivider(
-                                                deviceHeight: deviceHeight,
-                                                deviceWidth: deviceWidth,
-                                                uiColor: uiColor),
-                                          },
-                                          ...buildColumnBox(
-                                              text: [
-                                                "${dosePendings['vaccination']['name'] ?? 'Not Available'}",
-                                                "${dosePendings['dose']['name'] ?? 'Not Available'}",
-                                                "${dosePendings['dose_due_date'] ?? 'Not Available'}",
-                                              ],
-                                              width: containerWidth * .1,
-                                              deviceHeight: deviceHeight,
-                                              deviceWidth: deviceWidth,
-                                              uiColor: uiColor),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return SpinnerWithOverlay(
-                                    spinnerColor: uiColor,
-                                    message: "Loading Page $page ...",
-                                  );
-                                }
-                              },
+                                          : CustomTextStyle(
+                                              text:
+                                                  "Last Page ($page of $page)",
+                                              color: uiColor,
+                                              fontSize: 14,
+                                              isBold: true,
+                                              textAlign: TextAlign.center,
+                                            );
+                                    }
+                                  },
+                                ),
+                              ),
                             )
                           : CustomErrorWidget(uiColor: uiColor),
                     ),
@@ -474,4 +530,12 @@ List<Widget> buildColumnBox({
       })
       .expand((x) => x)
       .toList();
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }

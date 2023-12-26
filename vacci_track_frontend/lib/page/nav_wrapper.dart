@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,8 +37,9 @@ class _NavWrapperState extends ConsumerState<NavWrapper> {
 
   void checkAuthRedirect() async {
     userData = await Helpers.checkLogin(ref);
-    // ignore: use_build_context_synchronously
-    if (userData.isLoggedIn! == false) context.go('/login');
+    if (userData.isLoggedIn! == false) {
+      context.go('/login');
+    }
     if (userData.isLoggedIn!) {
       await setNavData();
       if (mounted) {
@@ -60,6 +63,7 @@ class _NavWrapperState extends ConsumerState<NavWrapper> {
     await Helpers.genderChange(ref);
     await setNavData();
 
+    // ignore: use_build_context_synchronously
     context.go("/login");
   }
 

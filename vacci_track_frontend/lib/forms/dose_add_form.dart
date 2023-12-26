@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -51,8 +53,12 @@ class _DoseAddFormState extends State<DoseAddForm> {
   Future<void> getVaccinationList() async {
     final API_URL = await Helpers.load_env();
 
-    vacciData = await Helpers.makeGetRequest(
+    final vacciData = await Helpers.makeGetRequest(
         "http://$API_URL/api/get_vaccination_list/");
+    bool error = await Helpers.checkError(vacciData[0], context);
+    if (error) {
+      return;
+    }
     vaccinationList = vacciData.map((item) {
       return DropdownMenuItem<String>(
         value: item['id'].toString(),

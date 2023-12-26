@@ -502,24 +502,30 @@ def add_vaccination_data(request):
 @permission_classes([IsAuthenticated])
 def get_vaccine_records(request):
     try:
-        due_date_filter = bool(request.query_params.get("due_date_filter", None))
+        records_per_page = request.query_params.get("records_per_page", 20)
+        due_date_filter = {"True": True, "False": False}.get(
+            request.query_params.get("due_date_filter", None), "Invalid Input"
+        )
         page = request.query_params.get("page", None)
         query = request.query_params.get("query", None)
-
-        print(due_date_filter)
-        print(page)
-        print(query)
-
+        print(f"records_per_page : {records_per_page}")
+        print(f"page : {page}")
+        print(f"due_date_filter : {due_date_filter}")
+        print(f"query : {query}")
         if due_date_filter:
             emp_vac_rec = Helper().get_emp_vac_rec(query)
 
         if not due_date_filter:
             raise Exception(f"Something went wrong. Try again later")
 
-        emp_vac_rec_page = Helper().paginator(page, emp_vac_rec)
+        emp_vac_rec_page, paginator_num_pages = Helper().paginator(
+            page, emp_vac_rec, records_per_page
+        )
 
         serializer = EmployeeVaccinationRecordSerializer(emp_vac_rec_page, many=True)
-        print(serializer.data)
-        return Response(serializer.data, status=200)
+
+        return Response([serializer.data, paginator_num_pages], status=200)
     except Exception as e:
-        return Response([{"error": f"Erros has Occurred. Error :  {e}"}], status=405)
+        return Response(
+            [[{"error": f"Erros has Occurred. Error :  {e}"}], 0], status=405
+        )

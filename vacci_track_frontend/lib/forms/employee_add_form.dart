@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -91,54 +93,47 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     );
 
     final API_URL = await Helpers.load_env();
+    final endpoints = [
+      "/api/get_prefix/",
+      "/api/get_department_list/",
+      "/api/get_designation_list/",
+      "/api/get_facility_list/",
+      "/api/get_vaccination_list/"
+    ];
 
-    final List prefixData =
-        await Helpers.makeGetRequest("http://$API_URL/api/get_prefix/");
-    prefixlist = prefixData.map((item) {
-      return DropdownMenuItem<String>(
-        value: item['gender'].toString(),
-        child: Text(item['gender']),
-      );
-    }).toList();
+    final results = await Future.wait(endpoints
+        .map((endpoint) => Helpers.makeGetRequest("http://$API_URL$endpoint")));
 
-    final List deptData = await Helpers.makeGetRequest(
-        "http://$API_URL/api/get_department_list/");
-    depatmentlist = deptData.map((item) {
-      return DropdownMenuItem<String>(
-        value: item['id'].toString(),
-        child: Text(item['name']),
-      );
-    }).toList();
-
-    final List desigData = await Helpers.makeGetRequest(
-        "http://$API_URL/api/get_designation_list/");
-    designationlist = desigData.map((item) {
-      return DropdownMenuItem<String>(
-        value: item['id'].toString(),
-        child: Text(item['name']),
-      );
-    }).toList();
-
-    final List facilityData =
-        await Helpers.makeGetRequest("http://$API_URL/api/get_facility_list/");
-    facilitylist = facilityData.map((item) {
-      return DropdownMenuItem<String>(
-        value: item['id'].toString(),
-        child: Text(item['name']),
-      );
-    }).toList();
-
-    final List vaccineData = await Helpers.makeGetRequest(
-        "http://$API_URL/api/get_vaccination_list/");
-    vaccineList = vaccineData.map((item) {
-      return MultiSelectItem(item['id'], item['name']);
-    }).toList();
+    for (var result in results) {
+      bool error = await Helpers.checkError(result[0], context);
+      if (error) {
+        return;
+      }
+    }
+    prefixlist = _mapToDropdown(results[0], 'gender');
+    depatmentlist = _mapToDropdown(results[1], 'id', 'name');
+    designationlist = _mapToDropdown(results[2], 'id', 'name');
+    facilitylist = _mapToDropdown(results[3], 'id', 'name');
+    vaccineList = results[4]
+        .map<MultiSelectItem<dynamic>>(
+            (item) => MultiSelectItem(item['id'], item['name']))
+        .toList();
 
     if (mounted) {
       setState(() {
         _isSpinning = false;
       });
     }
+  }
+
+  List<DropdownMenuItem<String>> _mapToDropdown(List data, String valueKey,
+      [String? childKey]) {
+    return data.map((item) {
+      return DropdownMenuItem<String>(
+        value: item[valueKey].toString(),
+        child: Text(childKey != null ? item[childKey] : item[valueKey]),
+      );
+    }).toList();
   }
 
   void submitHandler() async {

@@ -49,6 +49,7 @@ class NavigationHero extends StatelessWidget {
                 highlightColor: uiColor,
                 splashColor: uiColor,
                 hoverColor: Colors.white,
+                onTap: changeUiColor,
                 child: CircleAvatar(
                   backgroundColor: uiColor,
                   radius: 20,
@@ -59,10 +60,10 @@ class NavigationHero extends StatelessWidget {
                     child: const FaIcon(FontAwesomeIcons.userTie),
                   ),
                 ),
-                onTap: () {
-                  changeUiColor();
-                  // context.go("/login");
-                },
+                // () {
+                //   ();
+                //   context.go("/login");
+                // },
               ),
               AnimatedTextKit(
                 isRepeatingAnimation: true,
