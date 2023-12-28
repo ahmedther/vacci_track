@@ -9,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacci_track_frontend/model/users.dart';
+import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/provider/user_provider.dart';
 import 'package:vacci_track_frontend/ui/error_snackbar.dart';
 
@@ -42,7 +43,7 @@ class Helpers {
       id: prefs.getInt("user_id"),
       fullName: prefs.getString('fullName'),
       username: prefs.getString('username'),
-      gender: prefs.getString('gender'),
+      gender: prefs.getString('gender') ?? "male",
       prNumber: prefs.getString('prNumber'),
       token: prefs.getString('token'),
       isLoggedIn: prefs.getBool("isLoggedIn") ?? false,
@@ -174,7 +175,7 @@ class Helpers {
     Map data = await Helpers.checkLoggedInPost(userData.token);
     if (data["success"] == false) {
       clearProviderAndPrefs(ref);
-      return UserData(isLoggedIn: false);
+      return UserData(gender: "male", isLoggedIn: false);
     }
 
     // ignore: invalid_use_of_protected_member
@@ -372,6 +373,8 @@ class Helpers {
         userData.gender?.toLowerCase() == "male" ? "female" : "male";
     ref.watch(userProvider.notifier).setUserData(userData);
     prefs.setString("gender", userData.gender!);
+    await setNavData(ref);
+
     final API_URL = await Helpers.load_env();
     Helpers.makePostRequest(url: "http://$API_URL/api/edit_app_user/", data: {
       "id": userData.id,
@@ -416,9 +419,20 @@ class Helpers {
 
   static Future<bool> checkError(Map data, BuildContext context) async {
     if (data.containsKey("error")) {
-      context.go("/0");
+      context.go("/");
       return true;
     }
     return false;
+  }
+
+  static Future<void> setNavData(WidgetRef ref) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final UserData defaultUserData = await getUserFromLocalStorage(prefs);
+    late final List<Color> colorsUIBack =
+        getUIandBackgroundColor(defaultUserData.gender!);
+
+    ref.watch(navProvider.notifier).updateColors(
+        backgroundColor: colorsUIBack.last, uiColor: colorsUIBack.first);
   }
 }

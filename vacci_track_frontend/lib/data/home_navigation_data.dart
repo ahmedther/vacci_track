@@ -8,9 +8,10 @@ List<NavigationDestination> getHomNavigationDestination(Color iconColor) {
       label: 'Pending Doses',
       tooltip: "Click To View Doses That Are Due",
     ),
-    NavigationDestination(
-      icon: Icon(Icons.star_border),
-      label: 'Item 2',
+    const NavigationDestination(
+      icon: FaIcon(FontAwesomeIcons.clipboardCheck),
+      label: 'Doses Administered',
+      tooltip: "See the doses that have been administered in the recent past.",
     ),
     NavigationDestination(
       icon: Icon(Icons.bookmark_border),

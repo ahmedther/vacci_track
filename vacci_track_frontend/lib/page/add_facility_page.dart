@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/facility_add_form.dart';
 
 class AddFacilityPage extends ConsumerStatefulWidget {
-  static const String routeName = '/5';
+  static const String routeName = '/add_facility';
 
   const AddFacilityPage({super.key});
 

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,7 +67,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
 
   List initialValueVaccine = [];
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   @override
   void initState() {
@@ -104,10 +105,12 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     final results = await Future.wait(endpoints
         .map((endpoint) => Helpers.makeGetRequest("http://$API_URL$endpoint")));
 
-    for (var result in results) {
-      bool error = await Helpers.checkError(result[0], context);
-      if (error) {
-        return;
+    if (mounted) {
+      for (var result in results) {
+        bool error = await Helpers.checkError(result[0], context);
+        if (error) {
+          return;
+        }
       }
     }
     prefixlist = _mapToDropdown(results[0], 'gender');
@@ -137,7 +140,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   }
 
   void submitHandler() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && mounted) {
       _formKey.currentState!.save();
       setState(() {
         _isSpinning = true;
@@ -165,7 +168,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             "vaccinations": initialValueVaccine,
             if (widget.editPage) "edit": widget.editPage,
           });
-      if (data.containsKey('error')) {
+      if (data.containsKey('error') && mounted) {
         setState(() {
           _isSpinning = false;
         });
@@ -206,31 +209,33 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
   }
 
   Future resetBtnHandler() async {
-    setState(() {
-      if (_formKey.currentState != null) {
-        _formKey.currentState!.reset();
-      }
-      _searchController.clear();
-      prefix = null;
-      status = '';
-      notes = '';
-      firstName = "";
-      middleName = "";
-      lastName = "";
-      gender = null;
-      phoneNumber = "";
-      emailID = "";
-      prNumber = null;
-      uhid = null;
-      joiningDate = null;
-      department = null;
-      designation = null;
-      facility = null;
-      eligibility = null;
-      initialValueVaccine = [];
-      _searchError = false;
-      _isSpinning = false;
-    });
+    if (mounted) {
+      setState(() {
+        if (_formKey.currentState != null) {
+          _formKey.currentState!.reset();
+        }
+        _searchController.clear();
+        prefix = null;
+        status = '';
+        notes = '';
+        firstName = "";
+        middleName = "";
+        lastName = "";
+        gender = null;
+        phoneNumber = "";
+        emailID = "";
+        prNumber = null;
+        uhid = null;
+        joiningDate = null;
+        department = null;
+        designation = null;
+        facility = null;
+        eligibility = null;
+        initialValueVaccine = [];
+        _searchError = false;
+        _isSpinning = false;
+      });
+    }
 
     await widget.assignAvatar(
       newgender: "",
@@ -248,8 +253,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
     double inputWidth = deviceWidth < 540
         ? deviceWidth
         : Helpers.minAndMax(deviceWidth * .8, 80, 175);
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
+
     return _isSpinning
         ? SpinnerWithOverlay(
             spinnerColor: widget.uiColor,
@@ -259,7 +263,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
-              color: themeContainerColor,
+              color: themeColor,
               width: Helpers.minAndMax(deviceWidth * .8, 80, 800),
               padding: const EdgeInsets.all(30),
               child: Column(
@@ -279,7 +283,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                     },
                     controller: _searchController,
                     uiColor: widget.uiColor,
-                    backgroundColor: themeContainerColor,
+                    backgroundColor: themeColor,
                     hintText: widget.editPage
                         ? "Search PR or UHID In VacciTrack Database"
                         : "Search PR or UHID EHIS Database",
@@ -626,7 +630,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                             Padding(
                               padding: const EdgeInsets.only(top: 15),
                               child: MultiSelectDialogField(
-                                  backgroundColor: themeContainerColor,
+                                  backgroundColor: themeColor,
                                   decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
@@ -762,7 +766,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeContainerColor,
+          backgroundColor: themeColor,
           title: CustomTextStyle(
               text: 'Results Found With  "${_searchController.text}" ',
               color: widget.uiColor,

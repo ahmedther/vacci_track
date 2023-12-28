@@ -7,7 +7,7 @@ import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
 
 class AddDesignation extends ConsumerStatefulWidget {
-  static const String routeName = '/3';
+  static const String routeName = '/add_designation';
 
   const AddDesignation({super.key});
 

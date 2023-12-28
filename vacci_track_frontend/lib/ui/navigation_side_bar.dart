@@ -34,7 +34,7 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   bool isOtherHover = false;
   bool isVaccineHover = false;
   late int? selectedIndex =
-      GoRouter.of(context).routeInformationProvider.value.uri.toString() == "/0"
+      GoRouter.of(context).routeInformationProvider.value.uri.toString() == "/"
           ? 0
           : ref.watch(navProvider).selectedIndex;
   late int? otherIndex = ref.watch(navProvider).otherIndex;
@@ -71,7 +71,21 @@ class _NavigationSideBarState extends ConsumerState<NavigationSideBar> {
   }
 
   void pageChange(int value) {
-    context.go("/$value");
+    const routes = {
+      0: '/',
+      1: '/record_vaccine_dose',
+      2: '/add_new_employee',
+      3: '/add_designation',
+      4: '/add_department',
+      5: '/add_facility',
+      6: '/add_vaccine',
+      7: '/add_dose',
+      
+    };
+
+    if (routes.containsKey(value)) {
+      context.go(routes[value]!);
+    }
   }
 
   void changeNavIndex(int? value) {

@@ -36,8 +36,9 @@ class FormUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
-    late final themeColor =
+    late final Color themeColor =
         Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
+
     return ListView(
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),

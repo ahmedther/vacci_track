@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/home_navigation_data.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
@@ -15,7 +16,7 @@ import 'package:vacci_track_frontend/ui/search_bar.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
-  static const String routeName = '/0';
+  static const String routeName = '/';
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -24,7 +25,8 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   late final Color backgroundColor = ref.watch(navProvider).backgroundColor!;
   late final Color uiColor = ref.watch(navProvider).uiColor!;
-
+  late final Color themeColor =
+      Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
   final TextEditingController searchController = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
@@ -78,7 +80,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     changeStateFalse();
   }
 
-  void changeStateFalse() {
+  Future<void> changeStateFalse() async {
     if (mounted) {
       setState(() {
         isSpinning = false;
@@ -110,14 +112,15 @@ class _HomePageState extends ConsumerState<HomePage> {
     scrollController.addListener(() async {
       if (scrollController.position.maxScrollExtent ==
           scrollController.offset) {
-        if (isfetching || !hasMore) return;
-        page++;
-        isfetching = true;
+        if (!isfetching && hasMore && page <= (totalNumberOfPages ?? 1)) {
+          isfetching = true;
+          page++;
 
-        final empData = await getEmployeesData(query: searchController.text);
-        fullEmpData.addAll(empData);
+          final empData = await getEmployeesData(query: searchController.text);
+          fullEmpData.addAll(empData);
+        }
       }
-      changeStateFalse();
+      await changeStateFalse();
     });
   }
 
@@ -132,8 +135,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
-    final themeColor =
-        Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
     double containerWidth = Helpers.minAndMax(deviceWidth * .9, 100, 1290);
     return NavWrapper(
       child: Container(
@@ -157,7 +158,14 @@ class _HomePageState extends ConsumerState<HomePage> {
               width: containerWidth * 0.99,
               child: NavigationBar(
                 onDestinationSelected: (int value) {
-                  print(value);
+                  const routes = {
+                    0: '/',
+                    1: '/doses_recently_administered',
+                  };
+
+                  if (routes.containsKey(value)) {
+                    context.go(routes[value]!);
+                  }
                 },
                 indicatorColor: const Color.fromARGB(255, 255, 255, 255),
                 animationDuration: const Duration(seconds: 3),
@@ -279,7 +287,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   itemBuilder: (context, index) {
                                     if (index < fullEmpData.length) {
                                       Map dosePendings = fullEmpData[index];
-                                      // print(dosePendings);
                                       return Card(
                                         color: themeColor,
                                         surfaceTintColor: Colors.white,
@@ -422,12 +429,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           ? SpinnerWithOverlay(
                                               spinnerColor: uiColor,
                                               message:
-                                                  "Loading Page... $page of ${totalNumberOfPages.toString()}",
+                                                  "Loading Page... $page of $totalNumberOfPages",
                                               size: 50,
                                             )
                                           : CustomTextStyle(
                                               text:
-                                                  "Last Page ($page of $page)",
+                                                  "Last Page (${page < (totalNumberOfPages ?? 0) ? page : totalNumberOfPages} of $totalNumberOfPages)",
                                               color: uiColor,
                                               fontSize: 14,
                                               isBold: true,

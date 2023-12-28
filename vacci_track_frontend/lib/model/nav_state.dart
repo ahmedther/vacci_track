@@ -10,11 +10,12 @@ class NavState {
   NavState({
     this.selectedIndex,
     this.backgroundColor = Colors.white,
-    this.uiColor = Colors.blue,
+    this.uiColor = const Color(0xFF01579b),
   });
-
+ 
   @override
   String toString() {
     return 'NavState(selectedIndex: $selectedIndex)';
   }
+  
 }

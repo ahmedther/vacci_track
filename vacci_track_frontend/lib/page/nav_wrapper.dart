@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,14 +18,14 @@ class NavWrapper extends ConsumerStatefulWidget {
 }
 
 class _NavWrapperState extends ConsumerState<NavWrapper> {
-  UserData userData = UserData(gender: "male", isLoggedIn: false);
   bool isSpinning = true;
 
-  late Color uiColor =
-      Helpers.getUIandBackgroundColor(userData.gender ?? "female")[0];
+  late UserData userData;
+
   // Color uiColor = Helpers.getRandomColor();
-  late Color backgroundColor =
-      Helpers.getUIandBackgroundColor(userData.gender ?? "female")[1];
+  Color? uiColor;
+  late Color backgroundColor;
+  late final Color themeColor;
 
   @override
   void initState() {
@@ -35,13 +35,23 @@ class _NavWrapperState extends ConsumerState<NavWrapper> {
     });
   }
 
+  Future<void> setUiAndBackgroundColor(UserData userData) async {
+    final List<Color> colorsUIBack =
+        Helpers.getUIandBackgroundColor(userData.gender!);
+    uiColor = colorsUIBack.first;
+    backgroundColor = colorsUIBack.last;
+    themeColor =
+        Helpers.getThemeColor(context: context, gender: userData.gender!);
+  }
+
   void checkAuthRedirect() async {
     userData = await Helpers.checkLogin(ref);
+    await setUiAndBackgroundColor(userData);
     if (userData.isLoggedIn! == false) {
       context.go('/login');
     }
     if (userData.isLoggedIn!) {
-      await setNavData();
+      await Helpers.setNavData(ref);
       if (mounted) {
         setState(() {
           isSpinning = !userData.isLoggedIn!;
@@ -50,33 +60,21 @@ class _NavWrapperState extends ConsumerState<NavWrapper> {
     }
   }
 
-  Future<void> setNavData() async {
-    uiColor = Helpers.getUIandBackgroundColor(userData.gender!)[0];
-    backgroundColor = Helpers.getUIandBackgroundColor(userData.gender!)[1];
-
-    ref
-        .watch(navProvider.notifier)
-        .updateColors(backgroundColor: backgroundColor, uiColor: uiColor);
-  }
-
   void changeUiColor() async {
     await Helpers.genderChange(ref);
-    await setNavData();
-
-    // ignore: use_build_context_synchronously
+    ref
+        .watch(navProvider.notifier)
+        .updatIndex(otherIndex: null, selectedIndex: 0, vaccineIndex: null);
     context.go("/login");
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = Helpers.getThemeColor(
-        context: context, gender: userData.gender ?? "female");
-
     return Scaffold(
       body: Center(
         child: isSpinning
             ? SpinnerWithOverlay(
-                spinnerColor: uiColor,
+                spinnerColor: uiColor ?? const Color(0xFF01579b),
               )
             : Stack(
                 children: [
@@ -89,7 +87,7 @@ class _NavWrapperState extends ConsumerState<NavWrapper> {
                     top: 0,
                     bottom: 0,
                     child: NavigationSideBar(
-                        uiColor: uiColor,
+                        uiColor: uiColor!,
                         backgroundColor: themeColor,
                         userData: userData,
                         changeUiColor: changeUiColor),

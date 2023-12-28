@@ -29,7 +29,8 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
   late List<DropdownMenuItem<String>>? hodList = null;
   int? _id = 0;
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   @override
   void dispose() {
@@ -169,8 +170,6 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
 
     return isSpinning
         ? SpinnerWithOverlay(
@@ -192,7 +191,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                     },
                     controller: _searchController,
                     uiColor: widget.uiColor,
-                    backgroundColor: themeContainerColor,
+                    backgroundColor: themeColor,
                     hintText: "Search For A Department ",
                   ),
                 ),
@@ -203,7 +202,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                 elevation: 100,
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
-                  color: themeContainerColor,
+                  color: themeColor,
                   padding: const EdgeInsets.all(30),
                   width: inputWidth + 20,
                   child: Form(
@@ -245,7 +244,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                           },
                           controller: _searchControllerHOD,
                           uiColor: widget.uiColor,
-                          backgroundColor: themeContainerColor,
+                          backgroundColor: themeColor,
                           hintText: "Enter PR No Or Name",
                         ),
                         const SizedBox(height: 40),
@@ -302,7 +301,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeContainerColor,
+          backgroundColor: themeColor,
           title: CustomTextStyle(
               text:
                   "Multiple Departments Found with the keyword '${_searchController.text}' ",

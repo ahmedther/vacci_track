@@ -7,7 +7,7 @@ import 'package:vacci_track_frontend/ui/form_ui.dart';
 import 'package:vacci_track_frontend/forms/dose_add_form.dart';
 
 class AddDosePage extends ConsumerStatefulWidget {
-  static const String routeName = '/7';
+  static const String routeName = '/add_dose';
   const AddDosePage({super.key});
 
   @override

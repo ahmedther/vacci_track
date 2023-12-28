@@ -64,7 +64,8 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
 
   late List doseData;
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   @override
   void initState() {
@@ -308,8 +309,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     double inputWidth = Helpers.minAndMax(deviceWidth * .8, 200, 600);
     late final Color profileColor =
         Helpers.getUIandBackgroundColor(gender ?? "male")[0];
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
+
     if (widget.editPage) _isForm = false;
 
     return _isSpinning
@@ -329,14 +329,14 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                 elevation: 100,
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
-                  color: themeContainerColor,
+                  color: themeColor,
                   padding: const EdgeInsets.all(30),
                   width: inputWidth + 30,
                   child: Column(
                     children: [
                       if (!widget.editPage) ...{
                         SearchAnchor(
-                          viewBackgroundColor: themeContainerColor,
+                          viewBackgroundColor: themeColor,
                           builder: (BuildContext _context,
                               SearchController controller) {
                             return CustomSearchBar(
@@ -347,7 +347,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                               },
                               controller: controller,
                               uiColor: widget.uiColor,
-                              backgroundColor: themeContainerColor,
+                              backgroundColor: themeColor,
                               hintText:
                                   "Search For Employees With Name or UHID/PR Number",
                               onTap: () async {

@@ -25,7 +25,8 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
   String? _facilityId;
   int? _id = 0;
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   @override
   void dispose() {
@@ -124,8 +125,6 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
 
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
     return _isSpinning
         ? SpinnerWithOverlay(
             spinnerColor: widget.uiColor,
@@ -135,7 +134,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
-              color: themeContainerColor,
+              color: themeColor,
               padding: const EdgeInsets.all(30),
               width: inputWidth + 20,
               child: Form(
@@ -153,7 +152,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
                         },
                         controller: _searchController,
                         uiColor: widget.uiColor,
-                        backgroundColor: themeContainerColor,
+                        backgroundColor: themeColor,
                         hintText: "Search For A Facility",
                       ),
                       const SizedBox(height: 32)
@@ -231,7 +230,7 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeContainerColor,
+          backgroundColor: themeColor,
           title: CustomTextStyle(
               text:
                   "Multiple Facility Found with the keyword '${_searchController.text}'",

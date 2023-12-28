@@ -23,7 +23,8 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
   final TextEditingController _nameController = TextEditingController();
   int? _id = 0;
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   @override
   void dispose() {
@@ -119,9 +120,6 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
 
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
-
     return _isSpinning
         ? SpinnerWithOverlay(
             spinnerColor: widget.uiColor,
@@ -131,7 +129,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
             elevation: 100,
             margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
             child: Container(
-              color: themeContainerColor,
+              color: themeColor,
               padding: const EdgeInsets.all(30),
               width: inputWidth,
               child: Column(
@@ -148,7 +146,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
                       },
                       controller: _searchController,
                       uiColor: widget.uiColor,
-                      backgroundColor: themeContainerColor,
+                      backgroundColor: themeColor,
                       hintText: "Search For Designation",
                     ),
                     const SizedBox(height: 32)
@@ -178,7 +176,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeContainerColor,
+          backgroundColor: themeColor,
           title: CustomTextStyle(
               text:
                   "Multiple Designations Found with the keyword '${_searchController.text}'",

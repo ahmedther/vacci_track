@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,7 +35,8 @@ class _DoseAddFormState extends State<DoseAddForm> {
   String? _detail;
   String? _vaccination;
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   late List vacciData;
   late List<DropdownMenuItem<String>>? vaccinationList;
@@ -53,7 +54,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
   Future<void> getVaccinationList() async {
     final API_URL = await Helpers.load_env();
 
-    final vacciData = await Helpers.makeGetRequest(
+    vacciData = await Helpers.makeGetRequest(
         "http://$API_URL/api/get_vaccination_list/");
     bool error = await Helpers.checkError(vacciData[0], context);
     if (error) {
@@ -223,8 +224,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
     bool isEnabled = getEnableStatus();
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
+
     return _isSpinning
         ? SpinnerWithOverlay(
             spinnerColor: widget.uiColor,
@@ -247,7 +247,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                     },
                     controller: _searchController,
                     uiColor: widget.uiColor,
-                    backgroundColor: themeContainerColor,
+                    backgroundColor: themeColor,
                     hintText: "Search For A Dose",
                   ),
                 ),
@@ -260,7 +260,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                 elevation: 100,
                 margin: EdgeInsets.symmetric(vertical: deviceHeight * 0.05),
                 child: Container(
-                  color: themeContainerColor,
+                  color: themeColor,
                   padding: const EdgeInsets.all(40),
                   width: inputWidth + 40,
                   child: Form(
@@ -436,7 +436,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeContainerColor,
+          backgroundColor: themeColor,
           title: CustomTextStyle(
               text: 'Multiple Dose Found with  "${_searchController.text}" ',
               color: widget.uiColor,

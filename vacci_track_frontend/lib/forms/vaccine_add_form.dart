@@ -27,7 +27,8 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
   String? _totalDose;
   String? _otherNotes;
 
-  late Color themeContainerColor;
+  late final Color themeColor = Helpers.getThemeColorWithUIColor(
+      context: context, uiColor: widget.uiColor);
 
   @override
   void dispose() {
@@ -130,9 +131,6 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
     double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.minAndMax(deviceWidth * .4, 200, 500);
 
-    themeContainerColor = Helpers.getThemeColorWithUIColor(
-        context: context, uiColor: widget.uiColor);
-
     return _isSpinning
         ? SpinnerWithOverlay(
             spinnerColor: widget.uiColor,
@@ -141,7 +139,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
             borderOnForeground: true,
             elevation: 100,
             child: Container(
-              color: themeContainerColor,
+              color: themeColor,
               width: inputWidth + 30,
               padding: const EdgeInsets.all(30),
               child: Form(
@@ -160,7 +158,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
                         },
                         controller: _searchController,
                         uiColor: widget.uiColor,
-                        backgroundColor: themeContainerColor,
+                        backgroundColor: themeColor,
                       ),
                       const SizedBox(height: 32)
                     },
@@ -262,7 +260,7 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: themeContainerColor,
+          backgroundColor: themeColor,
           title: CustomTextStyle(
               text:
                   "Multiple Vaccine Found with the keyword '${_searchController.text}'",

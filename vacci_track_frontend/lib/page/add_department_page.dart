@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/department_add_form.dart';
 
 class AddDepartment extends ConsumerStatefulWidget {
-  static const String routeName = '/4';
+  static const String routeName = '/add_department';
 
   const AddDepartment({super.key});
 

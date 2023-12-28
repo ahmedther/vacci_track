@@ -10,8 +10,8 @@ import 'package:vacci_track_frontend/ui/form_ui.dart';
 import 'package:vacci_track_frontend/forms/record_vaccine_form.dart';
 
 class AddNewEmployee extends ConsumerStatefulWidget {
-  static const String routeName = '/1';
-  static const String routeName2 = '/2';
+  static const String routeName = '/record_vaccine_dose';
+  static const String routeName2 = '/add_new_employee';
   const AddNewEmployee({super.key});
 
   @override
@@ -21,10 +21,13 @@ class AddNewEmployee extends ConsumerStatefulWidget {
 class _AddNewEmployeeState extends ConsumerState<AddNewEmployee> {
   late final bool employeeAddFrom =
       GoRouter.of(context).routeInformationProvider.value.uri.toString() ==
-          "/2";
+          AddNewEmployee.routeName2;
 
   late final Color backgroundColor = ref.watch(navProvider).backgroundColor!;
   late final Color uiColor = ref.watch(navProvider).uiColor!;
+
+  late final themeColor =
+      Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
 
   String gender = "";
   String prefix = "";
@@ -72,8 +75,6 @@ class _AddNewEmployeeState extends ConsumerState<AddNewEmployee> {
     double deviceHeight = MediaQuery.of(context).size.height;
     final genderWiseColor = Helpers.getUIandBackgroundColor(gender)[0];
 
-    final themeColor =
-        Helpers.getThemeColorWithUIColor(context: context, uiColor: uiColor);
     return NavWrapper(
       child: FormUI(
         uiColor: employeeAddFrom
