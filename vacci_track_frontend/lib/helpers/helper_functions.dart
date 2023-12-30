@@ -8,11 +8,9 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/provider/user_provider.dart';
-import 'package:vacci_track_frontend/ui/error_snackbar.dart';
 
 final DateFormat formater = DateFormat('dd-MMM-yyyy');
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
-import 'package:vacci_track_frontend/helpers/helper_widget.dart';
+import 'package:vacci_track_frontend/helpers/helper_widgets.dart';
 
 class EmployeeDetailCards extends StatelessWidget {
   final Color uiColor;

@@ -8,7 +8,7 @@ import 'package:vacci_track_frontend/components/scroll_behavior.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/home_navigation_data.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
-import 'package:vacci_track_frontend/helpers/helper_widget.dart';
+import 'package:vacci_track_frontend/helpers/helper_widgets.dart';
 import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/employee_cards.dart';
 import 'package:vacci_track_frontend/ui/full_screen_error.dart';
@@ -300,37 +300,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
-Widget buildCustomTextColumn(
-    {required List<List<String>> columnTexts,
-    required double width,
-    double labelWidth = 80}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: columnTexts
-        .map((items) => Row(
-              children: items
-                  .asMap() // Convert to iterable map
-                  .entries
-                  .map(
-                    (entry) => SizedBox(
-                      width: entry.key == 0
-                          ? Helpers.minAndMax(width, 0, labelWidth)
-                          : entry.key == 1
-                              ? Helpers.minAndMax(width, 0, 50)
-                              : Helpers.minAndMax(
-                                  width, 0, 120), // Check if iteration is 2
-                      child: CustomTextStyle(
-                          text: entry.value,
-                          fontSize: 14,
-                          isBold: true,
-                          color: Colors.black,
-                          textAlign: entry.key == 1 ? TextAlign.center : null),
-                    ),
-                  )
-                  .toList(),
-            ))
-        .toList(),
-  );
-}
+
 
 

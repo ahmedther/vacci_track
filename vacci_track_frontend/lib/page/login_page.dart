@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vacci_track_frontend/helpers/helper_widget.dart';
+import 'package:vacci_track_frontend/helpers/helper_widgets.dart';
 import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/ui/input_field.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';

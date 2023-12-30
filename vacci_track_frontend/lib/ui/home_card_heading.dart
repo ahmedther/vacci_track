@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
-import 'package:vacci_track_frontend/helpers/helper_widget.dart';
+import 'package:vacci_track_frontend/helpers/helper_widgets.dart';
 
 class HomeCardHeading extends StatelessWidget {
   final Color uiColor;

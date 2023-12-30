@@ -47,6 +47,7 @@ class HelpersWidget {
       },
     );
   }
+
   static Widget buildVerticalDivider(
       {required double deviceWidth,
       required double deviceHeight,

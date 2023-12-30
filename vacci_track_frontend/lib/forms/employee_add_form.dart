@@ -8,7 +8,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
-import 'package:vacci_track_frontend/helpers/helper_widget.dart';
+import 'package:vacci_track_frontend/helpers/helper_widgets.dart';
 import 'package:vacci_track_frontend/ui/date_picker.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
