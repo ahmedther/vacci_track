@@ -37,14 +37,25 @@ class HomeWithNavWrapper extends StatelessWidget {
       required this.headings,
       super.key});
 
-
-  final int selectedIndex = 1;
-
+  int getIndex(BuildContext context) {
+    return homeRoutes.entries
+        .firstWhere(
+            (element) =>
+                element.value ==
+                GoRouter.of(context)
+                    .routeInformationProvider
+                    .value
+                    .uri
+                    .toString(),
+            orElse: () => const MapEntry(0, "/"))
+        .key;
+  }
 
   @override
   Widget build(BuildContext context) {
     late final List<NavigationDestination> homeNavigationList =
         getHomNavigationDestination(uiColor);
+    final int selectedIndex = getIndex(context);
 
     return NavWrapper(
       child: Container(

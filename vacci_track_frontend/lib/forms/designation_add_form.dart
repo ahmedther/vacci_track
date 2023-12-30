@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -35,12 +36,12 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
 
   void _submitHandler() async {
     if (_nameController.text == "") {
-      Helpers.showSnackBar(context,
+      HelpersWidget.showSnackBar(context,
           "Designation Name was left empty!!! Please enter a Name for the Designation.");
       return;
     }
     if (_nameController.text.length < 3) {
-      Helpers.showSnackBar(context,
+      HelpersWidget.showSnackBar(context,
           "Designation Name should be at least 3 characters long. Please enter a valid Name for the Designation");
       return;
     }
@@ -59,10 +60,10 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       setState(() {
         _isSpinning = false;
       });
-      Helpers.showSnackBar(context, data['error']);
+      HelpersWidget.showSnackBar(context, data['error']);
     } else {
       // ignore: use_build_context_synchronously
-      Helpers.showDialogOnScreen(
+      HelpersWidget.showDialogOnScreen(
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
@@ -95,7 +96,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
 
     if (_designationData.isEmpty || _designationData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, _designationData[0]['error']);
+      HelpersWidget.showSnackBar(context, _designationData[0]['error']);
       setState(() {
         _isSpinning = false;
       });
@@ -140,7 +141,7 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
                       deviceWidth: deviceWidth,
                       onPressed: () {
                         _searchController.text.length < 3
-                            ? Helpers.showSnackBar(
+                            ? HelpersWidget.showSnackBar(
                                 context, "Please enter at least 3 characters")
                             : _searchDesignation(context);
                       },

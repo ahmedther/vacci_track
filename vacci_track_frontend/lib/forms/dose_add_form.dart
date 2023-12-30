@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
@@ -87,7 +88,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
         query: {"query": _searchController.text.toString()});
     if (doseList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, doseList[0]['error']);
+      HelpersWidget.showSnackBar(context, doseList[0]['error']);
       setState(() {
         _isSpinning = false;
       });
@@ -128,11 +129,11 @@ class _DoseAddFormState extends State<DoseAddForm> {
           _isSpinning = false;
         });
         // ignore: use_build_context_synchronously
-        Helpers.showSnackBar(context, data['error']);
+        HelpersWidget.showSnackBar(context, data['error']);
         return;
       } else {
         // ignore: use_build_context_synchronously
-        Helpers.showDialogOnScreen(
+        HelpersWidget.showDialogOnScreen(
             context: context,
             btnMessage: 'OK',
             title: "✔ Successful",
@@ -241,7 +242,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                     deviceWidth: deviceWidth,
                     onPressed: () {
                       _searchController.text.length < 3
-                          ? Helpers.showSnackBar(
+                          ? HelpersWidget.showSnackBar(
                               context, "Please enter at least 3 characters")
                           : _searchDose();
                     },

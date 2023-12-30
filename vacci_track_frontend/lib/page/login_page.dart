@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/ui/input_field.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
@@ -64,7 +65,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       errorMessage += " Password cannot be left empty.";
     }
     if (error) {
-      Helpers.showSnackBar(context, errorMessage);
+      HelpersWidget.showSnackBar(context, errorMessage);
     }
   }
 
@@ -78,7 +79,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         error = true;
         errorMessage = data['error']!;
         // ignore: use_build_context_synchronously
-        Helpers.showSnackBar(context, errorMessage);
+        HelpersWidget.showSnackBar(context, errorMessage);
         return;
       }
       UserData userData = UserData(

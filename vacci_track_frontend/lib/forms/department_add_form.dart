@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/spinner.dart';
@@ -49,7 +50,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
         query: {"query": "param1=${_searchControllerHOD.text}"});
     if (hodData[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, hodData[0]['error']);
+      HelpersWidget.showSnackBar(context, hodData[0]['error']);
       setState(() {
         isSpinning = false;
       });
@@ -82,7 +83,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
         query: {"query": "param1=${_searchController.text}"});
     if (departmentList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, departmentList[0]['error']);
+      HelpersWidget.showSnackBar(context, departmentList[0]['error']);
       setState(() {
         isSpinning = false;
       });
@@ -120,11 +121,11 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
           isSpinning = false;
         });
         // ignore: use_build_context_synchronously
-        Helpers.showSnackBar(context, data['error']);
+        HelpersWidget.showSnackBar(context, data['error']);
         return;
       } else {
         // ignore: use_build_context_synchronously
-        Helpers.showDialogOnScreen(
+        HelpersWidget.showDialogOnScreen(
             context: context,
             btnMessage: 'OK',
             title: "✔ Successful",
@@ -185,7 +186,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                     deviceWidth: deviceWidth,
                     onPressed: () {
                       _searchController.text.length < 3
-                          ? Helpers.showSnackBar(
+                          ? HelpersWidget.showSnackBar(
                               context, "Please enter at least 3 characters")
                           : _searchDepartment(context);
                     },
@@ -234,7 +235,7 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
                           deviceWidth: deviceWidth,
                           onPressed: () {
                             if (_searchControllerHOD.text.length < 3) {
-                              Helpers.showSnackBar(context,
+                              HelpersWidget.showSnackBar(context,
                                   "Please enter at least 3 characters");
                               return;
                             }

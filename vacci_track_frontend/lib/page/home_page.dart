@@ -1,13 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/home_nav_wrapper.dart';
+import 'package:vacci_track_frontend/components/scroll_behavior.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/home_navigation_data.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/employee_cards.dart';
 import 'package:vacci_track_frontend/ui/full_screen_error.dart';
@@ -68,11 +69,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (!(empData[0] as Map).containsKey("error")) {
         fullEmpData = empData;
       } else if ((empData[0] as Map).containsKey("error")) {
-        Helpers.showSnackBar(context, empData[0].toString());
+        HelpersWidget.showSnackBar(context, empData[0].toString());
       }
     }
     if (empData.isEmpty && showError!) {
-      Helpers.showSnackBar(
+      HelpersWidget.showSnackBar(
           context, "No Data Found with Keyword : ${searchController.text}");
     }
 
@@ -161,7 +162,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           await getEmpData(
               query: searchController.text.trim(), showError: true);
         } else {
-          Helpers.showSnackBar(context,
+          HelpersWidget.showSnackBar(context,
               "Please enter at least three characters to perform a search. 💉");
         }
       },
@@ -332,10 +333,4 @@ Widget buildCustomTextColumn(
   );
 }
 
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
-}
+

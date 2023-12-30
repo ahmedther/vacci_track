@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 
 class HomeCardHeading extends StatelessWidget {
   final Color uiColor;
@@ -52,7 +53,7 @@ class HomeCardHeading extends StatelessWidget {
                             color: uiColor,
                             textAlign: TextAlign.center),
                       ),
-                      Helpers.buildVerticalDivider(
+                      HelpersWidget.buildVerticalDivider(
                           deviceHeight: deviceHeight,
                           deviceWidth: deviceWidth,
                           uiColor: uiColor),
@@ -62,7 +63,7 @@ class HomeCardHeading extends StatelessWidget {
               } else ...{
                 const SizedBox(width: 45),
               },
-              ...Helpers.buildColumnBox(
+              ...HelpersWidget.buildColumnBox(
                   text: headings.sublist(1),
                   width: containerWidth * .1,
                   deviceHeight: deviceHeight,

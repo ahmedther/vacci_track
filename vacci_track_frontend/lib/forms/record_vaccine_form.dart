@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/ui/date_picker.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/components/record_vac_form_profile.dart';
@@ -146,7 +147,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         query: {"query": query});
     if (spinning &&
         (empData.isEmpty || (empData[0] as Map).containsKey("error"))) {
-      Helpers.showSnackBar(
+      HelpersWidget.showSnackBar(
           context,
           empData.isEmpty
               ? "No Results Found with UHID/PR Number $query"
@@ -201,9 +202,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         setState(() {
           _isSpinning = false;
         });
-        Helpers.showSnackBar(context, data['error']);
+        HelpersWidget.showSnackBar(context, data['error']);
       } else {
-        Helpers.showDialogOnScreen(
+        HelpersWidget.showDialogOnScreen(
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
@@ -263,7 +264,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         query: {"query": value, "emp_id": empId.toString()});
 
     if (doseData[0].containsKey("error")) {
-      Helpers.showSnackBar(context, doseData[0]['error']);
+      HelpersWidget.showSnackBar(context, doseData[0]['error']);
       setState(() {
         _isSpinning = false;
       });

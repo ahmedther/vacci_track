@@ -8,6 +8,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 import 'package:vacci_track_frontend/ui/date_picker.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
@@ -173,7 +174,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
           _isSpinning = false;
         });
         // ignore: use_build_context_synchronously
-        Helpers.showSnackBar(context, data['error']);
+        HelpersWidget.showSnackBar(context, data['error']);
       } else {
         prefix = null;
         firstName = "";
@@ -194,7 +195,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
           newlastName: "",
         );
         // ignore: use_build_context_synchronously
-        Helpers.showDialogOnScreen(
+        HelpersWidget.showDialogOnScreen(
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
@@ -867,7 +868,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         query: {"query": "param1=${_searchController.text}"});
     if ((empData[0] as Map).containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(context, empData[0]['error']);
+      HelpersWidget.showSnackBar(context, empData[0]['error']);
       setState(() {
         _isSpinning = false;
       });
@@ -895,7 +896,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         query: {"query": "param1=${_searchController.text}"});
     if (empData.isEmpty || (empData[0] as Map).containsKey("error")) {
       // ignore: use_build_context_synchronously
-      Helpers.showSnackBar(
+      HelpersWidget.showSnackBar(
           context,
           empData.isEmpty
               ? "No Results Found with UHID/PR Number ${_searchController.text}"

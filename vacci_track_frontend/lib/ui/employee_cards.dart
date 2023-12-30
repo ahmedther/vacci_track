@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
+import 'package:vacci_track_frontend/helpers/helper_widget.dart';
 
 class EmployeeDetailCards extends StatelessWidget {
   final Color uiColor;
@@ -67,7 +68,7 @@ class EmployeeDetailCards extends StatelessWidget {
                   children: [
                     buildCustomTextColumn(
                         columnTexts: column1Texts, width: deviceWidth * .2),
-                    Helpers.buildVerticalDivider(
+                    HelpersWidget.buildVerticalDivider(
                         deviceHeight: deviceHeight,
                         deviceWidth: deviceWidth,
                         uiColor: uiColor),
@@ -76,7 +77,7 @@ class EmployeeDetailCards extends StatelessWidget {
                           columnTexts: column2Texts,
                           width: deviceWidth * .2,
                           labelWidth: 97),
-                      Helpers.buildVerticalDivider(
+                      HelpersWidget.buildVerticalDivider(
                           deviceHeight: deviceHeight,
                           deviceWidth: deviceWidth,
                           uiColor: uiColor),
@@ -87,12 +88,12 @@ class EmployeeDetailCards extends StatelessWidget {
             } else if (containerWidth > 592) ...{
               buildCustomTextColumn(
                   columnTexts: column1Texts, width: deviceWidth * .2),
-              Helpers.buildVerticalDivider(
+              HelpersWidget.buildVerticalDivider(
                   deviceHeight: deviceHeight,
                   deviceWidth: deviceWidth,
                   uiColor: uiColor),
             },
-            ...Helpers.buildColumnBox(
+            ...HelpersWidget.buildColumnBox(
                 text: otherColums,
                 width: containerWidth * .1,
                 deviceHeight: deviceHeight,
