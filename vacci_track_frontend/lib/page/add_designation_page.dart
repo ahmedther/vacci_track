@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/forms/designation_add_form.dart';
-import 'package:vacci_track_frontend/page/nav_wrapper.dart';
+import 'package:vacci_track_frontend/components/nav_wrapper.dart';
 import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
 

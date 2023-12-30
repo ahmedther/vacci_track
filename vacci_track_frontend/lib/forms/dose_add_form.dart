@@ -77,14 +77,14 @@ class _DoseAddFormState extends State<DoseAddForm> {
     super.dispose();
   }
 
-  Future<void> _searchDose(BuildContext context) async {
+  Future<void> _searchDose() async {
     setState(() {
       _isSpinning = true;
     });
     final API_URL = await Helpers.load_env();
     final List doseList = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_dose/",
-        query: {"query": "param1=${_searchController.text}"});
+        query: {"query": _searchController.text.toString()});
     if (doseList[0].containsKey("error")) {
       // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, doseList[0]['error']);
@@ -243,7 +243,7 @@ class _DoseAddFormState extends State<DoseAddForm> {
                       _searchController.text.length < 3
                           ? Helpers.showSnackBar(
                               context, "Please enter at least 3 characters")
-                          : _searchDose(context);
+                          : _searchDose();
                     },
                     controller: _searchController,
                     uiColor: widget.uiColor,

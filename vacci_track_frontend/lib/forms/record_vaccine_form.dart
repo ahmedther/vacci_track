@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/data/dropdown_decoration.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
@@ -14,7 +17,8 @@ import '../ui/spinner.dart';
 
 class RecordVaccineForm extends StatefulWidget {
   const RecordVaccineForm(
-      {required this.editPage,
+      {this.employeeData,
+      required this.editPage,
       required this.assignAvatar,
       required this.resetAvatar,
       required this.uiColor,
@@ -24,6 +28,7 @@ class RecordVaccineForm extends StatefulWidget {
   final Function resetAvatar;
   final Color uiColor;
   final bool editPage;
+  final Map<String, dynamic>? employeeData;
 
   @override
   State<RecordVaccineForm> createState() => _RecordVaccineFormState();
@@ -34,6 +39,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
 
   bool _isSpinning = false;
   bool _isForm = false;
+  bool _isSearchViewOpen = false;
 
   late int? empId;
   String? prefix;
@@ -72,7 +78,21 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     super.initState();
     Future.delayed(Duration.zero, () {
       widget.resetAvatar();
+      autoRedirectionHandel();
     });
+  }
+
+  Future<void> autoRedirectionHandel() async {
+    if (widget.employeeData == null) return;
+    await resetBtnHandler(useSoftReset: true);
+
+    vaccine = widget.employeeData!["vaccinations"][0]['id'].toString();
+    dose = widget.employeeData!["dose"]['id'].toString();
+    _isForm = true;
+
+    await updateEmpForm(widget.employeeData!);
+    await _searchDose(vaccine!);
+    await calculateDueDate(dose!);
   }
 
   Future updateEmpForm(Map empData) async {
@@ -101,7 +121,6 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     // emailID = empData["email_id"];
     // facility = empData["facility"]["id"]?.toString();
     vaccineList = generateDropDownList(empData["vaccinations"] ?? []);
-
     await widget.assignAvatar(
       newgender: gender ?? "",
       newprefix: prefix ?? "",
@@ -114,21 +133,19 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     });
   }
 
-  Future searchEmployee(BuildContext context, String query,
-      {bool spinning = false}) async {
+  Future searchEmployee(String query, {bool spinning = false}) async {
     if (spinning) {
       setState(() {
         _isSpinning = true;
       });
     }
-    // ignore: non_constant_identifier_names
+
     final API_URL = await Helpers.load_env();
     final List empData = await Helpers.makeGetRequest(
         "http://$API_URL/api/search_employee_by_name/",
-        query: {"query": "param1=$query"});
+        query: {"query": query});
     if (spinning &&
         (empData.isEmpty || (empData[0] as Map).containsKey("error"))) {
-      // ignore: use_build_context_synchronously
       Helpers.showSnackBar(
           context,
           empData.isEmpty
@@ -147,8 +164,11 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     empData1 = empData;
     if (spinning) {
       _isForm = true;
-      // await updateOtherDeatils(empData[0]);
-      await updateEmpForm(empData[0]);
+      if (empData.length > 1) {
+        await _dialogBuilder(empData);
+      } else {
+        await updateEmpForm(empData[0]);
+      }
       setState(() {
         _isSpinning = false;
       });
@@ -181,10 +201,8 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         setState(() {
           _isSpinning = false;
         });
-        // ignore: use_build_context_synchronously
         Helpers.showSnackBar(context, data['error']);
       } else {
-        // ignore: use_build_context_synchronously
         Helpers.showDialogOnScreen(
           context: context,
           btnMessage: 'OK',
@@ -208,7 +226,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
       lastName = "";
       gender = null;
       _isForm = false;
-
+      _isSearchViewOpen = false;
       vaccineList = null;
       vaccine = null;
 
@@ -217,7 +235,6 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
       _isSpinning = false;
     });
 
-    // ignore: use_build_context_synchronously
     await widget.assignAvatar(
       newgender: "",
       newprefix: "",
@@ -237,16 +254,15 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     }).toList();
   }
 
-  Future<void> _searchDose(BuildContext context, value) async {
+  Future<void> _searchDose(String value) async {
     setState(() {
       _isSpinning = true;
     });
     final API_URL = await Helpers.load_env();
     doseData = await Helpers.makeGetRequest("http://$API_URL/api/search_dose/",
-        query: {"query": "$empId=$value"});
+        query: {"query": value, "emp_id": empId.toString()});
 
     if (doseData[0].containsKey("error")) {
-      // ignore: use_build_context_synchronously
       Helpers.showSnackBar(context, doseData[0]['error']);
       setState(() {
         _isSpinning = false;
@@ -342,7 +358,8 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                             return CustomSearchBar(
                               deviceWidth: deviceWidth,
                               onPressed: () async {
-                                await searchEmployee(context, controller.text,
+                                await resetBtnHandler(useSoftReset: true);
+                                await searchEmployee(controller.text,
                                     spinning: true);
                               },
                               controller: controller,
@@ -351,10 +368,13 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                               hintText:
                                   "Search For Employees With Name or UHID/PR Number",
                               onTap: () async {
+                                if (_isSearchViewOpen) return;
+                                _isSearchViewOpen = true;
                                 final query = controller.text.length > 3
                                     ? controller.text
                                     : "";
-                                await searchEmployee(context, query);
+                                await searchEmployee(query);
+
                                 controller.openView();
                               },
                             );
@@ -366,7 +386,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                               controller.selection = TextSelection.collapsed(
                                   offset: controller.text.length);
                             });
-                            await searchEmployee(context, controller.text);
+                            await searchEmployee(controller.text);
                             if (empData1 == null || empData1!.isEmpty)
                               return [];
                             return empData1!.map(
@@ -390,6 +410,7 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                           _isForm = true;
                                         });
                                       });
+                                      _isSearchViewOpen = false;
 
                                       controller.closeView(controller.text);
                                       // _useUpdateOthers
@@ -432,6 +453,17 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                               },
                             );
                           },
+                          viewLeading: IconButton(
+                            icon: FaIcon(FontAwesomeIcons.arrowLeftLong,
+                                color: widget.uiColor),
+                            onPressed: () {
+                              _isSearchViewOpen = false;
+                              Navigator.of(context).pop();
+                            },
+                            style: const ButtonStyle(
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap),
+                          ),
                           viewBuilder: (Iterable<Widget> suggestions) {
                             return ListView.builder(
                                 itemCount: suggestions.length,
@@ -500,7 +532,7 @@ They can be reached at extension 33333."""
 
                                       vaccine = value!;
 
-                                      _searchDose(context, value);
+                                      _searchDose(value);
                                     },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -741,5 +773,99 @@ They can be reached at extension 33333."""
               ),
             ],
           );
+  }
+
+  Future<void> _dialogBuilder(List empData) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: themeColor,
+          title: CustomTextStyle(
+              text: 'Multiple Records Found',
+              color: widget.uiColor,
+              isBold: true),
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * .5,
+            width: MediaQuery.of(context).size.width * .3,
+            child: ListView.builder(
+              itemCount: empData.length,
+              itemBuilder: (context, index) {
+                Map user = empData[index];
+                return Card(
+                  child: ListTile(
+                    hoverColor: const Color.fromARGB(31, 0, 0, 0),
+                    onTap: () async {
+                      await updateEmpForm(user);
+                      context.pop();
+                    },
+                    leading: CircleAvatar(
+                      backgroundColor: Helpers.getRandomColor(),
+                      child: user['first_name'] != null
+                          ? Text(user['first_name'][0],
+                              style: const TextStyle(color: Colors.white))
+                          : const FaIcon(FontAwesomeIcons.userAlt,
+                              color: Colors.white),
+                    ),
+                    title: CustomTextStyle(
+                      text:
+                          '${user['prefix'] ?? ""} ${user['first_name'] ?? ""} ${user['middle_name'] ?? ""}  ${user['last_name'] ?? ""}',
+                      color: widget.uiColor,
+                      isBold: true,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomTextStyle(
+                          text: 'UHID: ${user['uhid'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'PR Number: ${user['pr_number'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Gender: ${user['gender'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Phone Number: ${user['phone_number'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Email ID: ${user['email_id'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                        CustomTextStyle(
+                          text: 'Facility: ${user['facility']?['name'] ?? ''}',
+                          color: Colors.black,
+                          isBold: true,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

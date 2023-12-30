@@ -228,7 +228,8 @@ def search_employee(request):
 @permission_classes([IsAuthenticated])
 def search_employee_by_name(request):
     try:
-        query = request.query_params["query"].split("=")[-1]
+        query = request.query_params.get("query", "")
+
         if query == "":
             emp_data = (
                 Employee.objects.filter(employee_vaccination__dose_date__isnull=True)
@@ -459,8 +460,8 @@ def add_dose(request):
 @permission_classes([IsAuthenticated])
 def search_dose(request):
     try:
-        query: str = request.query_params["query"].split("=")[-1]
-        emp_id: str = request.query_params["query"].split("=")[-2]
+        query: str = request.query_params.get("query","")
+        emp_id: str = request.query_params.get("emp_id","")
         dose = (
             Dose.objects.filter(
                 employee_vaccination__employee=emp_id,

@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/forms/employee_add_form.dart';
 import 'package:vacci_track_frontend/helpers/helper_functions.dart';
-import 'package:vacci_track_frontend/page/nav_wrapper.dart';
+import 'package:vacci_track_frontend/components/nav_wrapper.dart';
 import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/ui/form_ui.dart';
 import 'package:vacci_track_frontend/forms/record_vaccine_form.dart';
@@ -12,7 +12,8 @@ import 'package:vacci_track_frontend/forms/record_vaccine_form.dart';
 class AddNewEmployee extends ConsumerStatefulWidget {
   static const String routeName = '/record_vaccine_dose';
   static const String routeName2 = '/add_new_employee';
-  const AddNewEmployee({super.key});
+  final Map<String, dynamic>? empData;
+  const AddNewEmployee({this.empData, super.key});
 
   @override
   ConsumerState<AddNewEmployee> createState() => _AddNewEmployeeState();
@@ -74,7 +75,6 @@ class _AddNewEmployeeState extends ConsumerState<AddNewEmployee> {
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
     final genderWiseColor = Helpers.getUIandBackgroundColor(gender)[0];
-
     return NavWrapper(
       child: FormUI(
         uiColor: employeeAddFrom
@@ -113,6 +113,7 @@ class _AddNewEmployeeState extends ConsumerState<AddNewEmployee> {
                 editPage: false,
                 resetAvatar: resetAvatar,
                 uiColor: uiColor,
+                employeeData: widget.empData,
               ),
         toggelWidget2: employeeAddFrom
             ? EmployeeAddForm(

@@ -167,6 +167,7 @@ class EmployeeVaccinationRecordSerializer(serializers.ModelSerializer):
         }
         representation["dose"] = {"id": instance.dose.id, "name": instance.dose.name}
         representation["employee"] = {
+            "id": instance.employee.id,
             "prefix": instance.employee.prefix,
             "gender": instance.employee.gender,
             "first_name": instance.employee.first_name,

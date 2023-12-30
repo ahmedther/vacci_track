@@ -169,7 +169,7 @@ class Helper:
 
         return dose, created
 
-    def paginator(self, page,  object,records_per_page = 20):
+    def paginator(self, page, object, records_per_page=20):
         paginator = Paginator(object, records_per_page)
         if not page:
             page = 1
@@ -185,7 +185,7 @@ class Helper:
         return results, paginator.num_pages
 
     def get_emp_vac_rec(self, query):
-        filters = Q(dose_due_date__lt=datetime.now().date())
+        filters = Q(dose_due_date__lt=datetime.now().date()) & Q(is_dose_due=True)
         if query:
             filters &= (
                 Q(employee__first_name__icontains=query)

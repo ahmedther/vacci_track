@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vacci_track_frontend/components/text_style.dart';
 import 'package:vacci_track_frontend/model/users.dart';
 import 'package:vacci_track_frontend/provider/nav_state_provider.dart';
 import 'package:vacci_track_frontend/provider/user_provider.dart';
@@ -255,7 +256,6 @@ class Helpers {
         'Authorization': 'Token $authToken'
         // 'X-CSRFToken': csrfToken['csrfToken'],
       };
-
       Response response = await http
           .get(
             Uri.parse(url).replace(queryParameters: query),
@@ -434,5 +434,60 @@ class Helpers {
 
     ref.watch(navProvider.notifier).updateColors(
         backgroundColor: colorsUIBack.last, uiColor: colorsUIBack.first);
+  }
+
+  static void changeNavIndex(int? value, WidgetRef ref) {
+    ref.watch(navProvider.notifier).updatIndex(selectedIndex: value);
+  }
+
+  static Widget buildVerticalDivider(
+      {required double deviceWidth,
+      required double deviceHeight,
+      required Color uiColor}) {
+    return SizedBox(
+      height: Helpers.minAndMax(deviceHeight * .05, 0, 50),
+      width: Helpers.minAndMax(deviceWidth * .1, 0, 50),
+      child: VerticalDivider(
+        color: uiColor,
+        thickness: 1,
+      ),
+    );
+  }
+
+  static List<Widget> buildColumnBox({
+    required List<String> text,
+    required double width,
+    required double deviceHeight,
+    required double deviceWidth,
+    required Color uiColor,
+    bool useTextwithUiColor = false,
+  }) {
+    return text
+        .asMap()
+        .entries
+        .map((entry) {
+          int idx = entry.key;
+          String e = entry.value;
+          return [
+            SizedBox(
+              width: width,
+              child: CustomTextStyle(
+                text: e,
+                fontSize: 14,
+                isBold: true,
+                color: useTextwithUiColor ? uiColor : Colors.black,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            if (idx != text.length - 1)
+              buildVerticalDivider(
+                deviceHeight: deviceHeight,
+                deviceWidth: deviceWidth,
+                uiColor: uiColor,
+              ),
+          ];
+        })
+        .expand((x) => x)
+        .toList();
   }
 }

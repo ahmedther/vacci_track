@@ -6,7 +6,6 @@ import 'package:vacci_track_frontend/page/add_department_page.dart';
 import 'package:vacci_track_frontend/page/add_designation_page.dart';
 import 'package:vacci_track_frontend/page/add_dose_page.dart';
 import 'package:vacci_track_frontend/page/add_facility_page.dart';
-
 import 'package:vacci_track_frontend/page/add_new_employee_page.dart';
 import 'package:vacci_track_frontend/page/add_vaccine_page.dart';
 import 'package:vacci_track_frontend/page/doses_administered_page.dart';
@@ -31,9 +30,12 @@ class Home extends StatelessWidget {
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
-        path: AddNewEmployee.routeName,
-        builder: (context, state) => const AddNewEmployee(),
-      ),
+          path: AddNewEmployee.routeName,
+          builder: (context, state) {
+            final Map<String, dynamic>? data =
+                state.extra as Map<String, dynamic>?;
+            return AddNewEmployee(empData: data);
+          }),
       GoRoute(
         path: AddNewEmployee.routeName2,
         builder: (context, state) => const AddNewEmployee(),
