@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_init_to_null, non_constant_identifier_names
+
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
@@ -126,13 +128,15 @@ class _DepartmentAddFormState extends State<DepartmentAddForm> {
       } else {
         // ignore: use_build_context_synchronously
         HelpersWidget.showDialogOnScreen(
-            context: context,
-            btnMessage: 'OK',
-            title: "✔ Successful",
-            message: widget.editPage
-                ? "Department Successfully Updated"
-                : "Department Successfully Added",
-            onPressed: () {});
+          backgroundColor: themeColor,
+          uiColor: widget.uiColor,
+          context: context,
+          btnMessage: 'OK',
+          title: "✔ Successful",
+          contentMessage: widget.editPage
+              ? "Department Successfully Updated"
+              : "Department Successfully Added",
+        );
 
         setState(() {
           // _formKey.currentState!.reset();

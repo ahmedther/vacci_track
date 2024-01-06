@@ -8,9 +8,9 @@ import 'package:vacci_track_frontend/page/add_dose_page.dart';
 import 'package:vacci_track_frontend/page/add_facility_page.dart';
 import 'package:vacci_track_frontend/page/add_new_employee_page.dart';
 import 'package:vacci_track_frontend/page/add_vaccine_page.dart';
-import 'package:vacci_track_frontend/page/doses_administered_page.dart';
 import 'package:vacci_track_frontend/page/home_page.dart';
 import 'package:vacci_track_frontend/page/login_page.dart';
+import 'package:vacci_track_frontend/page/reports_download_page.dart';
 
 //colors #01579b #e91e63 #76997d
 
@@ -61,8 +61,17 @@ class Home extends StatelessWidget {
         builder: (context, state) => const AddDosePage(),
       ),
       GoRoute(
-        path: DosesAdministeredPage.routeName,
-        builder: (context, state) => const DosesAdministeredPage(),
+        path: HomePage.routeName1,
+        builder: (context, state) => const HomePage(isDoseAdminPage: true),
+      ),
+      GoRoute(
+        path: HomePage.routeName2,
+        builder: (context, state) =>
+            const HomePage(isVaccineCompletedPage: true),
+      ),
+      GoRoute(
+        path: DownloadReportsPage.routeName,
+        builder: (context, state) => const DownloadReportsPage(),
       ),
     ], initialLocation: HomePage.routeName);
 

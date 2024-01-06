@@ -19,43 +19,30 @@ class HomeWithNavWrapper extends StatelessWidget {
   final void Function(String)? onChangedSearch;
   final String? searchHintText;
   final List<Widget>? children;
-  final List<String> headings;
+  final List<String>? headings;
+  final int? selectedIndex;
 
   const HomeWithNavWrapper(
       {this.backgroundColor,
+      this.selectedIndex = 0,
       this.searchController,
       this.onPressedSearch,
       this.onChangedSearch,
       this.searchHintText,
       this.children,
+      this.headings,
       required this.themeColor,
       required this.uiColor,
       required this.containerWidth,
       required this.deviceWidth,
       required this.deviceHeight,
       required this.pageHeading,
-      required this.headings,
       super.key});
-
-  int getIndex(BuildContext context) {
-    return homeRoutes.entries
-        .firstWhere(
-            (element) =>
-                element.value ==
-                GoRouter.of(context)
-                    .routeInformationProvider
-                    .value
-                    .uri
-                    .toString(),
-            orElse: () => const MapEntry(0, "/"))
-        .key;
-  }
 
   @override
   Widget build(BuildContext context) {
     late final List<NavigationDestination> homeNavigationList =
         getHomNavigationDestination(uiColor);
-    final int selectedIndex = getIndex(context);
 
     return NavWrapper(
       child: Container(
@@ -86,33 +73,37 @@ class HomeWithNavWrapper extends StatelessWidget {
                 indicatorColor: const Color.fromARGB(255, 255, 255, 255),
                 animationDuration: const Duration(seconds: 3),
                 backgroundColor: themeColor,
-                selectedIndex: selectedIndex,
+                selectedIndex: selectedIndex!,
                 elevation: 10,
                 shadowColor: Colors.black,
                 surfaceTintColor: Colors.white,
                 destinations: homeNavigationList,
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(
-                  left: 30, right: 20, bottom: deviceHeight * .02),
-              child: CustomSearchBar(
-                deviceWidth: deviceWidth,
-                controller: searchController,
-                onPressed: onPressedSearch,
-                uiColor: uiColor,
-                backgroundColor: themeColor,
-                hintText: searchHintText,
-                onChanged: onChangedSearch,
+            if (searchController != null) ...{
+              Container(
+                margin: EdgeInsets.only(
+                    left: 30, right: 20, bottom: deviceHeight * .02),
+                child: CustomSearchBar(
+                  deviceWidth: deviceWidth,
+                  controller: searchController,
+                  onPressed: onPressedSearch,
+                  uiColor: uiColor,
+                  backgroundColor: themeColor,
+                  hintText: searchHintText,
+                  onChanged: onChangedSearch,
+                ),
               ),
-            ),
-            HomeCardHeading(
-                containerWidth: containerWidth,
-                deviceHeight: deviceHeight,
-                deviceWidth: deviceWidth,
-                themeColor: themeColor,
-                uiColor: uiColor,
-                headings: headings),
+            },
+            if (headings != null) ...{
+              HomeCardHeading(
+                  containerWidth: containerWidth,
+                  deviceHeight: deviceHeight,
+                  deviceWidth: deviceWidth,
+                  themeColor: themeColor,
+                  uiColor: uiColor,
+                  headings: headings!),
+            },
             ...?children,
           ],
         ),
@@ -120,3 +111,16 @@ class HomeWithNavWrapper extends StatelessWidget {
     );
   }
 }
+  // int getIndex(BuildContext context) {
+  //   return homeRoutes.entries
+  //       .firstWhere(
+  //           (element) =>
+  //               element.value ==
+  //               GoRouter.of(context)
+  //                   .routeInformationProvider
+  //                   .value
+  //                   .uri
+  //                   .toString(),
+  //           orElse: () => const MapEntry(0, "/"))
+  //       .key;
+  // }

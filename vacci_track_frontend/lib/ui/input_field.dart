@@ -7,8 +7,7 @@ class InputField extends StatefulWidget {
   Function dataCallback;
   bool obscureText = false;
   InputField(this.fieldIcon, this.hintText,
-      {this.obscureText = false, required this.dataCallback, Key? key})
-      : super(key: key);
+      {this.obscureText = false, required this.dataCallback, super.key});
 
   void sendDataToParent(text) {
     dataCallback(text); // Call the callback function and pass the data
@@ -30,11 +29,11 @@ class _InputFieldState extends State<InputField> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 250,
       child: Material(
         elevation: 5.0,
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        borderRadius: const BorderRadius.all(Radius.circular(10.0)),
         color: Colors.indigo,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

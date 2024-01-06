@@ -9,11 +9,11 @@ class SpinnerWithOverlay extends StatelessWidget {
   final String message;
 
   const SpinnerWithOverlay({
-    Key? key,
+    super.key,
     this.message = "",
     required this.spinnerColor,
     this.size = 125.0, // Set default value for size parameter
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

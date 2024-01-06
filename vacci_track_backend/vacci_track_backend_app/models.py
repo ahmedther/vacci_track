@@ -211,6 +211,12 @@ class EmployeeVaccinationRecord(models.Model):
     is_completed = models.BooleanField(
         default=False, db_index=True, verbose_name="Is All The Dose Completed?"
     )
+    creation_date = models.DateField(
+        auto_now_add=True,
+        db_index=True,
+        blank=False,
+        null=False,
+    )
 
     notes_remarks = models.TextField(blank=True, null=True, db_index=True)
 

@@ -1,4 +1,5 @@
 import json
+
 from vacci_track_backend_app.models import (
     Department,
     Designation,
@@ -19,15 +20,15 @@ from vacci_track_backend_app.serializers import (
     EmployeeVaccinationRecordSerializer,
 )
 from vacci_track_backend_app.helper import Helper
-from django.shortcuts import render
 from django.middleware import csrf
-from django.http import JsonResponse
+from django.http import JsonResponse,FileResponse
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
+from .excel_generator import excel_generator
 
 
 @api_view(["POST"])
@@ -460,8 +461,8 @@ def add_dose(request):
 @permission_classes([IsAuthenticated])
 def search_dose(request):
     try:
-        query: str = request.query_params.get("query","")
-        emp_id: str = request.query_params.get("emp_id","")
+        query: str = request.query_params.get("query", "")
+        emp_id: str = request.query_params.get("emp_id", "")
         dose = (
             Dose.objects.filter(
                 employee_vaccination__employee=emp_id,
@@ -504,20 +505,28 @@ def add_vaccination_data(request):
 def get_vaccine_records(request):
     try:
         records_per_page = request.query_params.get("records_per_page", 20)
-        due_date_filter = {"True": True, "False": False}.get(
-            request.query_params.get("due_date_filter", None), "Invalid Input"
+        due_date_filter = (
+            True
+            if request.query_params.get("due_date_filter", None) == "True"
+            else False
         )
-        page = request.query_params.get("page", None)
+        dose_date_filter = (
+            True
+            if request.query_params.get("dose_date_filter", None) == "True"
+            else False
+        )
+        vacc_compl_filter = (
+            True
+            if request.query_params.get("vacc_compl_filter", None) == "True"
+            else False
+        )
+        page = request.query_params.get("page", "1")
         query = request.query_params.get("query", None)
-        print(f"records_per_page : {records_per_page}")
-        print(f"page : {page}")
-        print(f"due_date_filter : {due_date_filter}")
-        print(f"query : {query}")
-        if due_date_filter:
-            emp_vac_rec = Helper().get_emp_vac_rec(query)
+        emp_id = request.query_params.get("emp_id", None)
 
-        if not due_date_filter:
-            raise Exception(f"Something went wrong. Try again later")
+        emp_vac_rec = Helper().get_emp_vac_rec(
+            query, emp_id, due_date_filter, dose_date_filter, vacc_compl_filter
+        )
 
         emp_vac_rec_page, paginator_num_pages = Helper().paginator(
             page, emp_vac_rec, records_per_page
@@ -526,7 +535,19 @@ def get_vaccine_records(request):
         serializer = EmployeeVaccinationRecordSerializer(emp_vac_rec_page, many=True)
 
         return Response([serializer.data, paginator_num_pages], status=200)
+
     except Exception as e:
         return Response(
-            [[{"error": f"Erros has Occurred. Error :  {e}"}], 0], status=405
+            [[{"error": f"Error has Occurred. Error :  {e}"}], 0], status=405
         )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_report(request):
+    try:
+        excel_file_path = Helper().generate_excel(request.query_params)
+        return FileResponse(open(excel_file_path, 'rb'))
+
+    except Exception as e:
+        return Response([{"error": f"Error has Occurred. Error :  {e}"}], status=405)

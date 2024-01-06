@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
@@ -87,7 +89,8 @@ class EmployeeDetailCards extends StatelessWidget {
               )
             } else if (containerWidth > 592) ...{
               buildCustomTextColumn(
-                  columnTexts: column1Texts, width: deviceWidth * .2),
+                  columnTexts: column1Texts.map((list) => [list.last]).toList(),
+                  width: deviceWidth * .2),
               HelpersWidget.buildVerticalDivider(
                   deviceHeight: deviceHeight,
                   deviceWidth: deviceWidth,
@@ -108,7 +111,8 @@ class EmployeeDetailCards extends StatelessWidget {
   Widget buildCustomTextColumn(
       {required List<List<String>> columnTexts,
       required double width,
-      double labelWidth = 80}) {
+      double labelWidth = 80,
+      double fontSize = 14}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: columnTexts
@@ -126,7 +130,7 @@ class EmployeeDetailCards extends StatelessWidget {
                                     width, 0, 120), // Check if iteration is 2
                         child: CustomTextStyle(
                             text: entry.value,
-                            fontSize: 14,
+                            fontSize: entry.value.length > 16 ? 10 : fontSize,
                             isBold: true,
                             color: Colors.black,
                             textAlign:

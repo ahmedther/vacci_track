@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
@@ -95,13 +97,15 @@ class _FacilityAddFormState extends State<FacilityAddForm> {
       } else {
         // ignore: use_build_context_synchronously
         HelpersWidget.showDialogOnScreen(
-            context: context,
-            btnMessage: 'OK',
-            title: "✔ Successful",
-            message: widget.editPage
-                ? "Facility Successfully Updated"
-                : "Facility Successfully Added",
-            onPressed: () {});
+          uiColor: widget.uiColor,
+          backgroundColor: themeColor,
+          context: context,
+          btnMessage: 'OK',
+          title: "✔ Successful",
+          contentMessage: widget.editPage
+              ? "Facility Successfully Updated"
+              : "Facility Successfully Added",
+        );
         await resetBtnHandler();
       }
     }

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore, non_constant_identifier_names, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -196,10 +196,12 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
         );
         // ignore: use_build_context_synchronously
         HelpersWidget.showDialogOnScreen(
+          uiColor: widget.uiColor,
+          backgroundColor: themeColor,
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
-          message: widget.editPage
+          contentMessage: widget.editPage
               ? "User Successfully Updated"
               : "User Successfully Added",
           onPressed: () {},
@@ -443,7 +445,7 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               dateTimeVal: joiningDate,
                               defaultLabel: "Joining Date",
                               onPressed: () async {
-                                joiningDate = await Helpers.openDatePicker(
+                                joiningDate = await HelpersWidget.openDatePicker(
                                     context: context,
                                     helpText: "Select Joining Date");
                                 if (joiningDate != null) {

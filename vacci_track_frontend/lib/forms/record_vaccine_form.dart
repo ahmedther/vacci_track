@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, no_leading_underscores_for_local_identifiers, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +11,7 @@ import 'package:vacci_track_frontend/helpers/helper_functions.dart';
 import 'package:vacci_track_frontend/helpers/helper_widgets.dart';
 import 'package:vacci_track_frontend/ui/date_picker.dart';
 import 'package:vacci_track_frontend/ui/drop_down_field.dart';
-import 'package:vacci_track_frontend/components/record_vac_form_profile.dart';
+import 'package:vacci_track_frontend/ui/emp_profile_card.dart';
 import 'package:vacci_track_frontend/ui/search_bar.dart';
 import 'package:vacci_track_frontend/ui/text_input.dart';
 import '../ui/spinner.dart';
@@ -205,11 +205,12 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         HelpersWidget.showSnackBar(context, data['error']);
       } else {
         HelpersWidget.showDialogOnScreen(
+          backgroundColor: themeColor,
+          uiColor: widget.uiColor,
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
-          message: "Vaccination Administered",
-          onPressed: () {},
+          contentMessage: "Vaccination Administered",
         );
         await resetBtnHandler(useSoftReset: true);
       }
@@ -290,13 +291,14 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         (dose) => dose['id'] == int.parse(value))["gap_before_next_dose"];
     doseAdministeredDate = DateTime.now();
     nextDoseDueDate = gap > 0
-        ? formater.format(DateTime(doseAdministeredDate!.year,
-            doseAdministeredDate!.month + gap, doseAdministeredDate!.day))
+        ? Helpers.getFormatedDate(
+            dateValue: DateTime(doseAdministeredDate!.year,
+                doseAdministeredDate!.month + gap, doseAdministeredDate!.day))
         : "Last Dose";
     isDoseDueText = doseDueDate != null
         ? (isDoseDue == true
-            ? "Yes! This Dose Is Due As of \n${formater.format(doseDueDate!)}."
-            : "No! This Dose is not Due Before \n${formater.format(doseDueDate!)}. \nPlease note that you are administering this dose before its due date!")
+            ? "Yes! This Dose Is Due As of \n${Helpers.getFormatedDate(dateValue: doseDueDate!)}."
+            : "No! This Dose is not Due Before \n${Helpers.getFormatedDate(dateValue: doseDueDate!)}. \nPlease note that you are administering this dose before its due date!")
         : "Dose due date is not available.";
 
     await Future.delayed(const Duration(milliseconds: 10), () {
@@ -324,8 +326,6 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
     final double deviceHeight = MediaQuery.of(context).size.height;
     final double deviceWidth = MediaQuery.of(context).size.width;
     double inputWidth = Helpers.minAndMax(deviceWidth * .8, 200, 600);
-    late final Color profileColor =
-        Helpers.getUIandBackgroundColor(gender ?? "male")[0];
 
     if (widget.editPage) _isForm = false;
 
@@ -336,11 +336,29 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
         : Column(
             children: [
               if (_isForm && deviceWidth > 900)
-                RecordVaccineEmployeeProfile(
-                    profileColor: profileColor,
-                    gender: gender ?? "Not Found",
-                    prNumber: prNumber ?? "Not Found",
-                    uhid: uhid ?? "Not Found"),
+                EmployeeProfileCard(
+                  gender: gender ?? "Not Found",
+                  column1Icon: const [
+                    FontAwesomeIcons.mars,
+                    FontAwesomeIcons.buildingUser
+                  ],
+                  column1Label: const ["Gender", "Designation"],
+                  column1Value: [
+                    gender ?? "Not Available",
+                    designation != null && department != null
+                        ? "$designation in $department"
+                        : "Not Available"
+                  ],
+                  column2Icon: const [
+                    FontAwesomeIcons.idCardClip,
+                    FontAwesomeIcons.solidIdBadge
+                  ],
+                  column2Label: const ["PR Number", "UHID"],
+                  column2Value: [
+                    prNumber ?? "Not Available",
+                    uhid ?? "Not Available"
+                  ],
+                ),
               Card(
                 borderOnForeground: true,
                 elevation: 100,
@@ -388,8 +406,9 @@ class _RecordVaccineFormState extends State<RecordVaccineForm> {
                                   offset: controller.text.length);
                             });
                             await searchEmployee(controller.text);
-                            if (empData1 == null || empData1!.isEmpty)
+                            if (empData1 == null || empData1!.isEmpty) {
                               return [];
+                            }
                             return empData1!.map(
                               (item) {
                                 return Card(
@@ -668,7 +687,7 @@ They can be reached at extension 33333."""
                                     fontSize: 16,
                                     onPressed: () async {
                                       doseAdministeredDate =
-                                          await Helpers.openDatePicker(
+                                          await HelpersWidget.openDatePicker(
                                                   context: context,
                                                   helpText:
                                                       "Select Dose Administered Date") ??

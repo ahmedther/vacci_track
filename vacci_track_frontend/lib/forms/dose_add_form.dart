@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,13 +134,15 @@ class _DoseAddFormState extends State<DoseAddForm> {
       } else {
         // ignore: use_build_context_synchronously
         HelpersWidget.showDialogOnScreen(
+          uiColor: widget.uiColor,
+backgroundColor: themeColor,
             context: context,
             btnMessage: 'OK',
             title: "✔ Successful",
-            message: widget.editPage
+            contentMessage: widget.editPage
                 ? "Dose Successfully Updated"
                 : "Dose Successfully Added",
-            onPressed: () {});
+            );
         await resetBtnHandler();
       }
     }

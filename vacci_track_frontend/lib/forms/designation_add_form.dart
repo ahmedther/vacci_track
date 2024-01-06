@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously, no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacci_track_frontend/components/text_style.dart';
@@ -62,12 +64,13 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
       });
       HelpersWidget.showSnackBar(context, data['error']);
     } else {
-      // ignore: use_build_context_synchronously
       HelpersWidget.showDialogOnScreen(
+        backgroundColor: themeColor,
+          uiColor: widget.uiColor,
           context: context,
           btnMessage: 'OK',
           title: "✔ Successful",
-          message: widget.editPage
+          contentMessage: widget.editPage
               ? "Designation Successfully Updated"
               : "Designation Successfully Added",
           onPressed: () {
@@ -95,7 +98,6 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
         query: {"query": "param1=${_searchController.text}"});
 
     if (_designationData.isEmpty || _designationData[0].containsKey("error")) {
-      // ignore: use_build_context_synchronously
       HelpersWidget.showSnackBar(context, _designationData[0]['error']);
       setState(() {
         _isSpinning = false;
@@ -104,7 +106,6 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
     }
 
     if (_designationData.length > 1) {
-      // ignore: use_build_context_synchronously
       await _dialogBuilder(context, _designationData);
     } else {
       await updateForm(_designationData[0]);
@@ -196,7 +197,6 @@ class _DesignationAddFormState extends State<DesignationAddForm> {
                     hoverColor: const Color.fromARGB(31, 0, 0, 0),
                     onTap: () async {
                       await updateForm(designationData);
-                      // ignore: use_build_context_synchronously
                       context.pop();
                     },
                     leading: CircleAvatar(

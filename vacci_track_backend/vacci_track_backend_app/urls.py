@@ -44,4 +44,5 @@ urlpatterns = [
         "add_vaccination_data/", views.add_vaccination_data, name="add_vaccination_data"
     ),
     path("get_vaccine_records/", views.get_vaccine_records, name="get_vaccine_records"),
+    path("get_report/", views.get_report, name="get_report"),
 ]

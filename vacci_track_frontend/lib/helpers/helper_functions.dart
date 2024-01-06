@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +25,15 @@ class Helpers {
     } else {
       return size;
     }
+  }
+
+  static String getFormatedDate({String? stringValue, DateTime? dateValue}) {
+    if (stringValue != null) {
+      return formater.format(DateTime.parse(stringValue));
+    } else if (dateValue != null) {
+      return formater.format(dateValue);
+    }
+    return "Not Available";
   }
 
   static Future<void> setUserValuesONLocalStorage(data) async {
@@ -187,19 +198,6 @@ class Helpers {
     prefs.clear();
   }
 
-  static Future<DateTime?> openDatePicker(
-      {required BuildContext context, String? helpText}) async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2008),
-      lastDate: DateTime.now(),
-      helpText: helpText,
-    );
-    if (selectedDate != null) return selectedDate;
-    return null;
-  }
-
   static keepOnlyNumbers({value, searchController}) {
     String cleanedValue = value.replaceAll(RegExp(r'[^0-9]'), '');
     searchController.value = searchController.value.copyWith(
@@ -243,7 +241,7 @@ class Helpers {
   }
 
   static Future makeGetRequest(String url,
-      {Map<String, dynamic>? query}) async {
+      {Map<String, dynamic>? query, bool fileResponce = false}) async {
     // final csrfToken = await get_csrfToken();
     // if (csrfToken.containsKey('error')) return csrfToken;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -262,6 +260,7 @@ class Helpers {
           .timeout(const Duration(minutes: 2));
       if (response.statusCode == 200) {
         // Success! Do something with the response
+        
         final List data = jsonDecode(response.body);
         return data;
       } else if (response.statusCode == 401) {
@@ -282,6 +281,8 @@ class Helpers {
       return data;
     }
   }
+
+  void fileResponse
 
   static Color getRandomColor() {
     return Colors.primaries[Random().nextInt(Colors.primaries.length)];
@@ -319,8 +320,6 @@ class Helpers {
     // return Color(
     //     int.parse(randomColorCode.substring(1, 7), radix: 16) + 0xFF000000);
   }
-
-  
 
   static Future genderChange(WidgetRef? ref) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -395,6 +394,4 @@ class Helpers {
   static void changeNavIndex(int? value, WidgetRef ref) {
     ref.watch(navProvider.notifier).updatIndex(selectedIndex: value);
   }
-
-  
 }

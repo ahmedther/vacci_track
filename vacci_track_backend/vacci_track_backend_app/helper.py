@@ -1,7 +1,9 @@
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from vacci_track_backend_app.models import *
-from django.db.models import Q
+from vacci_track_backend_app.excel_generator import excel_generator
+from django.db.models import Q, F, Value, CharField
+from django.db.models.functions import Concat
 
 
 class Helper:
@@ -184,8 +186,28 @@ class Helper:
 
         return results, paginator.num_pages
 
-    def get_emp_vac_rec(self, query):
-        filters = Q(dose_due_date__lt=datetime.now().date()) & Q(is_dose_due=True)
+    def get_emp_vac_rec(
+        self,
+        query: str,
+        emp_id: str,
+        due_date_filter: bool = True,
+        dose_date_filter: bool = False,
+        vacc_compl_filter: bool = False,
+    ):
+        order_by_fields = ["-id", "vaccination", "dose"]
+
+        if due_date_filter:
+            filters = Q(dose_due_date__lt=datetime.now().date()) & Q(dose_date=None)
+            order_by_fields.insert(0, "-dose_due_date")
+
+        if dose_date_filter:
+            filters = ~Q(dose_date=None)
+            order_by_fields.insert(0, "-dose_date")
+
+        if vacc_compl_filter:
+            filters = Q(is_completed=True)
+            order_by_fields.insert(0, "-dose_date")
+
         if query:
             filters &= (
                 Q(employee__first_name__icontains=query)
@@ -193,7 +215,197 @@ class Helper:
                 | Q(employee__pr_number=query)
                 | Q(employee__uhid=query)
             )
+        if emp_id:
+            filters = Q(employee__id=emp_id)
+            order_by_fields = ["vaccination", "dose", "-dose_date"]
+
         emp_rec = EmployeeVaccinationRecord.objects.filter(filters).order_by(
-            "-dose_due_date", "-id", "vaccination", "dose"
+            *order_by_fields
         )
+
         return emp_rec
+
+    def generate_excel(self, data):
+        print(data)
+        from_date = self.get_validated_date(data["from_date"])
+        to_date = self.get_validated_date(data["to_date"])
+        filter_data = data.get("filter", "all")
+        query = data.get("query")
+
+        filters = Q(creation_date__range=(from_date, to_date))
+        order_by_fields = ["creation_date", "employee", "vaccination", "dose"]
+
+        if filter_data == "due_date_filter":
+            filters = Q(dose_due_date__range=(from_date, to_date)) & Q(dose_date=None)
+            order_by_fields[0] = "dose_due_date"
+
+        if filter_data == "dose_date_filter":
+            filters = Q(dose_date__range=(from_date, to_date))
+            order_by_fields[0] = "dose_date"
+
+        if query:
+            filters &= (
+                Q(employee__first_name__icontains=query)
+                | Q(employee__last_name__icontains=query)
+                | Q(employee__pr_number=query)
+                | Q(employee__uhid=query)
+                | Q(vaccination__name__icontains=query)
+                | Q(dose__name__icontains=query)
+            )
+
+        emp_rec = (
+            EmployeeVaccinationRecord.objects.filter(filters)
+            .select_related(
+                "employee__department",
+                "employee__designation",
+                "employee__facility",
+                "vaccination",
+                "dose",
+            )
+            .order_by(*order_by_fields)
+            .values_list(
+                "id",
+                Concat(
+                    F("employee__prefix"),
+                    Value(" "),
+                    F("employee__first_name"),
+                    Value(" "),
+                    F("employee__middle_name"),
+                    Value(" "),
+                    F("employee__last_name"),
+                    output_field=CharField(),
+                ),
+                F("vaccination__name"),
+                F("dose__name"),
+                F("dose_due_date"),
+                F("dose_date"),
+                F("dose_administered_by_name"),
+                F("dose_administered_by_pr_number"),
+                F("creation_date"),
+                F("employee__gender"),
+                F("employee__pr_number"),
+                F("employee__uhid"),
+                F("employee__phone_number"),
+                F("employee__email_id"),
+                F("employee__department__name"),
+                F("employee__designation__name"),
+                F("employee__facility__name"),
+                F("employee__joining_date"),
+                Concat(
+                    F("notes_remarks"),
+                    Value("\n\n"),
+                    F("employee__notes_remarks"),
+                    output_field=CharField(),
+                ),
+                named=True,
+            )
+        )
+        column = [
+            "Record Number",
+            "Employee",
+            "Vaccination",
+            "Dose",
+            "Dose Due Date",
+            "Administered Date",
+            "Administrer Name",
+            "Administrer PR",
+            "Created Date",
+            "Gender",
+            "PR Number",
+            "UHID",
+            "Phone Number",
+            "Email ID",
+            "Departmnet",
+            "Designation",
+            "Facility",
+            "Joining Date",
+            "Notes / Remarks",
+        ]
+
+        excel_file_path = excel_generator(
+            column=column,
+            data=emp_rec,
+            page_name="Vaccinaion Records" if filter_data == "all" else filter_data,
+        )
+        return excel_file_path
+
+        # emp_rec = (
+        #     EmployeeVaccinationRecord.objects.filter(filters)
+        #     .order_by(*order_by_fields)
+        #     .values()
+        # )
+        # column = [
+        #     "Record Number",
+        #     "Employee",
+        #     "Vaccination",
+        #     "Dose",
+        #     "Dose Due Date",
+        #     "Administered Date",
+        #     "Administrer Name",
+        #     "Administrer PR",
+        #     "Created Date",
+        #     "Gender",
+        #     "PR Number",
+        #     "UHID",
+        #     "Phone Number",
+        #     "Email ID",
+        #     "Departmnet",
+        #     "Designation",
+        #     "Facility",
+        #     "Joining Date",
+        #     "Notes / Remarks",
+        # ]
+        # rec_data = []
+
+        # for records in emp_rec:
+        #     emp = Employee.objects.filter(id=records["employee_id"]).first()
+        #     vac = Vaccination.objects.filter(id=records["vaccination_id"]).first()
+        #     dose = Dose.objects.filter(id=records["dose_id"]).first()
+        #     rec_data.append(
+        #         [
+        #             records["id"],
+        #             " ".join(
+        #                 filter(
+        #                     None,
+        #                     [
+        #                         emp.prefix,
+        #                         emp.first_name,
+        #                         emp.middle_name,
+        #                         emp.last_name,
+        #                     ],
+        #                 )
+        #             ),
+        #             vac.name if vac else "",
+        #             dose.name if dose else "",
+        #             records["dose_due_date"],
+        #             records["dose_date"],
+        #             records["dose_administered_by_name"],
+        #             records["dose_administered_by_pr_number"],
+        #             records["creation_date"],
+        #             emp.gender,
+        #             emp.pr_number,
+        #             emp.uhid,
+        #             emp.phone_number,
+        #             emp.email_id,
+        #             emp.department.name if emp.department else "",
+        #             emp.designation.name if emp.designation else "",
+        #             emp.facility.name if emp.facility else "",
+        #             emp.joining_date,
+        #             "\n\n".join(
+        #                 filter(
+        #                     None,
+        #                     [
+        #                         records["notes_remarks"],
+        #                         emp.notes_remarks,
+        #                     ],
+        #                 )
+        #             ),
+        #         ],
+        #     )
+
+        # excel_file_path = excel_generator(
+        #     column=column,
+        #     data=rec_data,
+        #     page_name="Vaccinaion Records" if filter_data == "all" else filter_data,
+        # )
+        # return excel_file_path

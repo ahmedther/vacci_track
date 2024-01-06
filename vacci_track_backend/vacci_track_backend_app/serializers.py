@@ -176,6 +176,10 @@ class EmployeeVaccinationRecordSerializer(serializers.ModelSerializer):
             "pr_number": instance.employee.pr_number,
             "uhid": instance.employee.uhid,
             "phone_number": instance.employee.phone_number,
+            "notes_remarks": instance.notes_remarks,
+            "facility": instance.employee.facility.name
+            if instance.employee.facility
+            else None,
             "department": instance.employee.department.name
             if instance.employee.department
             else None,

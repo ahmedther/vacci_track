@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -100,13 +102,15 @@ class _VaccineAddFormState extends State<VaccineAddForm> {
       } else {
         // ignore: use_build_context_synchronously
         HelpersWidget.showDialogOnScreen(
-            context: context,
-            btnMessage: 'OK',
-            title: "✔ Successful",
-            message: widget.editPage
-                ? "Vaccine Successfully Updated"
-                : "Vaccine Successfully Added",
-            onPressed: () {});
+          backgroundColor: themeColor,
+          uiColor: widget.uiColor,
+          context: context,
+          btnMessage: 'OK',
+          title: "✔ Successful",
+          contentMessage: widget.editPage
+              ? "Vaccine Successfully Updated"
+              : "Vaccine Successfully Added",
+        );
         await resetBtnHandler();
       }
     }

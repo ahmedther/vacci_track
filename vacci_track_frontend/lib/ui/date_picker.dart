@@ -9,7 +9,7 @@ class CustomDatePicker extends StatelessWidget {
   final String? defaultLabel;
   final void Function()? onPressed;
   final bool isDisabled;
-  final fontSize;
+  final double fontSize;
 
   const CustomDatePicker(
       {this.onPressed,
@@ -41,7 +41,7 @@ class CustomDatePicker extends StatelessWidget {
         children: [
           CustomTextStyle(
             text: dateTimeVal != null
-                ? formater.format(dateTimeVal!)
+                ? Helpers.getFormatedDate(dateValue: dateTimeVal!)
                 : defaultLabel ?? "",
             color: color,
             isBold: true,

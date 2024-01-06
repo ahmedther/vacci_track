@@ -17,32 +17,56 @@ class HelpersWidget {
     );
   }
 
-  static Future showDialogOnScreen({
-    required BuildContext context,
-    required String title,
-    required String message,
-    required String btnMessage,
-    required Function onPressed,
-  }) {
+  static Future showDialogOnScreen(
+      {final Color? uiColor,
+      final Color? backgroundColor,
+      final double? titleFontSize = 24,
+      final Widget? content,
+      final String? contentMessage,
+      required final BuildContext context,
+      required final String title,
+      required final String btnMessage,
+      final Function? onPressed,
+      List<Widget>? actions}) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: backgroundColor,
           scrollable: true,
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: Text(btnMessage),
-              onPressed: () {
-                onPressed();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+          title: CustomTextStyle(
+              text: title,
+              color: uiColor,
+              fontSize: titleFontSize,
+              isBold: true,
+              textAlign: TextAlign.center),
+          content: content ??
+              CustomTextStyle(
+                  text: contentMessage ?? "",
+                  color: Colors.black,
+                  fontSize: 16,
+                  isBold: true,
+                  textAlign: TextAlign.center),
+          actions: actions ??
+              [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  child: CustomTextStyle(
+                      text: btnMessage,
+                      color: uiColor,
+                      fontSize: 14,
+                      isBold: true,
+                      textAlign: TextAlign.right),
+                  onPressed: () {
+                    if (onPressed != null) {
+                      onPressed();
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
         );
       },
     );
@@ -97,5 +121,18 @@ class HelpersWidget {
         })
         .expand((x) => x)
         .toList();
+  }
+
+  static Future<DateTime?> openDatePicker(
+      {required BuildContext context, String? helpText}) async {
+    DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2008),
+      lastDate: DateTime.now(),
+      helpText: helpText,
+    );
+    if (selectedDate != null) return selectedDate;
+    return null;
   }
 }

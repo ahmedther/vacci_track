@@ -5,5 +5,7 @@ psycopg2
 django-cors-headers
 djangorestframework-simplejwt
 sqlalchemy
+pandas
+xlsxwriter
 # uwsgi
 # python-dotenv

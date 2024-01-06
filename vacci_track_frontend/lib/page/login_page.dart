@@ -59,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       error = true;
       errorMessage += "Username cannot be left empty.";
     }
-    ;
+    
     if (password.isEmpty) {
       error = true;
       errorMessage += " Password cannot be left empty.";
