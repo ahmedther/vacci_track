@@ -21,14 +21,13 @@ from vacci_track_backend_app.serializers import (
 )
 from vacci_track_backend_app.helper import Helper
 from django.middleware import csrf
-from django.http import JsonResponse,FileResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
-from .excel_generator import excel_generator
 
 
 @api_view(["POST"])
@@ -545,9 +544,15 @@ def get_vaccine_records(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_report(request):
-    try:
-        excel_file_path = Helper().generate_excel(request.query_params)
-        return FileResponse(open(excel_file_path, 'rb'))
-
-    except Exception as e:
-        return Response([{"error": f"Error has Occurred. Error :  {e}"}], status=405)
+    # try:
+    excel_file_path, filename = Helper().generate_excel(request.query_params)
+    response = HttpResponse(
+        open(excel_file_path, "rb"),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = f"attachment; filename={filename}"
+    response[
+        "Access-Control-Expose-Headers"
+    ] = "Content-Disposition"  # Add this for CORS
+    return response
+    response = FileResponse(open(excel_file_path, "rb"))

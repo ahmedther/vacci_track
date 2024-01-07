@@ -5,6 +5,7 @@ from datetime import datetime
 
 
 def excel_generator(data, column, page_name):
+    page_name = page_name if len(page_name) <= 31 else page_name[:31]
     # gives you location of manage.py
     current_dir = os.path.dirname(os.path.abspath(__file__))
     curret_path = Path(current_dir)

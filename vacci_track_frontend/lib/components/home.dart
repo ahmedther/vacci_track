@@ -77,6 +77,7 @@ class Home extends StatelessWidget {
 
     return MaterialApp.router(
       title: title,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           useMaterial3: true,
           textTheme: GoogleFonts.latoTextTheme(),

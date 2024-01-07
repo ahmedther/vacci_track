@@ -1,6 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -257,10 +259,24 @@ class Helpers {
             Uri.parse(url).replace(queryParameters: query),
             headers: headers,
           )
-          .timeout(const Duration(minutes: 2));
+          .timeout(const Duration(minutes: 30));
       if (response.statusCode == 200) {
         // Success! Do something with the response
-        
+
+        if (fileResponce) {
+          await fileResponseHandler(
+              response.bodyBytes,
+              response.headers['content-disposition']
+                      ?.split(';')
+                      .firstWhere(
+                          (element) => element.trim().startsWith('filename='))
+                      .split("=")
+                      .last ??
+                  "Name Not Available");
+          return [
+            {'error': "Download Successful!!! Please save your file"}
+          ];
+        }
         final List data = jsonDecode(response.body);
         return data;
       } else if (response.statusCode == 401) {
@@ -282,7 +298,14 @@ class Helpers {
     }
   }
 
-  void fileResponse
+  static Future<void> fileResponseHandler(
+      Uint8List responseFile, String filename) async {
+    print(filename);
+    html.AnchorElement(
+        href: html.Url.createObjectUrlFromBlob(html.Blob([responseFile])))
+      ..setAttribute('download', "$filename.xlsx")
+      ..click();
+  }
 
   static Color getRandomColor() {
     return Colors.primaries[Random().nextInt(Colors.primaries.length)];

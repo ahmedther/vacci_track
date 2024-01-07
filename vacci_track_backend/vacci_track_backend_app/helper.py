@@ -225,12 +225,12 @@ class Helper:
 
         return emp_rec
 
-    def generate_excel(self, data):
+    def generate_excel(self, data: dict):
         print(data)
         from_date = self.get_validated_date(data["from_date"])
         to_date = self.get_validated_date(data["to_date"])
         filter_data = data.get("filter", "all")
-        query = data.get("query")
+        query: str = data.get("query")
 
         filters = Q(creation_date__range=(from_date, to_date))
         order_by_fields = ["creation_date", "employee", "vaccination", "dose"]
@@ -321,13 +321,19 @@ class Helper:
             "Joining Date",
             "Notes / Remarks",
         ]
-
+        page_name = (
+            "Vaccinaion Records"
+            if filter_data == "all"
+            else filter_data + "_with_" + query.replace(" ", "_")
+            if query
+            else ""
+        )
         excel_file_path = excel_generator(
             column=column,
             data=emp_rec,
-            page_name="Vaccinaion Records" if filter_data == "all" else filter_data,
+            page_name=page_name,
         )
-        return excel_file_path
+        return excel_file_path, page_name
 
         # emp_rec = (
         #     EmployeeVaccinationRecord.objects.filter(filters)

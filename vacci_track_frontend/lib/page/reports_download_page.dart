@@ -222,24 +222,21 @@ class _DownloadReportsPageState extends ConsumerState<DownloadReportsPage> {
       isSpinning = true;
     });
     final API_URL = await Helpers.load_env();
-    final List data =
-        await Helpers.makeGetRequest("http://$API_URL/api/get_report/", query: {
-      "from_date": fromDate.toString(),
-      "to_date": toDate.toString(),
-      "query": controller.text,
-      "filter": filter,
-    });
-    print(data);
+    final List data = await Helpers.makeGetRequest(
+        "http://$API_URL/api/get_report/",
+        fileResponce: true,
+        query: {
+          "from_date": fromDate.toString(),
+          "to_date": toDate.toString(),
+          "query": controller.text,
+          "filter": filter,
+        });
     if (data.isEmpty || (data[0] as Map).containsKey("error")) {
       HelpersWidget.showSnackBar(
           context,
           data.isEmpty
               ? "No Records Found between ${Helpers.getFormatedDate(dateValue: fromDate)} and ${Helpers.getFormatedDate(dateValue: toDate)}"
               : data[0]['error']);
-      setState(() {
-        isSpinning = false;
-      });
-      return;
     }
     setState(() {
       isSpinning = false;
