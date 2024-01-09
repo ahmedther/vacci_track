@@ -31,8 +31,8 @@ services:
     env_file:
       - ./nginx/nginx.env
     ports:
-      - 8000:8000
-      - 8001:8001
+      - 8010:8010
+      - 8009:8009
     depends_on:
       - app
 
@@ -45,8 +45,8 @@ services:
       - ./postgresql/data:/var/lib/postgresql/data
     env_file:
       - ./vacci_track_backend/django.env
-    # ports:
-    #   - 5432:5432
+    ports:
+      - 5427:5427
 
   # # flutter_app:
   #   build: 

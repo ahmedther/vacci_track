@@ -47,8 +47,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && apt autoremove -y  \
-    && export DPI_DEBUG_LEVEL=64
-
+    && export DPI_DEBUG_LEVEL=64 
 
 LABEL maintainer='ahmed'
 
