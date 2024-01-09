@@ -10,7 +10,7 @@ server {
     client_body_buffer_size 100m;
 
     access_log /var/log/nginx/vacci_track_backend_access.log;
-    error_log /var/log/nginx/vacci_track_backend_log_error.log;
+    error_log /dev/stderr;
 
     client_body_timeout 7200s;
     client_header_timeout 7200s;
@@ -18,7 +18,7 @@ server {
     send_timeout 7200s;
 
     location /static {
-    root /vacci_track_backend/static;
+    alias /vacci_track_backend/static;
     }
 
     location / {
@@ -54,8 +54,9 @@ server {
     index index.html;
 
     # Logging:
+    # access_log /dev/stdout;
     access_log /var/log/nginx/flutter_access.log;
-    error_log /var/log/nginx/flutter_error.log;
+    error_log /dev/stderr;
 
     location / {
         # Attempt to serve the requested file directly,
