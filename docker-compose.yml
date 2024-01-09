@@ -46,7 +46,7 @@ services:
     env_file:
       - ./vacci_track_backend/django.env
     ports:
-      - 5427:5427
+      - 5427:5432
 
   # # flutter_app:
   #   build: 

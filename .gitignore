@@ -1,3 +1,4 @@
+
 node_modules
 .parcel-cache
 __pycache__
@@ -7,7 +8,6 @@ postgresql
 *.xlsx
 
 vacci_track_backend/static
-
 # Flutter/Dart-specific files and directories
 vacci_track_frontend/android
 vacci_track_frontend/ios
@@ -68,3 +68,4 @@ vacci_track_frontend/**/*.pbjson.dart
 
 # Keep the pubspec.lock file, as it ensures that your project uses a consistent set of dependencies.
 #!vacci_track_frontend/pubspec.lock
+
