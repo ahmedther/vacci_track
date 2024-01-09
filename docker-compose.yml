@@ -45,8 +45,8 @@ services:
       - ./postgresql/data:/var/lib/postgresql/data
     env_file:
       - ./vacci_track_backend/django.env
-    ports:
-      - 5432:5432
+    # ports:
+    #   - 5432:5432
 
   # # flutter_app:
   #   build: 
