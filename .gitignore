@@ -4,6 +4,9 @@ __pycache__
 postgresql
 /static
 /vacci_track_venv
+*.xlsx
+
+vacci_track_backend/static
 
 # Flutter/Dart-specific files and directories
 vacci_track_frontend/android

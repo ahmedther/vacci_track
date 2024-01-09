@@ -1,5 +1,6 @@
 from sqlalchemy import Table, MetaData, create_engine, inspect, or_
 from sqlalchemy.orm import sessionmaker, declarative_base
+import oracledb
 
 
 class SqlAlchemyConnection:
@@ -10,8 +11,9 @@ class SqlAlchemyConnection:
         port = "1521"
         sid = "NEWDB1"
 
+        oracledb.init_oracle_client()
         # Construct the database URL
-        url = f"oracle://{username}:{password}@{host}:{port}/{sid}"
+        url = f"oracle+oracledb://{username}:{password}@{host}:{port}/{sid}"
 
         # Create the engine
         self.engine = create_engine(url)

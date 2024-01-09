@@ -300,7 +300,6 @@ class Helpers {
 
   static Future<void> fileResponseHandler(
       Uint8List responseFile, String filename) async {
-    print(filename);
     html.AnchorElement(
         href: html.Url.createObjectUrlFromBlob(html.Blob([responseFile])))
       ..setAttribute('download', "$filename.xlsx")

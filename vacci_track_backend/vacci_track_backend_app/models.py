@@ -139,8 +139,8 @@ class Employee(models.Model):
     eligibility = models.CharField(
         max_length=20,
         choices=ELIGIBILTY_CHOICES,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         db_index=True,
     )
     added_by = models.ForeignKey(

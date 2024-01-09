@@ -1,9 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date
+import os
+from pathlib import Path
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from vacci_track_backend_app.models import *
-from vacci_track_backend_app.excel_generator import excel_generator
 from django.db.models import Q, F, Value, CharField
 from django.db.models.functions import Concat
+import xlsxwriter
 
 
 class Helper:
@@ -197,7 +199,7 @@ class Helper:
         order_by_fields = ["-id", "vaccination", "dose"]
 
         if due_date_filter:
-            filters = Q(dose_due_date__lt=datetime.now().date()) & Q(dose_date=None)
+            filters = Q(dose_due_date__lte=datetime.now().date()) & Q(dose_date=None)
             order_by_fields.insert(0, "-dose_due_date")
 
         if dose_date_filter:
@@ -226,7 +228,6 @@ class Helper:
         return emp_rec
 
     def generate_excel(self, data: dict):
-        print(data)
         from_date = self.get_validated_date(data["from_date"])
         to_date = self.get_validated_date(data["to_date"])
         filter_data = data.get("filter", "all")
@@ -321,97 +322,59 @@ class Helper:
             "Joining Date",
             "Notes / Remarks",
         ]
-        page_name = (
-            "Vaccinaion Records"
-            if filter_data == "all"
-            else filter_data + "_with_" + query.replace(" ", "_")
-            if query
-            else ""
-        )
-        excel_file_path = excel_generator(
+        page_name = self.get_page_name(filter_data, query)
+        excel_file_path = self.excel_generator(
             column=column,
             data=emp_rec,
             page_name=page_name,
         )
         return excel_file_path, page_name
 
-        # emp_rec = (
-        #     EmployeeVaccinationRecord.objects.filter(filters)
-        #     .order_by(*order_by_fields)
-        #     .values()
-        # )
-        # column = [
-        #     "Record Number",
-        #     "Employee",
-        #     "Vaccination",
-        #     "Dose",
-        #     "Dose Due Date",
-        #     "Administered Date",
-        #     "Administrer Name",
-        #     "Administrer PR",
-        #     "Created Date",
-        #     "Gender",
-        #     "PR Number",
-        #     "UHID",
-        #     "Phone Number",
-        #     "Email ID",
-        #     "Departmnet",
-        #     "Designation",
-        #     "Facility",
-        #     "Joining Date",
-        #     "Notes / Remarks",
-        # ]
-        # rec_data = []
+    def excel_generator(self, data, column, page_name):
+        page_name = page_name if len(page_name) <= 31 else page_name[:31]
+        # gives you location of manage.py
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        curret_path = Path(current_dir)
+        parent_path = curret_path.parent
 
-        # for records in emp_rec:
-        #     emp = Employee.objects.filter(id=records["employee_id"]).first()
-        #     vac = Vaccination.objects.filter(id=records["vaccination_id"]).first()
-        #     dose = Dose.objects.filter(id=records["dose_id"]).first()
-        #     rec_data.append(
-        #         [
-        #             records["id"],
-        #             " ".join(
-        #                 filter(
-        #                     None,
-        #                     [
-        #                         emp.prefix,
-        #                         emp.first_name,
-        #                         emp.middle_name,
-        #                         emp.last_name,
-        #                     ],
-        #                 )
-        #             ),
-        #             vac.name if vac else "",
-        #             dose.name if dose else "",
-        #             records["dose_due_date"],
-        #             records["dose_date"],
-        #             records["dose_administered_by_name"],
-        #             records["dose_administered_by_pr_number"],
-        #             records["creation_date"],
-        #             emp.gender,
-        #             emp.pr_number,
-        #             emp.uhid,
-        #             emp.phone_number,
-        #             emp.email_id,
-        #             emp.department.name if emp.department else "",
-        #             emp.designation.name if emp.designation else "",
-        #             emp.facility.name if emp.facility else "",
-        #             emp.joining_date,
-        #             "\n\n".join(
-        #                 filter(
-        #                     None,
-        #                     [
-        #                         records["notes_remarks"],
-        #                         emp.notes_remarks,
-        #                     ],
-        #                 )
-        #             ),
-        #         ],
-        #     )
+        excel_file_path = f"{parent_path}/excel_media/{page_name}.xlsx"
 
-        # excel_file_path = excel_generator(
-        #     column=column,
-        #     data=rec_data,
-        #     page_name="Vaccinaion Records" if filter_data == "all" else filter_data,
-        # )
-        # return excel_file_path
+        workbook = xlsxwriter.Workbook(excel_file_path)
+        worksheet = workbook.add_worksheet()
+
+        # Define the date and datetime formats.
+        date_format = workbook.add_format({"num_format": "dd-mm-yyyy"})
+        datetime_format = workbook.add_format({"num_format": "dd-mm-yyyy hh:mm:ss"})
+
+        # Define the format for the headers.
+        header_format = workbook.add_format({"bold": True, "font_size": 12})
+
+        # Write the column headers
+        for i, column_title in enumerate(column):
+            worksheet.write(0, i, column_title, header_format)
+
+        for i, row in enumerate(data, start=1):
+            for j, cell in enumerate(row):
+                if isinstance(cell, datetime):
+                    worksheet.write(i, j, cell, datetime_format)
+                elif isinstance(cell, date):
+                    worksheet.write(i, j, cell, date_format)
+                else:
+                    worksheet.write(i, j, cell)
+
+        for i, column_title in enumerate(column):
+            max_len = max([len(str(row[i])) for row in list(data) + [column]])
+
+            worksheet.set_column(
+                i, i, (max_len if max_len < 50 else 50) + 2
+            )  # Adding some extra space for better readability
+
+        # Close the workbook.
+        workbook.close()
+
+        return excel_file_path
+
+    def get_page_name(self, filter_data, query):
+        suffix = f"_with_{query.replace(' ', '_')}" if query else ""
+        prefix = "Vaccination_Records" if filter_data == "all" else filter_data
+        return prefix + suffix

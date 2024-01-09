@@ -13,11 +13,11 @@ import os
 
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
 
-# env_path = f"{Path(__file__).resolve().parent.parent.parent}/.env"
-load_dotenv()
+# from dotenv import load_dotenv
 
+# # env_path = f"{Path(__file__).resolve().parent.parent.parent}/.env"
+# load_dotenv('django.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +33,7 @@ SECRET_KEY = "django-insecure-qd-@ghcner%ou#gwo((yd*p(xi8y8c3u3&9f$pmtj4x+#k21$e
 DEBUG = bool(os.getenv("DEBUG", False))
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "*").split(",")
 
 
@@ -92,7 +93,7 @@ DATABASES = {
         "NAME": os.environ.get("POSTGRES_DB"),
         "USER": os.environ.get("POSTGRES_USER"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("TMP_POSTGRES_HOST"),
+        "HOST": os.environ.get("POSTGRES_HOST"),
         "PORT": os.environ.get("POSTGRES_PORT"),
     }
 }
@@ -185,3 +186,17 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# This is the URL Django uses when it refers to static files
+STATIC_URL = "/static/"
+
+# This is the absolute path to the directory where Django will collect static files
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# # These are additional locations where Django will look for static files
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]

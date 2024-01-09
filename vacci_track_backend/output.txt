@@ -1,0 +1,2 @@
+Linux
+print("This is another line.")

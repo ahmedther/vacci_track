@@ -333,7 +333,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               decoration: dropdownDecorationAddEmployee(
                                   color: widget.uiColor),
                               onSaved: (value) {
-                                prefix = value!;
+                                if (value == null || value.isEmpty) return;
+                                prefix = value;
                               },
                               onChanged: (value) async {
                                 await widget.assignAvatar(newprefix: value);
@@ -415,7 +416,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               width: inputWidth,
                               hint: "Gender",
                               onSaved: (value) {
-                                gender = value!;
+                                if (value == null) return;
+                                gender = value;
                               },
                               value: gender,
                               items: const [
@@ -445,9 +447,10 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               dateTimeVal: joiningDate,
                               defaultLabel: "Joining Date",
                               onPressed: () async {
-                                joiningDate = await HelpersWidget.openDatePicker(
-                                    context: context,
-                                    helpText: "Select Joining Date");
+                                joiningDate =
+                                    await HelpersWidget.openDatePicker(
+                                        context: context,
+                                        helpText: "Select Joining Date");
                                 if (joiningDate != null) {
                                   setState(() {});
                                 }
@@ -546,7 +549,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               hint: "Department",
                               onChanged: (v) {},
                               onSaved: (value) {
-                                department = value!;
+                                if (value == null) return;
+                                department = value;
                               },
                               items: depatmentlist,
                               value: department,
@@ -565,7 +569,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               width: inputWidth,
                               hint: "Designation",
                               onSaved: (value) {
-                                designation = value!;
+                                if (value == null) return;
+                                designation = value;
                               },
                               items: designationlist,
                               validator: (value) {
@@ -583,7 +588,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               width: inputWidth,
                               hint: "Facility",
                               onSaved: (value) {
-                                facility = value!;
+                                if (value == null) return;
+                                facility = value;
                               },
                               items: facilitylist,
                               validator: (value) {
@@ -613,7 +619,8 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                               width: inputWidth,
                               hint: "Eligibilty",
                               onSaved: (value) {
-                                eligibility = value!;
+                                if (value == null) return;
+                                eligibility = value;
                               },
                               onChanged: (value) {},
                               items: const [
@@ -623,12 +630,6 @@ class _EmployeeAddFormState extends State<EmployeeAddForm> {
                                     value: "Non - Eligible",
                                     child: Text("Non - Eligible")),
                               ],
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Gender Cannot be Empty";
-                                }
-                                return null;
-                              },
                             ),
                             Padding(
                               padding: const EdgeInsets.only(top: 15),

@@ -1,4 +1,7 @@
 import json
+import os
+
+from django.shortcuts import render
 
 from vacci_track_backend_app.models import (
     Department,
@@ -21,7 +24,7 @@ from vacci_track_backend_app.serializers import (
 )
 from vacci_track_backend_app.helper import Helper
 from django.middleware import csrf
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -142,10 +145,15 @@ def get_prefix(request):
         genders = [{"gender": row[0]} for row in genders if row[0]]
     except:
         genders = [
-            {"gender": "Mr."},
-            {"gender": "Ms."},
-            {"gender": "Mrs."},
+            {"gender": "Ms"},
+            {"gender": "Master"},
             {"gender": "Dr"},
+            {"gender": "General"},
+            {"gender": "Ms."},
+            {"gender": "Dr."},
+            {"gender": "Mr."},
+            {"gender": "Mr"},
+            {"gender": "Mrs."},
         ]
     return Response(genders, status=200)
 
@@ -544,15 +552,28 @@ def get_vaccine_records(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_report(request):
-    # try:
-    excel_file_path, filename = Helper().generate_excel(request.query_params)
-    response = HttpResponse(
-        open(excel_file_path, "rb"),
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
-    response["Content-Disposition"] = f"attachment; filename={filename}"
-    response[
-        "Access-Control-Expose-Headers"
-    ] = "Content-Disposition"  # Add this for CORS
-    return response
-    response = FileResponse(open(excel_file_path, "rb"))
+    try:
+        excel_file_path, filename = Helper().generate_excel(request.query_params)
+        response = HttpResponse(
+            open(excel_file_path, "rb"),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        response[
+            "Access-Control-Expose-Headers"
+        ] = "Content-Disposition"  # Add this for CORS
+        return response
+        # response = FileResponse(open(excel_file_path, "rb"))
+    except Exception as e:
+        return Response(
+            [[{"error": f"Error has Occurred. Error :  {e}"}], 0], status=405
+        )
+
+
+def home(request):
+    # from dotenv import load_dotenv
+    # # # env_path = f"{Path(__file__).resolve().parent.parent.parent}/.env"
+    # load_dotenv()
+
+    context = {"SERVE_FLUTTER_ON": os.environ.get("SERVE_FLUTTER_ON")}
+    return render(request, "vacci_track_backend_app/index.html", context)

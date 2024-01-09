@@ -545,7 +545,8 @@ They can be reached at extension 33333."""
                                     disabledHint: const Text(
                                         "No Vaccination Has Been Assigned"),
                                     onSaved: (value) {
-                                      vaccine = value!;
+                                      if (value == null) return;
+                                      vaccine = value;
                                     },
                                     onChanged: (value) async {
                                       softFormReset();
@@ -577,7 +578,8 @@ They can be reached at extension 33333."""
                                             doseList == null ? true : false),
                                     disabledHint: const Text("Select Dose"),
                                     onSaved: (value) {
-                                      dose = value!;
+                                      if (value == null) return;
+                                      dose = value;
                                     },
                                     onChanged: (value) async {
                                       dose = value!;

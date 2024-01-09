@@ -1,11 +1,10 @@
 djangorestframework
 Django
-cx_oracle
+oracledb
 psycopg2
+xlsxwriter
 django-cors-headers
 djangorestframework-simplejwt
 sqlalchemy
-pandas
-xlsxwriter
-# uwsgi
+uwsgi
 # python-dotenv

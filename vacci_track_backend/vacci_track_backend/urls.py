@@ -1,3 +1,5 @@
+import vacci_track_backend_app.views
+
 """
 URL configuration for vacci_track_backend project.
 
@@ -18,7 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    path("", vacci_track_backend_app.views.home, name="home"),
     path("api/", include("vacci_track_backend_app.urls")),
     path("admin/", admin.site.urls),
 ]
-
