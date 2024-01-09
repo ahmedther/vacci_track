@@ -14,10 +14,10 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
-# # env_path = f"{Path(__file__).resolve().parent.parent.parent}/.env"
-# load_dotenv('django.env')
+# env_path = f"{Path(__file__).resolve().parent.parent.parent}/.env"
+load_dotenv('django.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
