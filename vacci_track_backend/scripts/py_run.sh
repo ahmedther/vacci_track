@@ -17,7 +17,7 @@ while true; do
 done
 
 # Add cron job to remove files at 4:45 AM every night and log the output
-(crontab -l 2>/dev/null; echo "45 4 * * * rm -rf /vacci_track_backend/excel_media/* > /var/log/cron.log 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "50 4 * * * rm -rf /vacci_track_backend/excel_media/* > /var/log/cron.log 2>&1") | crontab -
 
 # Start Cron service
 cron
