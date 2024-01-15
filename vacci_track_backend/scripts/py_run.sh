@@ -16,12 +16,11 @@ while true; do
   sleep 1
 done
 
-# Add cron job to remove files at 2:00 AM every night
-(crontab -l 2>/dev/null; echo "* * * * * rm -rf /vacci_track_backend/excel_media/*") | crontab -
+# Add cron job to remove files at 4:45 AM every night and log the output
+(crontab -l 2>/dev/null; echo "45 4 * * * rm -rf /vacci_track_backend/excel_media/* > /var/log/cron.log 2>&1") | crontab -
 
-#Start Cron service
+# Start Cron service
 cron
-
 # Start uWSGI
 uwsgi --ini /vacci_track_backend/uwsgi/uwsgi.ini
 
